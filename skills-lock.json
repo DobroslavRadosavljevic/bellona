@@ -5,7 +5,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/agents-md/SKILL.md",
-      "computedHash": "15c536d29e8728ca47a91960232c31c5a8adeb60a2a49750933b380631512bdf"
+      "computedHash": "e9d83332fc469c517781cc97befb57fc172fac80ae157123f86e4a5eeacbc9c2"
     },
     "base-ui": {
       "source": "DobroslavRadosavljevic/skills",
@@ -43,11 +43,23 @@
       "skillPath": "skills/clickhouse/SKILL.md",
       "computedHash": "652c91ce0e887301b9e2b6dad1530caaa9911f537154d4204216256b1a169804"
     },
+    "clone-to-temp": {
+      "source": "DobroslavRadosavljevic/skills",
+      "sourceType": "github",
+      "skillPath": "skills/clone-to-temp/SKILL.md",
+      "computedHash": "4e2c55d5fa1026436aff3f35d10479be8fb69f63cd74d1c5a48506863f23a136"
+    },
     "compound-ui": {
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/compound-ui/SKILL.md",
       "computedHash": "dc3b87c8097d59e6e072a011a91e6e9ac7845f053767addcb310b3855183c35b"
+    },
+    "copywriting": {
+      "source": "DobroslavRadosavljevic/skills",
+      "sourceType": "github",
+      "skillPath": "skills/copywriting/SKILL.md",
+      "computedHash": "7d5af733cbcec6a7b9a22c9236dbd0c7c125bd4f3931a2d1956724beb386d439"
     },
     "create-durable-plan": {
       "source": "DobroslavRadosavljevic/skills",
@@ -101,7 +113,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/effect/SKILL.md",
-      "computedHash": "a13b7fbe22f9ad3f0493b6d3463cb113f32f77fe5aaf81a3152a6f39ac2eb28f"
+      "computedHash": "d56f585d57ac897a81d7fae4f6bd93d92f32aa23a247c229dce1ea4d18c07d14"
     },
     "elysia": {
       "source": "DobroslavRadosavljevic/skills",
@@ -131,7 +143,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/grok/SKILL.md",
-      "computedHash": "caa630c9942be3dfd04a55eb91f8c3178d856cf29019230cc0c77d68f525b36c"
+      "computedHash": "7a71a99c2277188712d9f28c6fe6e44e9c8528b4d0fe468b513fa11c8a3fff92"
     },
     "handoff": {
       "source": "DobroslavRadosavljevic/skills",
@@ -156,6 +168,12 @@
       "sourceType": "github",
       "skillPath": "skills/intlayer/SKILL.md",
       "computedHash": "7be3b6bc8ecf1fbc23582865a44cd218a95d776162f468241769740a29ccf1f3"
+    },
+    "is-bot": {
+      "source": "DobroslavRadosavljevic/skills",
+      "sourceType": "github",
+      "skillPath": "skills/is-bot/SKILL.md",
+      "computedHash": "e3a851847f0b93ba8564bdabd72d7105a06a07b4a3bbf6371b8b4bf1e41800a8"
     },
     "jsdoc": {
       "source": "DobroslavRadosavljevic/skills",
@@ -203,7 +221,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/motion/SKILL.md",
-      "computedHash": "43aed94af64192e2aaf6b3db7440f7491c6d66224f42b9380ace2563735d45a2"
+      "computedHash": "728f67045c184132c3944b89cfcb2dffcb23c2f8f478aa6bb411fb2625e9c949"
     },
     "oxfmt": {
       "source": "DobroslavRadosavljevic/skills",
@@ -227,7 +245,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/plain-language/SKILL.md",
-      "computedHash": "6e30576a2ba57334bd7a0aa45e39055ac1ea6cc9c989f03c306d8afed8431abc"
+      "computedHash": "a9e53ddef17ececcc98806fb895b515f9eef35eced38c01d6215335fcdd56995"
     },
     "playwright": {
       "source": "DobroslavRadosavljevic/skills",
@@ -347,7 +365,7 @@
       "source": "DobroslavRadosavljevic/skills",
       "sourceType": "github",
       "skillPath": "skills/tanstack-charts/SKILL.md",
-      "computedHash": "c33a1a845d4ae2d1f77abf3672e0226eee97130fd892bba0a7538cf4d3e49e4f"
+      "computedHash": "c9f48655141504be6dd2143341a9c8bf5ef1f3fe7dd04b53f0671bd6b440b9fa"
     },
     "tanstack-form": {
       "source": "DobroslavRadosavljevic/skills",
@@ -420,6 +438,12 @@
       "sourceType": "github",
       "skillPath": "skills/turborepo-architecture/SKILL.md",
       "computedHash": "83a924e8e120e52d1f9f3a1d1ed591c886e0162f0ea3ae248a578ec7aff06217"
+    },
+    "ua-parser": {
+      "source": "DobroslavRadosavljevic/skills",
+      "sourceType": "github",
+      "skillPath": "skills/ua-parser/SKILL.md",
+      "computedHash": "718bc6bf9b4f181984a1024a3e3fc40bfeb161bc87c2ea622997bb6baed99c3b"
     },
     "ultra-review": {
       "source": "DobroslavRadosavljevic/skills",
