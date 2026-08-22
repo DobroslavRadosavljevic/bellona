@@ -96,6 +96,8 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
+    "login": "npm login --auth-type=web --registry=https://registry.npmjs.org/",
+    "whoami": "npm whoami --registry=https://registry.npmjs.org/",
     "pack:lint": "publint --strict",
     "pack:dry": "bun publish --dry-run",
     "prepublishOnly": "bun run check",
