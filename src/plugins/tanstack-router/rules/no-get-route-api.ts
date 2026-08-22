@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { isJsString } from '../../../lib/js-kind.ts';
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -62,7 +63,7 @@ export const noGetRouteApi: CreateOnceRule = defineVamanaRule({
       },
       ImportDeclaration(node) {
         const source = node.source.value;
-        if (typeof source !== 'string' || !ROUTER_MODULE_SET.has(source)) {
+        if (!isJsString(source) || !ROUTER_MODULE_SET.has(source)) {
           return;
         }
         for (const specifier of node.specifiers) {

@@ -14,10 +14,7 @@ import { noObjectParameters, noObjectParametersName } from './rules/no-object-pa
 import { noReflectApply, noReflectApplyName } from './rules/no-reflect-apply.ts';
 import { noReflectGet, noReflectGetName } from './rules/no-reflect-get.ts';
 import { noRuntimeTypeof, noRuntimeTypeofName } from './rules/no-runtime-typeof.ts';
-import {
-  noShapeInSymbolNames,
-  noShapeInSymbolNamesName,
-} from './rules/no-shape-in-symbol-names.ts';
+import { forbiddenTermInNames, forbiddenTermInNamesId } from './rules/no-shape-in-symbol-names.ts';
 import { noUnknownParameters, noUnknownParametersName } from './rules/no-unknown-parameters.ts';
 import { noUnknownReturns, noUnknownReturnsName } from './rules/no-unknown-returns.ts';
 import { noUnknownTypeAliases, noUnknownTypeAliasesName } from './rules/no-unknown-type-aliases.ts';
@@ -41,7 +38,7 @@ const js = defineVamanaPlugin('js', {
   [noReflectApplyName]: noReflectApply,
   [noReflectGetName]: noReflectGet,
   [noRuntimeTypeofName]: noRuntimeTypeof,
-  [noShapeInSymbolNamesName]: noShapeInSymbolNames,
+  [forbiddenTermInNamesId]: forbiddenTermInNames,
   [noUnknownParametersName]: noUnknownParameters,
   [noUnknownReturnsName]: noUnknownReturns,
   [noUnknownTypeAliasesName]: noUnknownTypeAliases,
@@ -70,8 +67,8 @@ export {
   noReflectGetName,
   noRuntimeTypeof,
   noRuntimeTypeofName,
-  noShapeInSymbolNames,
-  noShapeInSymbolNamesName,
+  forbiddenTermInNames,
+  forbiddenTermInNamesId,
   noUnknownParameters,
   noUnknownParametersName,
   noUnknownReturns,

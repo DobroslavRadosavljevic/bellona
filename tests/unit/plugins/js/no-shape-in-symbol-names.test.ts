@@ -1,10 +1,10 @@
-import { noShapeInSymbolNamesName } from '../../../../src/plugins/js/rules/no-shape-in-symbol-names.ts';
+import { forbiddenTermInNamesId } from '../../../../src/plugins/js/rules/no-shape-in-symbol-names.ts';
 import { error, invalidWith, validWith } from '../../lib/cases.ts';
 import { runJsRule } from './harness.ts';
 
 const forbidden = error('forbiddenSymbolName');
 
-runJsRule(noShapeInSymbolNamesName, {
+runJsRule(forbiddenTermInNamesId, {
   valid: [
     validWith('const user = { id: "one" };', { name: 'plain identifier' }),
     validWith('interface User { readonly id: string }', { name: 'interface without term' }),

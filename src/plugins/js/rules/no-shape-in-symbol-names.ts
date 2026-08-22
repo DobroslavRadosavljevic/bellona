@@ -14,9 +14,9 @@ function containsForbiddenTerm(name: string, term: string, caseSensitive: boolea
 }
 
 /** Ban a configurable substring (default `shape`) in JavaScript and TypeScript symbol names. */
-export const noShapeInSymbolNamesName = vmRuleName('no-shape-in-symbol-names');
+export const forbiddenTermInNamesId = vmRuleName('no-shape-in-symbol-names');
 
-export const noShapeInSymbolNames: CreateOnceRule = defineVamanaRule({
+export const forbiddenTermInNames: CreateOnceRule = defineVamanaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,5 +1,13 @@
 import { defineConfig } from 'oxlint';
 
+import js from './src/plugins/js/index.ts';
+
+const jsPluginSpecifier = './src/plugins/js/index.ts';
+
+const jsRules = Object.fromEntries(
+  Object.keys(js.rules).map((ruleName) => [`${js.meta.name}/${ruleName}`, 'error' as const]),
+);
+
 export default defineConfig({
   plugins: ['eslint', 'typescript', 'unicorn', 'oxc', 'node', 'import'],
   categories: {
@@ -8,6 +16,8 @@ export default defineConfig({
   },
   env: { node: true },
   ignorePatterns: ['dist/**', 'coverage/**', '.agents/**', '.claude/**', 'agent/**'],
+  jsPlugins: [jsPluginSpecifier],
+  rules: jsRules,
   overrides: [
     {
       files: ['**/*.{test,spec}.ts', 'tests/**'],

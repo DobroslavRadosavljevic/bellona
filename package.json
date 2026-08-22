@@ -1,13 +1,17 @@
 {
   "name": "vamana",
   "version": "0.0.0",
-  "description": "Opt-in Oxlint JS plugins for JS/TS and TanStack Router.",
+  "description": "Opt-in Oxlint JS plugins for JS/TS, React, Base UI, Zod, TanStack Router, and Elysia.",
   "keywords": [
+    "base-ui",
+    "elysia",
     "lint",
     "oxc",
     "oxlint",
+    "react",
     "rules",
-    "tanstack-router"
+    "tanstack-router",
+    "zod"
   ],
   "license": "MIT",
   "files": [
@@ -27,10 +31,30 @@
       "import": "./dist/js.js",
       "default": "./dist/js.js"
     },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    },
+    "./base-ui": {
+      "types": "./dist/base-ui.d.ts",
+      "import": "./dist/base-ui.js",
+      "default": "./dist/base-ui.js"
+    },
+    "./zod": {
+      "types": "./dist/zod.d.ts",
+      "import": "./dist/zod.js",
+      "default": "./dist/zod.js"
+    },
     "./tanstack-router": {
       "types": "./dist/tanstack-router.d.ts",
       "import": "./dist/tanstack-router.js",
       "default": "./dist/tanstack-router.js"
+    },
+    "./elysia": {
+      "types": "./dist/elysia.d.ts",
+      "import": "./dist/elysia.js",
+      "default": "./dist/elysia.js"
     },
     "./package.json": "./package.json"
   },
@@ -42,8 +66,8 @@
     "test:coverage": "vitest run --coverage",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit",
     "check": "oxfmt --check && oxlint && tsc --noEmit && vitest run && tsdown"
   },

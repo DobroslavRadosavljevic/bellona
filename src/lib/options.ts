@@ -1,22 +1,27 @@
 import type { Context } from '@oxlint/plugins';
 
+import {
+  isJsBoolean,
+  isJsNumber,
+  isJsPlainObject,
+  isJsString,
+  type JsonObject,
+} from './js-kind.ts';
+
 /**
  * Read a JSON object option for this file. Call from visitors/`before`, not from
  * the `createOnce` closure — that callback runs once for the process.
  */
-export function objectOptionAt(
-  context: Context,
-  index: number,
-): Record<string, unknown> | undefined {
+export function objectOptionAt(context: Context, index: number): JsonObject | undefined {
   const value = context.options[index];
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+  if (!isJsPlainObject(value)) {
     return undefined;
   }
   return value;
 }
 
 export function integerField(
-  object: Record<string, unknown> | undefined,
+  object: JsonObject | undefined,
   key: string,
   fallback: number,
 ): number {
@@ -24,23 +29,22 @@ export function integerField(
     return fallback;
   }
   const value = object[key];
-  return typeof value === 'number' && Number.isInteger(value) ? value : fallback;
+  if (isJsNumber(value) && Number.isInteger(value)) {
+    return value;
+  }
+  return fallback;
 }
 
-export function stringField(
-  object: Record<string, unknown> | undefined,
-  key: string,
-  fallback: string,
-): string {
+export function stringField(object: JsonObject | undefined, key: string, fallback: string): string {
   if (object === undefined) {
     return fallback;
   }
   const value = object[key];
-  return typeof value === 'string' ? value : fallback;
+  return isJsString(value) ? value : fallback;
 }
 
 export function stringListField(
-  object: Record<string, unknown> | undefined,
+  object: JsonObject | undefined,
   key: string,
   fallback: readonly string[],
 ): readonly string[] {
@@ -53,7 +57,7 @@ export function stringListField(
   }
   const strings: string[] = [];
   for (const item of value) {
-    if (typeof item === 'string') {
+    if (isJsString(item)) {
       strings.push(item);
     }
   }
@@ -61,7 +65,7 @@ export function stringListField(
 }
 
 export function booleanField(
-  object: Record<string, unknown> | undefined,
+  object: JsonObject | undefined,
   key: string,
   fallback: boolean,
 ): boolean {
@@ -69,5 +73,36 @@ export function booleanField(
     return fallback;
   }
   const value = object[key];
-  return typeof value === 'boolean' ? value : fallback;
+  return isJsBoolean(value) ? value : fallback;
+}
+
+export interface NamedImportHint {
+  component: string;
+  from: string;
+}
+
+/** Read `{ tag: { component, from } }` maps from a JSON object option field. */
+export function namedImportHintMap(
+  object: JsonObject | undefined,
+  key: string,
+): ReadonlyMap<string, NamedImportHint> {
+  const hints = new Map<string, NamedImportHint>();
+  if (object === undefined) {
+    return hints;
+  }
+  const value = object[key];
+  if (!isJsPlainObject(value)) {
+    return hints;
+  }
+  for (const [tag, hint] of Object.entries(value)) {
+    if (!isJsPlainObject(hint)) {
+      continue;
+    }
+    const component = hint['component'];
+    const from = hint['from'];
+    if (isJsString(component) && isJsString(from)) {
+      hints.set(tag.toLowerCase(), { component, from });
+    }
+  }
+  return hints;
 }

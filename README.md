@@ -17,11 +17,22 @@ bun add -D vamana oxlint
 import { defineConfig } from 'oxlint';
 
 export default defineConfig({
-  jsPlugins: ['vamana/js', 'vamana/tanstack-router'],
+  jsPlugins: [
+    'vamana/js',
+    'vamana/react',
+    'vamana/base-ui',
+    'vamana/zod',
+    'vamana/tanstack-router',
+    'vamana/elysia',
+  ],
   rules: {
     'js/vm-max-classes': ['error', { max: 5 }],
+    'react/vm-no-react-namespace': 'error',
+    'base-ui/vm-require-native-button-with-render': 'error',
+    'zod/vm-zod-schema-naming': 'error',
     'tanstack-router/vm-no-dynamic-router-to': 'error',
     'tanstack-router/vm-require-router-hook-from': 'error',
+    'elysia/vm-no-context-param': 'error',
   },
 });
 ```
@@ -31,7 +42,11 @@ Omit a subpath if you do not want that plugin loaded.
 | Subpath                  | Plugin name       | Rules          |
 | ------------------------ | ----------------- | -------------- |
 | `vamana/js`              | `js`              | See list below |
+| `vamana/react`           | `react`           | See list below |
+| `vamana/base-ui`         | `base-ui`         | See list below |
+| `vamana/zod`             | `zod`             | See list below |
 | `vamana/tanstack-router` | `tanstack-router` | See list below |
+| `vamana/elysia`          | `elysia`          | See list below |
 
 `vamana/js` includes `vm-max-classes` and these TypeScript evidence rules:
 
@@ -63,6 +78,29 @@ rules: {
 }
 ```
 
+`vamana/react` rules (`allow` path substrings skip a file; test/spec files are skipped; most rules apply to `.tsx` / `.jsx`):
+
+- `vm-component-file-name-match`
+- `vm-hook-file-name-match`
+- `vm-no-jsx-iife-in-components`
+- `vm-no-jsx-local-constants-in-components`
+- `vm-no-jsx-module-constants`
+- `vm-no-jsx-variable-reassignment-in-components`
+- `vm-no-multi-component-files`
+- `vm-no-multi-hook-files`
+- `vm-no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
+- `vm-no-react-namespace`
+- `vm-no-render-helper-functions-in-components`
+
+`vamana/base-ui` rules:
+
+- `vm-require-native-button-with-render` (`components`, `requireExplicitWhenUnknown`)
+
+`vamana/zod` rules (`allow` path substrings skip a file; test/spec files are skipped):
+
+- `vm-zod-modern-format-validators`
+- `vm-zod-schema-naming`
+
 `vamana/tanstack-router` rules (`allow` path substrings skip a file; test/spec files are skipped):
 
 - `vm-no-dynamic-router-to`
@@ -72,6 +110,24 @@ rules: {
 - `vm-no-router-href`
 - `vm-no-router-type-assertion`
 - `vm-require-router-hook-from`
+
+`vamana/elysia` rules (`allow` path substrings skip a file; test/spec files are skipped; files that do not import `elysia` are skipped except `vm-no-route-factory`):
+
+- `vm-no-context-param`
+- `vm-no-controller-context-class`
+- `vm-no-cookie-undefined-check`
+- `vm-no-functional-plugin-callback`
+- `vm-no-route-factory` (`patterns`; `modules/` or `routes/` only)
+- `vm-one-route-method-per-file` (`routes/` leaf files)
+- `vm-prefer-resolve-for-auth` (`/plugins/` paths)
+- `vm-prefer-status-helper`
+- `vm-prefer-throw-status`
+- `vm-require-error-body-literal`
+- `vm-require-plugin-name` (also skips `/main.ts`, `/server.ts`, `/index.ts`, `/app.ts`)
+- `vm-require-response-schema` (`requireAllRoutes`, default `true`)
+- `vm-require-route-export-name` (`routes/` leaf files)
+- `vm-require-route-schema` (`methods`, default `post`/`put`/`patch`)
+- `vm-routes-index-mount-only` (`routes/index` files)
 
 ## Develop a rule
 

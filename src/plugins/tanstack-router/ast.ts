@@ -1,5 +1,7 @@
 import type { ESTree } from '@oxlint/plugins';
 
+import { isJsNumber, isJsString } from '../../lib/js-kind.ts';
+
 function isTsExpressionWrapper(
   node: ESTree.Node,
 ): node is
@@ -66,10 +68,10 @@ export function getStaticPropertyName(node: ESTree.Node): string | undefined {
     return node.name;
   }
   if (node.type === 'Literal') {
-    if (typeof node.value === 'string') {
+    if (isJsString(node.value)) {
       return node.value;
     }
-    if (typeof node.value === 'number') {
+    if (isJsNumber(node.value)) {
       return String(node.value);
     }
   }

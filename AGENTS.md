@@ -29,7 +29,7 @@ Keep technical names (APIs, files, flags) when they are required. Define a new t
 - Test name: `bunx vitest run path/to/file.test.ts -t "custom max"`
 - Lint: `bun run lint` / `bun run lint:fix`
 - Types: `bun run typecheck`
-- Format: `bun run fmt` / `bun run fmt:check`
+- Format: `bun run format` / `bun run format:check`
 - Build: `bun run build`
 - Gate (matches CI): `bun run check`
 
@@ -46,7 +46,7 @@ Keep technical names (APIs, files, flags) when they are required. Define a new t
 ## Project rules
 
 - New framework/domain coverage = **new plugin folder + package `exports` entry + tsdown `entry`**, not a dump onto an existing plugin. TypeScript evidence rules live on `vamana/js`.
-- Plugin `meta.name` must match the last export segment (`js`, `tanstack-router`) so rule ids are `<name>/vm-<slug>`
+- Plugin `meta.name` must match the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`) so rule ids are `<name>/vm-<slug>`
 - Register rules with `vmRuleName('slug')` (`vm-max-classes`, never a bare `max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure

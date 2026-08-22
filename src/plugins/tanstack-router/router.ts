@@ -1,5 +1,6 @@
 import type { ESTree } from '@oxlint/plugins';
 
+import { isJsString } from '../../lib/js-kind.ts';
 import { getCallName, getStaticPropertyName, unwrapExpression } from './ast.ts';
 
 export const TANSTACK_ROUTER_MODULES = [
@@ -35,7 +36,7 @@ export function programImportsTanstackRouter(program: ESTree.Program): boolean {
       continue;
     }
     const source = statement.source.value;
-    if (typeof source === 'string' && TANSTACK_ROUTER_MODULE_SET.has(source)) {
+    if (isJsString(source) && TANSTACK_ROUTER_MODULE_SET.has(source)) {
       return true;
     }
   }
@@ -50,7 +51,7 @@ export function isStaticRoutePath(node: ESTree.Node | undefined): boolean {
   if (expression === undefined) {
     return false;
   }
-  if (expression.type === 'Literal' && typeof expression.value === 'string') {
+  if (expression.type === 'Literal' && isJsString(expression.value)) {
     return true;
   }
   return expression.type === 'TemplateLiteral' && expression.expressions.length === 0;
@@ -71,7 +72,7 @@ export function getStaticRoutePathValue(node: ESTree.Node | undefined): string |
   if (expression === undefined) {
     return undefined;
   }
-  if (expression.type === 'Literal' && typeof expression.value === 'string') {
+  if (expression.type === 'Literal' && isJsString(expression.value)) {
     return expression.value;
   }
   if (expression.type === 'TemplateLiteral' && expression.expressions.length === 0) {
