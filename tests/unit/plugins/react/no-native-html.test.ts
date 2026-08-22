@@ -74,5 +74,31 @@ runReactRule(noNativeHtmlName, {
       options: [{ tags: ['h1', 'p'] }],
       errors: [error('forbidden')],
     }),
+    invalidWith({
+      code: 'const el = <textarea />;',
+      filename: tsx,
+      errors: [error('forbidden')],
+    }),
+    invalidWith({
+      code: 'const el = <dialog open />;',
+      filename: tsx,
+      errors: [error('forbidden')],
+    }),
+    invalidWith({
+      code: 'const el = <button />;',
+      filename: tsx,
+      options: [
+        {
+          tags: ['button'],
+          replacements: { Button: { component: 'UiButton', from: '@ui/button' } },
+        },
+      ],
+      errors: [
+        {
+          messageId: 'forbiddenFrom',
+          data: { tag: 'button', component: 'UiButton', from: '@ui/button' },
+        },
+      ],
+    }),
   ],
 });

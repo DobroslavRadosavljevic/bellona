@@ -1,9 +1,8 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
-import { isThrowArgument } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
-import { isNamedCall } from '../route.ts';
+import { isNotFoundHandled, isRouterNotFoundCall } from '../route.ts';
 
 export const requireThrowNotFoundName = vmRuleName('require-throw-not-found');
 
@@ -11,11 +10,11 @@ export const requireThrowNotFound: CreateOnceRule = defineVamanaRule({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Require `throw notFound(...)`',
+      description: 'Require `throw notFound(...)` or `notFound({ throw: true })`',
     },
     messages: {
       throwNotFound:
-        'Throw the not-found result: `throw notFound()`. A bare call does not stop the loader or type the route as missing.',
+        'Use `throw notFound()` or `notFound({ throw: true })`. A bare call does not stop the loader or type the route as missing.',
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,
@@ -28,7 +27,7 @@ export const requireThrowNotFound: CreateOnceRule = defineVamanaRule({
         }
       },
       CallExpression(node) {
-        if (!isNamedCall(node, 'notFound') || isThrowArgument(node)) {
+        if (!isRouterNotFoundCall(node) || isNotFoundHandled(node)) {
           return;
         }
         context.report({ messageId: 'throwNotFound', node });

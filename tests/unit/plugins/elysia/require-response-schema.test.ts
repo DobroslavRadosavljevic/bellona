@@ -70,6 +70,27 @@ runElysiaRule(requireResponseSchemaName, {
       languageOptions: ts.languageOptions,
       code: `${elysiaImport}app.get('/', () => 'ok')`,
     },
+    // Guard / group can supply response
+    {
+      ...ts,
+      code: `${elysiaImport}app.guard({ response: t.String() }, (app) => app.get('/', () => 'ok'))`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.group('/v1', { response: { 302: t.Any() } }, (app) =>
+  app.get('/go', ({ redirect }) => redirect('/x'))
+)`,
+    },
+    // HTTP client is not a route
+    {
+      ...ts,
+      code: `${elysiaImport}axios.post('/users', { name: 'x' })`,
+    },
+    // Inline literal handler still needs response under default — supplied
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', 'Hello', { response: t.String() })`,
+    },
   ],
   invalid: [
     // Default requireAllRoutes: every route needs response
@@ -124,6 +145,11 @@ runElysiaRule(requireResponseSchemaName, {
       options: [...requireStatusOnly],
       code: `${elysiaImport}app.get('/go', () => redirect('/x'), { response: { 401: t.Any() } })`,
       errors: [error('missingRedirectStatus')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', 'Hello')`,
+      errors: [error('missingResponse')],
     },
   ],
 });

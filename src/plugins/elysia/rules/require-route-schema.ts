@@ -4,13 +4,12 @@ import { objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
 import {
   DEFAULT_SCHEMA_REQUIRED_METHODS,
-  getEnclosingElysiaGuardHook,
   getElysiaRouteHandler,
-  getElysiaRouteHookObject,
   getElysiaRouteMethod,
   getElysiaRoutePath,
   getHandlerDestructuredPropNames,
-  routeHookHasSchema,
+  isElysiaStyleRouteCall,
+  routeOrGuardHasSchema,
   routeOrGuardHasSchemaKey,
   routePathHasParams,
 } from '../elysia.ts';
@@ -40,6 +39,9 @@ export const requireRouteSchema: CreateOnceRule = defineVamanaRule({
         }
       },
       CallExpression(node) {
+        if (!isElysiaStyleRouteCall(node)) {
+          return;
+        }
         const method = getElysiaRouteMethod(node);
         if (!method) {
           return;
@@ -72,15 +74,31 @@ export const requireRouteSchema: CreateOnceRule = defineVamanaRule({
             node,
           });
         }
+        if (destructured.has('headers') && !routeOrGuardHasSchemaKey(node, 'headers')) {
+          context.report({
+            messageId: 'missingHeaders',
+            data: { method },
+            node,
+          });
+        }
+        if (destructured.has('cookie') && !routeOrGuardHasSchemaKey(node, 'cookie')) {
+          context.report({
+            messageId: 'missingCookie',
+            data: { method },
+            node,
+          });
+        }
 
-        if (!methods.has(method)) {
-          return;
+        const hasAnySchema = routeOrGuardHasSchema(node);
+        if (destructured.has('body') && !routeOrGuardHasSchemaKey(node, 'body') && hasAnySchema) {
+          context.report({
+            messageId: 'missingBody',
+            data: { method },
+            node,
+          });
         }
-        const hook = getElysiaRouteHookObject(node);
-        if (routeHookHasSchema(hook)) {
-          return;
-        }
-        if (routeHookHasSchema(getEnclosingElysiaGuardHook(node))) {
+
+        if (!methods.has(method) || hasAnySchema) {
           return;
         }
         context.report({
@@ -103,6 +121,12 @@ export const requireRouteSchema: CreateOnceRule = defineVamanaRule({
         'Elysia `.{{method}}()` should declare a `params` schema (path has `:param` and/or handler destructures `params`).',
       missingQuery:
         'Elysia `.{{method}}()` should declare a `query` schema (handler destructures `query`).',
+      missingHeaders:
+        'Elysia `.{{method}}()` should declare a `headers` schema (handler destructures `headers`).',
+      missingCookie:
+        'Elysia `.{{method}}()` should declare a `cookie` schema (handler destructures `cookie`).',
+      missingBody:
+        'Elysia `.{{method}}()` should declare a `body` schema (handler destructures `body`).',
     },
     schema: [
       {

@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
-import { isFunctionLike } from '../ast.ts';
+import { getExportedExpressionName, unwrapComponentInit } from '../ast.ts';
 import { basenameWithoutExtension, isPrimaryComponentName, kebabToPascal } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
@@ -45,7 +45,11 @@ export const componentFileNameMatch: CreateOnceRule = defineVamanaRule({
         if (shouldSkipJsxFile(context)) {
           return false;
         }
-        expected = kebabToPascal(basenameWithoutExtension(context.filename));
+        const basename = basenameWithoutExtension(context.filename);
+        if (basename.length === 0 || basename.toLowerCase() === 'index') {
+          return false;
+        }
+        expected = kebabToPascal(basename);
         if (expected.length === 0) {
           return false;
         }
@@ -59,7 +63,7 @@ export const componentFileNameMatch: CreateOnceRule = defineVamanaRule({
 
         if (declaration?.type === 'VariableDeclaration') {
           for (const declarator of declaration.declarations) {
-            if (!isFunctionLike(declarator.init)) {
+            if (unwrapComponentInit(declarator.init) === undefined) {
               continue;
             }
             if (declarator.id.type === 'Identifier') {
@@ -72,7 +76,13 @@ export const componentFileNameMatch: CreateOnceRule = defineVamanaRule({
         const { declaration } = node;
         if (declaration.type === 'FunctionDeclaration') {
           checkPrimary(declaration.id ?? declaration, declaration.id?.name);
+          return;
         }
+        if (declaration.type === 'ClassDeclaration') {
+          return;
+        }
+        const name = getExportedExpressionName(declaration);
+        checkPrimary(declaration, name);
       },
     };
   },

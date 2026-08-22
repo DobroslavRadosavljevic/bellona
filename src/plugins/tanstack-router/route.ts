@@ -1,7 +1,16 @@
 import type { ESTree } from '@oxlint/plugins';
 
-import { getCallName, getStaticPropertyName, isFunctionLike, unwrapExpression } from './ast.ts';
-import { getObjectPropValue, objectHasOwnProperty } from './router.ts';
+import { isAstNode } from '../../lib/ast-node.ts';
+import { isJsString } from '../../lib/js-kind.ts';
+import {
+  getCallName,
+  getStaticPropertyName,
+  isFunctionLike,
+  isReturnArgument,
+  isThrowArgument,
+  unwrapExpression,
+} from './ast.ts';
+import { getObjectPropValue, getStaticRoutePathValue, objectHasOwnProperty } from './router.ts';
 
 export const CREATE_ROUTE_DIRECT = new Set(['createRootRoute', 'createRoute']);
 
@@ -33,19 +42,74 @@ export function isNamedCall(node: ESTree.CallExpression, name: string): boolean 
 
 export function isHookCall(node: ESTree.CallExpression): boolean {
   const leaf = callLeafName(node);
+  if (leaf === 'use') {
+    const callee = unwrapExpression(node.callee);
+    if (callee?.type === 'Identifier') {
+      return callee.name === 'use';
+    }
+    if (callee?.type === 'MemberExpression') {
+      const object = unwrapExpression(callee.object);
+      return object?.type === 'Identifier' && object.name === 'React';
+    }
+    return false;
+  }
   return leaf !== undefined && /^use[A-Z]/u.test(leaf);
 }
 
-export function getCreateRouteOptions(
-  node: ESTree.CallExpression,
-): { functionName: string; options: ESTree.ObjectExpression } | undefined {
+const REDIRECT_OBJECTS = new Set(['Route', 'route']);
+
+export function isRouterRedirectCall(node: ESTree.CallExpression): boolean {
+  const callee = unwrapExpression(node.callee);
+  if (callee?.type === 'Identifier') {
+    return callee.name === 'redirect';
+  }
+  if (callee?.type !== 'MemberExpression') {
+    return false;
+  }
+  if (getStaticPropertyName(callee.property) !== 'redirect') {
+    return false;
+  }
+  const object = unwrapExpression(callee.object);
+  return object?.type === 'Identifier' && REDIRECT_OBJECTS.has(object.name);
+}
+
+export function isRouterNotFoundCall(node: ESTree.CallExpression): boolean {
+  const callee = unwrapExpression(node.callee);
+  return callee?.type === 'Identifier' && callee.name === 'notFound';
+}
+
+export function callHasThrowTrue(node: ESTree.CallExpression): boolean {
+  const first = node.arguments[0];
+  if (first === undefined || first.type === 'SpreadElement') {
+    return false;
+  }
+  const throwValue = getObjectPropValue(first, 'throw');
+  const unwrapped = unwrapExpression(throwValue);
+  return unwrapped?.type === 'Literal' && unwrapped.value === true;
+}
+
+export function isRedirectHandled(node: ESTree.CallExpression): boolean {
+  return isThrowArgument(node) || isReturnArgument(node) || callHasThrowTrue(node);
+}
+
+export function isNotFoundHandled(node: ESTree.CallExpression): boolean {
+  return isThrowArgument(node) || callHasThrowTrue(node);
+}
+
+export type CreatedRoute = {
+  functionName: string;
+  options: ESTree.ObjectExpression;
+  routePath: string | undefined;
+};
+
+export function getCreateRouteOptions(node: ESTree.CallExpression): CreatedRoute | undefined {
   const callee = unwrapExpression(node.callee);
   if (callee?.type !== 'Identifier') {
     return undefined;
   }
   const functionName = callee.name;
   if (CREATE_ROUTE_DIRECT.has(functionName)) {
-    return optionsFromArgs(functionName, node.arguments);
+    return optionsFromArgs(functionName, node.arguments, undefined);
   }
   if (!CREATE_ROUTE_INDIRECT.has(functionName)) {
     return undefined;
@@ -54,13 +118,15 @@ export function getCreateRouteOptions(
   if (parent?.type !== 'CallExpression' || unwrapExpression(parent.callee) !== node) {
     return undefined;
   }
-  return optionsFromArgs(functionName, parent.arguments);
+  const factoryPath = getStaticRoutePathValue(node.arguments[0]);
+  return optionsFromArgs(functionName, parent.arguments, factoryPath);
 }
 
 function optionsFromArgs(
   functionName: string,
   args: ESTree.CallExpression['arguments'],
-): { functionName: string; options: ESTree.ObjectExpression } | undefined {
+  factoryPath: string | undefined,
+): CreatedRoute | undefined {
   const first = args[0];
   if (first === undefined || first.type === 'SpreadElement') {
     return undefined;
@@ -69,7 +135,16 @@ function optionsFromArgs(
   if (options?.type !== 'ObjectExpression') {
     return undefined;
   }
-  return { functionName, options };
+  const optionPath = getStaticRoutePathValue(getObjectPropValue(options, 'path'));
+  return { functionName, options, routePath: factoryPath ?? optionPath };
+}
+
+export function getCallFromPath(node: ESTree.CallExpression): string | undefined {
+  const first = node.arguments[0];
+  if (first === undefined || first.type === 'SpreadElement') {
+    return undefined;
+  }
+  return getStaticRoutePathValue(getObjectPropValue(first, 'from'));
 }
 
 export function routeHasValidateSearch(options: ESTree.ObjectExpression): boolean {
@@ -99,11 +174,7 @@ function propertyNameOfFunction(fn: ESTree.Node): string | undefined {
   return undefined;
 }
 
-export function isInsideLoaderFunction(node: ESTree.Node): boolean {
-  const fn = enclosingFunction(node);
-  if (fn === undefined) {
-    return false;
-  }
+function functionIsLoaderOrHandler(fn: ESTree.Node): boolean {
   const name = propertyNameOfFunction(fn);
   if (name === LOADER_PROP) {
     return true;
@@ -123,6 +194,17 @@ export function isInsideLoaderFunction(node: ESTree.Node): boolean {
   return (
     loaderProperty?.type === 'Property' && getStaticPropertyName(loaderProperty.key) === LOADER_PROP
   );
+}
+
+export function isInsideLoaderFunction(node: ESTree.Node): boolean {
+  let current = parentOf(node);
+  while (current !== undefined) {
+    if (isFunctionLike(current) && functionIsLoaderOrHandler(current)) {
+      return true;
+    }
+    current = parentOf(current);
+  }
+  return false;
 }
 
 export function isInsideRouteLifecycle(node: ESTree.Node): boolean {
@@ -150,6 +232,9 @@ function isSearchRead(node: ESTree.Node): boolean {
   if (parent.type === 'MemberExpression' && parent.computed && parent.property === node) {
     return false;
   }
+  if (parent.type === 'MemberExpression' && parent.object === node) {
+    return false;
+  }
   if (
     parent.type === 'Property' &&
     parent.key === node &&
@@ -160,53 +245,63 @@ function isSearchRead(node: ESTree.Node): boolean {
   return false;
 }
 
-export function isSearchIdentifierInLoader(node: ESTree.Node): boolean {
-  return isSearchRead(node) && isInsideLoaderFunction(node);
-}
-
-export function loaderDepsReadsSearch(options: ESTree.ObjectExpression): boolean {
-  const loaderDeps = getObjectPropValue(options, 'loaderDeps');
-  if (loaderDeps === undefined) {
+function isComputedSearchMember(node: ESTree.Node): boolean {
+  if (node.type !== 'MemberExpression' || !node.computed) {
     return false;
   }
-  const fn = unwrapExpression(loaderDeps);
+  const property = unwrapExpression(node.property);
+  return property?.type === 'Literal' && isJsString(property.value) && property.value === 'search';
+}
+
+export function isSearchAccess(node: ESTree.Node): boolean {
+  return isSearchRead(node) || isComputedSearchMember(node);
+}
+
+export function isSearchAccessInLoader(node: ESTree.Node): boolean {
+  return isSearchAccess(node) && isInsideLoaderFunction(node);
+}
+
+function subtreeReadsSearch(node: ESTree.Node): boolean {
+  if (isSearchAccess(node)) {
+    return true;
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'parent') {
+      continue;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (isAstNode(item) && subtreeReadsSearch(item)) {
+          return true;
+        }
+      }
+      continue;
+    }
+    if (isAstNode(value) && subtreeReadsSearch(value)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function routeOptionFunctionReadsSearch(options: ESTree.ObjectExpression, name: string): boolean {
+  const value = getObjectPropValue(options, name);
+  if (value === undefined) {
+    return false;
+  }
+  const fn = unwrapExpression(value);
   if (fn === undefined || !isFunctionLike(fn)) {
     return false;
   }
-  return functionParamOrBodyReadsSearch(fn);
+  return subtreeReadsSearch(fn);
 }
 
-function functionParamOrBodyReadsSearch(
-  fn: ESTree.Function | ESTree.ArrowFunctionExpression,
-): boolean {
-  for (const param of fn.params) {
-    if (objectPatternHasSearch(param)) {
-      return true;
-    }
-  }
-  return false;
+export function loaderDepsReadsSearch(options: ESTree.ObjectExpression): boolean {
+  return routeOptionFunctionReadsSearch(options, 'loaderDeps');
 }
 
-function objectPatternHasSearch(node: ESTree.Node): boolean {
-  if (node.type === 'AssignmentPattern') {
-    return objectPatternHasSearch(node.left);
-  }
-  if (node.type !== 'ObjectPattern') {
-    return false;
-  }
-  for (const property of node.properties) {
-    if (property.type === 'RestElement') {
-      continue;
-    }
-    const keyName = getStaticPropertyName(property.key);
-    if (keyName === 'search') {
-      return true;
-    }
-    if (property.value.type === 'ObjectPattern' && objectPatternHasSearch(property.value)) {
-      return true;
-    }
-  }
-  return false;
+export function beforeLoadReadsSearch(options: ESTree.ObjectExpression): boolean {
+  return routeOptionFunctionReadsSearch(options, 'beforeLoad');
 }
 
 export function pathHasParamToken(value: string): boolean {

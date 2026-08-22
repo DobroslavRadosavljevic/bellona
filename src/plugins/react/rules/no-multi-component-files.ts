@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
-import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
+import { isModuleLevelDeclaration, unwrapComponentInit } from '../ast.ts';
 import { isPrimaryComponentName } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
@@ -48,7 +48,7 @@ export const noMultiComponentFiles: CreateOnceRule = defineVamanaRule({
       },
       VariableDeclarator(node) {
         if (
-          !isFunctionLike(node.init) ||
+          unwrapComponentInit(node.init) === undefined ||
           !isModuleLevelDeclaration(node) ||
           node.id.type !== 'Identifier'
         ) {

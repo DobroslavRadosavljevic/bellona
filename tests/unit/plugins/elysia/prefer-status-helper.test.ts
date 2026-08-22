@@ -20,6 +20,14 @@ runElysiaRule(preferStatusHelperName, {
       ...ts,
       code: `${elysiaImport}app.onBeforeHandle(() => status(401))`,
     },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ status }) => status(418, 'teapot'))`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}function log(error: (code: number) => void) { error(400) }`,
+    },
   ],
   invalid: [
     {
@@ -38,6 +46,16 @@ runElysiaRule(preferStatusHelperName, {
       ...ts,
       code: `${elysiaImport}app.get('/', () => 'ok', { beforeHandle: ({ set }) => { set.status = 401 } })`,
       errors: [error('preferStatus')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ error }) => error(418, 'teapot'))`,
+      errors: [error('preferStatusOverError')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', () => 'ok', { beforeHandle: ({ error }) => error(401) })`,
+      errors: [error('preferStatusOverError')],
     },
   ],
 });

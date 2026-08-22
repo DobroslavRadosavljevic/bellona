@@ -36,6 +36,11 @@ runElysiaRule(requireRouteExportNameName, {
       code: `${elysiaImport}export const status = new Elysia({ name: 'status' })`,
       options: [{ allow: ['/routes/status.ts'] }],
     },
+    {
+      ...leaf,
+      code: `${elysiaImport}const app = new Elysia({ name: 'BILLING_STATUS_ROUTE' })
+export const billingStatusRoute = app`,
+    },
   ],
   invalid: [
     {

@@ -112,6 +112,10 @@ export function isThrowArgument(node: ESTree.Node): boolean {
   return outermostExpression(node).parent?.type === 'ThrowStatement';
 }
 
+export function isReturnArgument(node: ESTree.Node): boolean {
+  return outermostExpression(node).parent?.type === 'ReturnStatement';
+}
+
 export function isFunctionLike(
   node: ESTree.Node,
 ): node is ESTree.Function | ESTree.ArrowFunctionExpression {

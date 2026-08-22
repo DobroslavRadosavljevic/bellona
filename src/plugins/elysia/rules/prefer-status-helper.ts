@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
-import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
+import { getCallName, getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
 
@@ -42,15 +42,27 @@ export const preferStatusHelper: CreateOnceRule = defineVamanaRule({
         }
         context.report({ messageId: 'preferStatus', node });
       },
+      CallExpression(node) {
+        if (getCallName(node) !== 'error') {
+          return;
+        }
+        if (!isInsideElysiaHandlerContext(node)) {
+          return;
+        }
+        context.report({ messageId: 'preferStatusOverError', node });
+      },
     };
   },
   meta: {
     docs: {
-      description: 'Prefer status(code, value) over set.status in Elysia handlers',
+      description:
+        'Prefer status(code, value) over set.status or deprecated error() in Elysia handlers',
     },
     messages: {
       preferStatus:
         'Prefer `status(code, value)` over `set.status`. It preserves response typing and Eden narrowing.',
+      preferStatusOverError:
+        'Prefer `status(code, value)` over deprecated `error()`. Elysia 1.3+ renamed context `error` to `status`.',
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

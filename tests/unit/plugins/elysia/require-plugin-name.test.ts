@@ -62,6 +62,11 @@ runElysiaRule(requirePluginNameName, {
       ...ts,
       code: `${elysiaImport}export const auth = new Elysia({ ...opts })`,
     },
+    // seed alone is not a name; this instance is local
+    {
+      ...ts,
+      code: `${elysiaImport}const plugin = (config: object) => new Elysia({ seed: config })`,
+    },
   ],
   invalid: [
     {
@@ -91,6 +96,11 @@ runElysiaRule(requirePluginNameName, {
       filename: 'src/routes/health.ts',
       languageOptions: ts.languageOptions,
       code: `${elysiaImport}export const health = new Elysia()`,
+      errors: [error('missingName')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}export const plugin = new Elysia({ seed: { value: 'x' } })`,
       errors: [error('missingName')],
     },
   ],

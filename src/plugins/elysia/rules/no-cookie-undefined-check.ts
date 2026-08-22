@@ -50,6 +50,18 @@ export const noCookieUndefinedCheck: CreateOnceRule = defineVamanaRule({
         }
         const left = unwrapExpression(node.left);
         const right = unwrapExpression(node.right);
+        const leftTypeof =
+          left?.type === 'UnaryExpression' && left.operator === 'typeof' ? left : undefined;
+        const rightTypeof =
+          right?.type === 'UnaryExpression' && right.operator === 'typeof' ? right : undefined;
+        if (leftTypeof && right?.type === 'Literal' && right.value === 'undefined') {
+          reportJar(leftTypeof.argument);
+          return;
+        }
+        if (rightTypeof && left?.type === 'Literal' && left.value === 'undefined') {
+          reportJar(rightTypeof.argument);
+          return;
+        }
         let cookieSide: ESTree.Node | undefined = undefined;
         if (isCookieJarMember(left)) {
           cookieSide = left;

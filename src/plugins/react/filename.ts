@@ -78,6 +78,9 @@ export function isHookFile(filename: string): boolean {
 }
 
 export function hookNameFromBasename(basename: string): string | undefined {
+  if (!basename.startsWith('use-')) {
+    return undefined;
+  }
   const pascalName = kebabToPascal(basename);
   if (!pascalName.startsWith('Use')) {
     return undefined;

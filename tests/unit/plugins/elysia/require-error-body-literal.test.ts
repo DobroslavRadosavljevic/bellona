@@ -55,6 +55,11 @@ app.get('/', () => status(401, { code: CODE, message: 'Unauthorized' }))`,
       code: `${elysiaImport}const code = 402
 app.get('/', () => status(code, { code: 'pay', message: 'Pay' }))`,
     },
+    {
+      name: 'string body without object',
+      ...ts,
+      code: `${elysiaImport}app.get('/', () => status(418, "I'm a teapot"))`,
+    },
   ],
   invalid: [
     {

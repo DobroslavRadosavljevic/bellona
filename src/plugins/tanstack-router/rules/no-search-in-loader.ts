@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
-import { isSearchIdentifierInLoader } from '../route.ts';
+import { isSearchAccessInLoader } from '../route.ts';
 
 export const noSearchInLoaderName = vmRuleName('no-search-in-loader');
 
@@ -27,7 +27,12 @@ export const noSearchInLoader: CreateOnceRule = defineVamanaRule({
         }
       },
       Identifier(node) {
-        if (isSearchIdentifierInLoader(node)) {
+        if (isSearchAccessInLoader(node)) {
+          context.report({ messageId: 'searchInLoader', node });
+        }
+      },
+      MemberExpression(node) {
+        if (isSearchAccessInLoader(node)) {
           context.report({ messageId: 'searchInLoader', node });
         }
       },

@@ -1,31 +1,18 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
-import type { ESTree } from '@oxlint/plugins';
 
 import { booleanField, objectOptionAt } from '../../../lib/options.ts';
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike } from '../ast.ts';
 import {
   getElysiaRouteHandler,
-  getElysiaRouteHookObject,
   getElysiaRouteMethod,
-  objectHasOwnProperty,
-  objectHasSpread,
-  routeHookResponseHasRedirectStatus,
+  isElysiaStyleRouteCall,
+  routeOrGuardHasSchemaKey,
+  routeOrGuardResponseHasRedirectStatus,
   subtreeUsesElysiaRedirect,
   subtreeUsesElysiaStatus,
 } from '../elysia.ts';
 import { shouldSkipElysiaFile } from '../options.ts';
-
-/** True when the route hook declares `response` (spreads count as satisfied). */
-const hookHasResponse = (hook: ESTree.ObjectExpression | undefined): boolean => {
-  if (!hook) {
-    return false;
-  }
-  if (objectHasSpread(hook)) {
-    return true;
-  }
-  return objectHasOwnProperty(hook, 'response');
-};
 
 /**
  * Require a `response` schema on Elysia route hooks.
@@ -46,6 +33,9 @@ export const requireResponseSchema: CreateOnceRule = defineVamanaRule({
         }
       },
       CallExpression(node) {
+        if (!isElysiaStyleRouteCall(node)) {
+          return;
+        }
         const method = getElysiaRouteMethod(node);
         if (!method) {
           return;
@@ -60,21 +50,20 @@ export const requireResponseSchema: CreateOnceRule = defineVamanaRule({
           return;
         }
 
-        const hook = getElysiaRouteHookObject(node);
-        if (!hookHasResponse(hook)) {
+        if (!routeOrGuardHasSchemaKey(node, 'response')) {
           context.report({
             messageId: usesStatus ? 'missingResponseStatus' : 'missingResponse',
             data: { method },
-            node: hook ?? node,
+            node,
           });
           return;
         }
 
-        if (usesRedirect && !routeHookResponseHasRedirectStatus(hook)) {
+        if (usesRedirect && !routeOrGuardResponseHasRedirectStatus(node)) {
           context.report({
             messageId: 'missingRedirectStatus',
             data: { method },
-            node: hook ?? node,
+            node,
           });
         }
       },

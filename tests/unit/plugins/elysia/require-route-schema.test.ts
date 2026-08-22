@@ -72,6 +72,53 @@ runElysiaRule(requireRouteSchemaName, {
       options: [{ allow: ['file.ts'] }],
       code: `${elysiaImport}app.post('/', ({ body }) => body)`,
     },
+    // .group() hook supplies schema
+    {
+      ...ts,
+      code: `${elysiaImport}app.group('/v1', { body: t.Object({}) }, (app) => app.post('/', ({ body }) => body))`,
+    },
+    // Optional path param still needs params schema — supplied here
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/:id?', ({ params }) => params, { params: t.Object({ id: t.Optional(t.String()) }) })`,
+    },
+    // HTTP client: data object in handler slot is not an Elysia route
+    {
+      ...ts,
+      code: `${elysiaImport}axios.post('/users', { name: 'x' })`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}client.get('/users')`,
+    },
+    // Inline string handler (Elysia allows this)
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', 'Hello World')`,
+    },
+    // Destructured headers / cookie / body with matching schemas
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ headers }) => headers, { headers: t.Object({}) })`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ cookie }) => cookie, { cookie: t.Object({}) })`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ body }) => body, { body: t.Object({}) })`,
+    },
+    // POST with body schema; extra unused hook keys ok
+    {
+      ...ts,
+      code: `${elysiaImport}new Elysia().post('/', ({ body }) => body, { body: t.Object({}), response: t.Any() })`,
+    },
+    // .route('POST', …) uses the verb for methods
+    {
+      ...ts,
+      code: `${elysiaImport}app.route('POST', '/', ({ body }) => body, { body: t.Object({}) })`,
+    },
   ],
   invalid: [
     {
@@ -137,6 +184,31 @@ runElysiaRule(requireRouteSchemaName, {
       options: [{ methods: [] }],
       code: `${elysiaImport}app.get('/:id', () => 'ok')`,
       errors: [error('missingParams')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/:id?', () => 'ok')`,
+      errors: [error('missingParams')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ headers }) => headers)`,
+      errors: [error('missingHeaders')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ cookie }) => cookie)`,
+      errors: [error('missingCookie')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.post('/', ({ body }) => body, { query: t.Object({}) })`,
+      errors: [error('missingBody')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.route('POST', '/', () => 'ok')`,
+      errors: [error('missingSchema')],
     },
   ],
 });

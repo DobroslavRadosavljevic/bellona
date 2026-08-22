@@ -31,6 +31,14 @@ runElysiaRule(preferThrowStatusName, {
       code: `${elysiaImport}app.onError(({ error }) => { throw status(500, error) })`,
     },
     {
+      ...ts,
+      code: `${elysiaImport}app.get('/throw', ({ status }) => { throw status(418) })`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.get('/return', ({ status }) => { return status(418) })`,
+    },
+    {
       filename: 'file.test.ts',
       languageOptions: ts.languageOptions,
       code: `${elysiaImport}app.get('/', () => { throw new Error('x') })`,
@@ -65,6 +73,11 @@ runElysiaRule(preferThrowStatusName, {
     {
       ...ts,
       code: `${elysiaImport}app.get('/', () => 'ok', { beforeHandle: () => { throw new Error('x') } })`,
+      errors: [error('throwError')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}app.onBeforeHandle(() => { throw new Error('x') })`,
       errors: [error('throwError')],
     },
   ],

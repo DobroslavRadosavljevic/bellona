@@ -81,3 +81,46 @@ export function getCallName(node: ESTree.CallExpression): string | undefined {
   }
   return undefined;
 }
+
+/** True when `expr` is `z.string(...)` (not `z.coerce.string()`). */
+export function isZStringFactoryCall(node: ESTree.Expression | undefined): boolean {
+  const current = unwrapExpression(node);
+  if (current?.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = unwrapExpression(current.callee);
+  if (callee?.type !== 'MemberExpression') {
+    return false;
+  }
+  const object = unwrapExpression(callee.object);
+  return (
+    object?.type === 'Identifier' &&
+    object.name === 'z' &&
+    getStaticPropertyName(callee.property) === 'string'
+  );
+}
+
+/**
+ * True when a format method is chained from `z.string()`
+ * (`z.string().email()`, `z.string().min(1).email()`).
+ * False for `z.coerce.string().email()` and non-`z` receivers.
+ */
+export function isZStringSchemaExpression(node: ESTree.Expression | undefined): boolean {
+  let current = unwrapExpression(node);
+  while (current?.type === 'CallExpression') {
+    if (isZStringFactoryCall(current)) {
+      return true;
+    }
+    const callee = unwrapExpression(current.callee);
+    if (callee?.type !== 'MemberExpression') {
+      return false;
+    }
+    const object = unwrapExpression(callee.object);
+    if (object?.type === 'CallExpression') {
+      current = object;
+      continue;
+    }
+    return false;
+  }
+  return false;
+}

@@ -40,5 +40,10 @@ runElysiaRule(noContextParamName, {
       code: `${elysiaImport}const c = { root(context: Context) { return context } }`,
       errors: [error('contextParam')],
     },
+    {
+      ...ts,
+      code: `${elysiaImport}const root = (context: import('elysia').Context) => context`,
+      errors: [error('contextParam')],
+    },
   ],
 });

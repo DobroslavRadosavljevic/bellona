@@ -58,5 +58,15 @@ runElysiaRule(routesIndexMountOnlyName, {
       code: `${elysiaImport}export const X = new Elysia().derive(() => ({ x: 1 }))`,
       errors: [error('lifecycle')],
     },
+    {
+      ...index,
+      code: `${elysiaImport}export const X = new Elysia().resolve(() => ({ user: null }))`,
+      errors: [error('lifecycle')],
+    },
+    {
+      ...index,
+      code: `${elysiaImport}export const X = new Elysia().group('/v1', (app) => app)`,
+      errors: [error('disallowedMethod')],
+    },
   ],
 });

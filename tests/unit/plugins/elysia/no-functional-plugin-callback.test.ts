@@ -48,6 +48,19 @@ export const route = new Elysia({ name: 'R' }).get('/', () =>
       ...ts,
       code: `${elysiaImport}app.use((app) => app.get('/', () => 'ok'))`,
     },
+    // Official deferred / lazy plugin
+    {
+      ...ts,
+      code: `${elysiaImport}const app = new Elysia()
+app.use(async (app) => {
+  const plugin = await import('./heavy')
+  return app.use(plugin)
+})`,
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}new Elysia().use(import('./plugin'))`,
+    },
   ],
   invalid: [
     {

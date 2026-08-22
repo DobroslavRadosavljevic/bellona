@@ -1,7 +1,7 @@
 import type { ESTree } from '@oxlint/plugins';
 
 import { forEachChild } from '../../lib/ast-node.ts';
-import { isFunctionLike, unwrapExpression } from './ast.ts';
+import { getStaticPropertyName, isFunctionLike, unwrapExpression } from './ast.ts';
 
 type VisitorKeys = Readonly<Record<string, readonly string[]>>;
 
@@ -47,6 +47,33 @@ function asExpression(node: ESTree.Node | null | undefined): ESTree.Expression |
   }
 }
 
+function isListMapperName(name: string | undefined): boolean {
+  return name === 'map' || name === 'flatMap';
+}
+
+function isJsxMappedListCall(node: ESTree.Expression, visitorKeys: VisitorKeys): boolean {
+  if (node.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = unwrapExpression(node.callee);
+  if (callee === undefined || callee.type !== 'MemberExpression') {
+    return false;
+  }
+  if (!isListMapperName(getStaticPropertyName(callee.property))) {
+    return false;
+  }
+  for (const argument of node.arguments) {
+    if (argument.type === 'SpreadElement') {
+      continue;
+    }
+    const callback = unwrapExpression(argument);
+    if (isFunctionLike(callback) && functionReturnsJsx(callback, visitorKeys)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function expressionContainsJsx(
   node: ESTree.Expression | null | undefined,
   visitorKeys: VisitorKeys,
@@ -60,6 +87,9 @@ export function expressionContainsJsx(
   }
   if (isFunctionLike(expression)) {
     return false;
+  }
+  if (isJsxMappedListCall(expression, visitorKeys)) {
+    return true;
   }
 
   const keys = visitorKeys[expression.type] ?? [];
@@ -75,7 +105,10 @@ export function expressionContainsJsx(
   return found;
 }
 
-function expressionDirectlyReturnsJsx(node: ESTree.Expression | null | undefined): boolean {
+function expressionDirectlyReturnsJsx(
+  node: ESTree.Expression | null | undefined,
+  visitorKeys: VisitorKeys,
+): boolean {
   const expression = unwrapExpression(node);
   if (expression === undefined) {
     return false;
@@ -85,23 +118,32 @@ function expressionDirectlyReturnsJsx(node: ESTree.Expression | null | undefined
   }
   if (expression.type === 'ConditionalExpression') {
     return (
-      expressionDirectlyReturnsJsx(expression.consequent) ||
-      expressionDirectlyReturnsJsx(expression.alternate)
+      expressionDirectlyReturnsJsx(expression.consequent, visitorKeys) ||
+      expressionDirectlyReturnsJsx(expression.alternate, visitorKeys)
     );
   }
   if (expression.type === 'LogicalExpression') {
     return (
-      expressionDirectlyReturnsJsx(expression.left) ||
-      expressionDirectlyReturnsJsx(expression.right)
+      expressionDirectlyReturnsJsx(expression.left, visitorKeys) ||
+      expressionDirectlyReturnsJsx(expression.right, visitorKeys)
     );
   }
   if (expression.type === 'SequenceExpression') {
-    return expressionDirectlyReturnsJsx(expression.expressions.at(-1));
+    return expressionDirectlyReturnsJsx(expression.expressions.at(-1), visitorKeys);
   }
   if (expression.type === 'ArrayExpression') {
     return expression.elements.some((element) =>
-      element === null ? false : expressionDirectlyReturnsJsx(asExpression(element)),
+      element === null ? false : expressionDirectlyReturnsJsx(asExpression(element), visitorKeys),
     );
+  }
+  if (isJsxMappedListCall(expression, visitorKeys)) {
+    return true;
+  }
+  if (expression.type === 'CallExpression') {
+    const callee = unwrapExpression(expression.callee);
+    if (isFunctionLike(callee)) {
+      return functionReturnsJsx(callee, visitorKeys);
+    }
   }
   return false;
 }
@@ -115,12 +157,12 @@ export function functionReturnsJsx(
     return false;
   }
   if (body.type !== 'BlockStatement') {
-    return expressionDirectlyReturnsJsx(body);
+    return expressionDirectlyReturnsJsx(body, visitorKeys);
   }
 
   const visit = (current: ESTree.Node): boolean => {
     if (current.type === 'ReturnStatement') {
-      return expressionDirectlyReturnsJsx(current.argument);
+      return expressionDirectlyReturnsJsx(current.argument, visitorKeys);
     }
     if (current !== body && isFunctionLike(current)) {
       return false;

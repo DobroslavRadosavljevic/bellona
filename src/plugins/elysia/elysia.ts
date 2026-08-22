@@ -587,6 +587,29 @@ export const isElysiaRouteMethodCall = (node: ESTree.CallExpression): boolean =>
   return isElysiaInstanceExpression(callee.object);
 };
 
+/**
+ * Route-shaped Elysia call: a proven instance chain, or a typical
+ * `app.get(path, handler)` form. Skips HTTP clients that pass a data
+ * object in the handler slot (`axios.post(url, body)`).
+ */
+export const isElysiaStyleRouteCall = (node: ESTree.CallExpression): boolean => {
+  if (!getElysiaRouteMethod(node)) {
+    return false;
+  }
+  const callee = unwrapExpression(node.callee);
+  if (callee?.type !== 'MemberExpression') {
+    return false;
+  }
+  if (isElysiaInstanceExpression(callee.object)) {
+    return true;
+  }
+  const handler = getElysiaRouteHandler(node);
+  if (!handler) {
+    return false;
+  }
+  return handler.type !== 'ObjectExpression';
+};
+
 /** Leaf method name of an Elysia instance member call, if any. */
 export const getElysiaInstanceMethodName = (node: ESTree.CallExpression): string | undefined => {
   const callee = unwrapExpression(node.callee);
@@ -1005,6 +1028,16 @@ export const routeHookHasSchemaKey = (
 export const routeOrGuardHasSchemaKey = (node: ESTree.CallExpression, key: string): boolean =>
   routeHookHasSchemaKey(getElysiaRouteHookObject(node), key) ||
   routeHookHasSchemaKey(getEnclosingElysiaGuardHook(node), key);
+
+/** True when the route hook or an enclosing guard/group declares any schema key. */
+export const routeOrGuardHasSchema = (node: ESTree.CallExpression): boolean =>
+  routeHookHasSchema(getElysiaRouteHookObject(node)) ||
+  routeHookHasSchema(getEnclosingElysiaGuardHook(node));
+
+/** True when route or enclosing guard `response` includes a redirect status. */
+export const routeOrGuardResponseHasRedirectStatus = (node: ESTree.CallExpression): boolean =>
+  routeHookResponseHasRedirectStatus(getElysiaRouteHookObject(node)) ||
+  routeHookResponseHasRedirectStatus(getEnclosingElysiaGuardHook(node));
 
 /** Same-object property node, if it is a static key. */
 export const getObjectProperty = (

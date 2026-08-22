@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
-import { getEnclosingFunctionName, isFunctionLike } from '../ast.ts';
+import { getEnclosingFunctionName, isFunctionLike, unwrapExpression } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
 import { functionReturnsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
@@ -27,12 +27,11 @@ export const noJsxIifeInComponents: CreateOnceRule = defineVamanaRule({
           return false;
         }
       },
-      VariableDeclarator(node) {
-        if (node.init?.type !== 'CallExpression' || !isFunctionLike(node.init.callee)) {
+      CallExpression(node) {
+        const callee = unwrapExpression(node.callee);
+        if (!isFunctionLike(callee)) {
           return;
         }
-
-        const callee = node.init.callee;
 
         if (!functionReturnsJsx(callee, context.sourceCode.visitorKeys)) {
           return;

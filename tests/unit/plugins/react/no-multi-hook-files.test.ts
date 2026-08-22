@@ -9,11 +9,28 @@ runReactRule(
       validWith('export function useUserProfile() { return null; }', {
         filename: 'use-user-profile.ts',
       }),
+      validWith(
+        'export function useUserProfile() {\n  function useInner() { return 1; }\n  return useInner();\n}',
+        { filename: 'use-user-profile.ts' },
+      ),
+      validWith(
+        'export function useUserProfile() { return null; }\nexport function useUserSettings() { return null; }',
+        { filename: 'user-profile.ts' },
+      ),
+      validWith(
+        'export function useUserProfile() { return null; }\nexport function useUserSettings() { return null; }',
+        { filename: 'use-user-profile.ts', options: [{ allow: ['use-user-profile.ts'] }] },
+      ),
     ],
     invalid: [
       invalidWith({
         filename: 'use-user-profile.ts',
         code: 'export function useUserProfile() { return null; }\nexport function useUserSettings() { return null; }',
+        errors: [error('multiple')],
+      }),
+      invalidWith({
+        filename: 'use-user-profile.ts',
+        code: 'export const useUserProfile = () => null;\nexport const useUserSettings = () => null;',
         errors: [error('multiple')],
       }),
     ],

@@ -93,5 +93,12 @@ runElysiaRule(preferResolveForAuthName, {
       code: `${elysiaImport}export const A = new Elysia({ name: 'A' }).derive({ as: 'scoped' }, () => ({ auth: true }))`,
       errors: [error('preferResolve')],
     },
+    {
+      name: 'named derive callback',
+      ...pluginFile,
+      code: `${elysiaImport}const readSession = ({ cookie }: { cookie: unknown }) => ({ session: cookie })
+export const A = new Elysia({ name: 'A' }).derive(readSession)`,
+      errors: [error('preferResolve')],
+    },
   ],
 });

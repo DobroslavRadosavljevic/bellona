@@ -8,8 +8,16 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipZodFile } from '.
 
 const ZOD_SCHEMA_BUILDERS = new Set([
   'object',
+  'strictObject',
+  'looseObject',
   'string',
   'number',
+  'int',
+  'int32',
+  'int64',
+  'uint32',
+  'float32',
+  'float64',
   'boolean',
   'bigint',
   'date',
@@ -20,15 +28,19 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'any',
   'unknown',
   'never',
+  'nan',
   'array',
   'tuple',
   'record',
+  'partialRecord',
+  'looseRecord',
   'map',
   'set',
   'enum',
   'nativeEnum',
   'literal',
   'union',
+  'xor',
   'discriminatedUnion',
   'intersection',
   'promise',
@@ -38,9 +50,16 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'custom',
   'file',
   'json',
+  'templateLiteral',
+  'preprocess',
+  'pipe',
+  'codec',
+  'transform',
   'email',
   'url',
+  'httpUrl',
   'uuid',
+  'guid',
   'cuid',
   'cuid2',
   'ulid',
@@ -48,12 +67,40 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'jwt',
   'base64',
   'base64url',
+  'hex',
+  'hash',
   'emoji',
   'ipv4',
   'ipv6',
   'cidrv4',
   'cidrv6',
+  'hostname',
+  'e164',
+  'mac',
+  'creditCard',
 ]);
+
+const ZOD_ISO_METHODS = new Set(['date', 'time', 'datetime', 'duration']);
+
+const ZOD_COERCE_METHODS = new Set(['string', 'number', 'boolean', 'bigint', 'date']);
+
+function isZodNamespaceCall(
+  object: ESTree.Expression,
+  method: string | undefined,
+  namespace: string,
+  methods: ReadonlySet<string>,
+): boolean {
+  if (object.type !== 'MemberExpression' || method === undefined) {
+    return false;
+  }
+  const root = unwrapExpression(object.object);
+  return (
+    root?.type === 'Identifier' &&
+    root.name === 'z' &&
+    getStaticPropertyName(object.property) === namespace &&
+    methods.has(method)
+  );
+}
 
 function isZodSchemaBuilderCall(init: ESTree.Expression | undefined): boolean {
   let current = unwrapExpression(init);
@@ -66,12 +113,23 @@ function isZodSchemaBuilderCall(init: ESTree.Expression | undefined): boolean {
 
     const method = getStaticPropertyName(callee.property);
     const object = unwrapExpression(callee.object);
+    if (object === undefined) {
+      return false;
+    }
 
-    if (object?.type === 'Identifier' && object.name === 'z') {
+    if (object.type === 'Identifier' && object.name === 'z') {
       return method !== undefined && ZOD_SCHEMA_BUILDERS.has(method);
     }
 
-    if (object?.type === 'CallExpression') {
+    if (isZodNamespaceCall(object, method, 'iso', ZOD_ISO_METHODS)) {
+      return true;
+    }
+
+    if (isZodNamespaceCall(object, method, 'coerce', ZOD_COERCE_METHODS)) {
+      return true;
+    }
+
+    if (object.type === 'CallExpression') {
       current = object;
       continue;
     }

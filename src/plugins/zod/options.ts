@@ -1,7 +1,25 @@
-import type { Context } from '@oxlint/plugins';
+import type { Context, ESTree } from '@oxlint/plugins';
 
+import { isJsString } from '../../lib/js-kind.ts';
 import { objectOptionAt, stringListField } from '../../lib/options.ts';
 import { isTestFile, matchesAllow } from './filename.ts';
+
+/** True when the file imports from `zod` or a `zod/` subpath. */
+export function programImportsZod(program: ESTree.Program | undefined): boolean {
+  if (program === undefined) {
+    return false;
+  }
+  for (const statement of program.body) {
+    if (statement.type !== 'ImportDeclaration') {
+      continue;
+    }
+    const source = statement.source.value;
+    if (isJsString(source) && (source === 'zod' || source.startsWith('zod/'))) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export const ALLOW_OPTION_SCHEMA = {
   type: 'object',
@@ -22,5 +40,9 @@ export function readAllowList(context: Context): readonly string[] {
 }
 
 export function shouldSkipZodFile(context: Context): boolean {
-  return isTestFile(context.filename) || matchesAllow(context.filename, readAllowList(context));
+  return (
+    !programImportsZod(context.sourceCode.ast) ||
+    isTestFile(context.filename) ||
+    matchesAllow(context.filename, readAllowList(context))
+  );
 }

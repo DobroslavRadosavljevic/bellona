@@ -52,6 +52,154 @@ export function getStaticPropertyName(node: ESTree.Node): string | undefined {
   return undefined;
 }
 
+export function getCallName(node: ESTree.CallExpression): string | undefined {
+  const callee = unwrapExpression(node.callee);
+  if (callee === undefined) {
+    return undefined;
+  }
+  if (callee.type === 'Identifier') {
+    return callee.name;
+  }
+  if (callee.type === 'MemberExpression') {
+    const propertyName = getStaticPropertyName(callee.property);
+    if (propertyName === undefined) {
+      return undefined;
+    }
+    const object = unwrapExpression(callee.object);
+    if (object?.type === 'Identifier') {
+      return `${object.name}.${propertyName}`;
+    }
+    return propertyName;
+  }
+  return undefined;
+}
+
+function isComponentWrapperName(name: string | undefined): boolean {
+  return (
+    name === 'memo' ||
+    name === 'forwardRef' ||
+    name === 'React.memo' ||
+    name === 'React.forwardRef' ||
+    name?.endsWith('.memo') === true ||
+    name?.endsWith('.forwardRef') === true
+  );
+}
+
+export function isComponentWrapperCall(node: ESTree.CallExpression): boolean {
+  return isComponentWrapperName(getCallName(node));
+}
+
+function isWrapperCallArgument(call: ESTree.CallExpression, node: ESTree.Node): boolean {
+  return call.arguments.some((argument) => argument === node);
+}
+
+export function unwrapComponentInit(
+  node: ESTree.Expression | null | undefined,
+): ESTree.Function | ESTree.ArrowFunctionExpression | undefined {
+  const expression = unwrapExpression(node);
+  if (expression === undefined) {
+    return undefined;
+  }
+  if (isFunctionLike(expression)) {
+    return expression;
+  }
+  if (expression.type === 'CallExpression' && isComponentWrapperCall(expression)) {
+    for (const argument of expression.arguments) {
+      if (argument.type === 'SpreadElement') {
+        continue;
+      }
+      const inner = unwrapComponentInit(argument);
+      if (inner !== undefined) {
+        return inner;
+      }
+    }
+  }
+  return undefined;
+}
+
+function getAssignedFunctionName(fn: ESTree.Node): string | undefined {
+  let current: ESTree.Node = fn;
+  let parent: ESTree.Node | undefined = fn.parent ?? undefined;
+
+  while (parent) {
+    if (
+      parent.type === 'ParenthesizedExpression' ||
+      parent.type === 'ChainExpression' ||
+      isTsExpressionWrapper(parent)
+    ) {
+      current = parent;
+      parent = parent.parent ?? undefined;
+      continue;
+    }
+
+    if (
+      parent.type === 'CallExpression' &&
+      isComponentWrapperCall(parent) &&
+      isWrapperCallArgument(parent, current)
+    ) {
+      current = parent;
+      parent = parent.parent ?? undefined;
+      continue;
+    }
+
+    if (parent.type === 'VariableDeclarator' && parent.id.type === 'Identifier') {
+      return parent.id.name;
+    }
+
+    if (parent.type === 'AssignmentExpression' && parent.left.type === 'Identifier') {
+      return parent.left.name;
+    }
+
+    return undefined;
+  }
+
+  return undefined;
+}
+
+export function getDeclaredFunctionName(
+  node: ESTree.Function | ESTree.ArrowFunctionExpression,
+): string | undefined {
+  if (
+    (node.type === 'FunctionDeclaration' || node.type === 'FunctionExpression') &&
+    node.id?.name !== undefined
+  ) {
+    return node.id.name;
+  }
+  return getAssignedFunctionName(node);
+}
+
+export function getExportedExpressionName(
+  node: ESTree.Node | null | undefined,
+): string | undefined {
+  if (node === undefined || node === null) {
+    return undefined;
+  }
+  if (node.type === 'FunctionDeclaration') {
+    return node.id?.name;
+  }
+  if (node.type === 'Identifier') {
+    return node.name;
+  }
+  if (isFunctionLike(node)) {
+    const component = unwrapComponentInit(node);
+    if (component !== undefined) {
+      return getDeclaredFunctionName(component) ?? getAssignedFunctionName(component);
+    }
+    return getDeclaredFunctionName(node);
+  }
+  if (
+    node.type === 'CallExpression' ||
+    node.type === 'ParenthesizedExpression' ||
+    isTsExpressionWrapper(node)
+  ) {
+    const component = unwrapComponentInit(node);
+    if (component !== undefined) {
+      return getDeclaredFunctionName(component) ?? getAssignedFunctionName(component);
+    }
+  }
+  return undefined;
+}
+
 export function isFunctionLike(
   node: ESTree.Node | null | undefined,
 ): node is ESTree.Function | ESTree.ArrowFunctionExpression {
@@ -68,18 +216,9 @@ export function getEnclosingFunctionName(node: ESTree.Node): string | undefined 
   let current: ESTree.Node | undefined = node.parent ?? undefined;
 
   while (current) {
-    if (current.type === 'FunctionDeclaration') {
-      return current.id?.name;
+    if (isFunctionLike(current)) {
+      return getDeclaredFunctionName(current);
     }
-
-    if (
-      (current.type === 'ArrowFunctionExpression' || current.type === 'FunctionExpression') &&
-      current.parent.type === 'VariableDeclarator' &&
-      current.parent.id.type === 'Identifier'
-    ) {
-      return current.parent.id.name;
-    }
-
     current = current.parent ?? undefined;
   }
 

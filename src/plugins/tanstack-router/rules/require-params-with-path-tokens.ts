@@ -35,7 +35,8 @@ export const requireParamsWithPathTokens: CreateOnceRule = defineVamanaRule({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Require `params` when TanStack Router `to` includes a `$` path token',
+      description:
+        'Require `params` when `to` includes a `$` token and `from` is not set to inherit params',
     },
     messages: {
       missingParams:
@@ -58,7 +59,8 @@ export const requireParamsWithPathTokens: CreateOnceRule = defineVamanaRule({
         reportIfMissingParams(
           context.report,
           getJsxAttrValue(node, 'to'),
-          getJsxAttrValue(node, 'params') !== undefined,
+          getJsxAttrValue(node, 'params') !== undefined ||
+            getJsxAttrValue(node, 'from') !== undefined,
         );
       },
       CallExpression(node) {
@@ -73,7 +75,8 @@ export const requireParamsWithPathTokens: CreateOnceRule = defineVamanaRule({
           reportIfMissingParams(
             context.report,
             getObjectPropValue(optionsObject, 'to'),
-            objectHasOwnProperty(optionsObject, 'params'),
+            objectHasOwnProperty(optionsObject, 'params') ||
+              objectHasOwnProperty(optionsObject, 'from'),
           );
         }
       },

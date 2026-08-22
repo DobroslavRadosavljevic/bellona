@@ -46,6 +46,10 @@ export const noFunctionalPluginCallback: CreateOnceRule = defineVamanaRule({
         if (!isFunctionLike(expression)) {
           return;
         }
+        // Official deferred plugins are async callbacks (`await app.modules`).
+        if (expression.async) {
+          return;
+        }
         context.report({
           messageId: 'functionalPlugin',
           node: expression,

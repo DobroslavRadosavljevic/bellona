@@ -167,7 +167,9 @@ export const noNativeHtml: CreateOnceRule = defineVamanaRule({
       before() {
         const tags = stringListField(objectOptionAt(context, 0), 'tags', HIGH_CONFIDENCE_TAGS);
         banned = new Set([...tags].map((tag) => tag.toLowerCase()));
-        replacements = new Map(readNativeHtmlReplacements(context));
+        replacements = new Map(
+          [...readNativeHtmlReplacements(context)].map(([tag, hint]) => [tag.toLowerCase(), hint]),
+        );
         if (banned.size === 0) {
           return false;
         }

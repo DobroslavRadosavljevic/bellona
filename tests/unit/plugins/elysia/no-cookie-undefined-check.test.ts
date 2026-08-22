@@ -9,6 +9,7 @@ runElysiaRule(noCookieUndefinedCheckName, {
   valid: [
     { ...ts, code: `${elysiaImport}if (!cookie.session.value) {}` },
     { ...ts, code: `${elysiaImport}if (cookie.session.value == null) {}` },
+    { ...ts, code: `${elysiaImport}visit.value ??= 0` },
     { ...ts, code: `${elysiaImport}session.value = 'x'` },
     // No elysia import
     { ...ts, code: `if (!cookie.session) {}` },
@@ -37,6 +38,26 @@ runElysiaRule(noCookieUndefinedCheckName, {
     {
       ...ts,
       code: `${elysiaImport}cookie.session && doStuff()`,
+      errors: [error('cookieCheck')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}if (cookie['session'] == null) {}`,
+      errors: [error('cookieCheck')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}if (typeof cookie.session === 'undefined') {}`,
+      errors: [error('cookieCheck')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}if ('undefined' === typeof cookie.session) {}`,
+      errors: [error('cookieCheck')],
+    },
+    {
+      ...ts,
+      code: `${elysiaImport}const x = cookie.session ?? fallback`,
       errors: [error('cookieCheck')],
     },
   ],
