@@ -1,0 +1,67 @@
+{
+  "name": "vamana",
+  "version": "0.0.0",
+  "description": "Opt-in Oxlint JS plugins for JS/TS and TanStack Router.",
+  "keywords": [
+    "lint",
+    "oxc",
+    "oxlint",
+    "rules",
+    "tanstack-router"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./js": {
+      "types": "./dist/js.d.ts",
+      "import": "./dist/js.js",
+      "default": "./dist/js.js"
+    },
+    "./tanstack-router": {
+      "types": "./dist/tanstack-router.d.ts",
+      "import": "./dist/tanstack-router.js",
+      "default": "./dist/tanstack-router.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
+    "check": "oxfmt --check && oxlint && tsc --noEmit && vitest run && tsdown"
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.78.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.10",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "oxlint": "^1.78.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}
