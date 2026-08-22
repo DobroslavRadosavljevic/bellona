@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -9,9 +9,9 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noTryCatchInEffectGenName = vmRuleName('no-try-catch-in-effect-gen');
+export const noTryCatchInEffectGenName = bnRuleName('no-try-catch-in-effect-gen');
 
-export const noTryCatchInEffectGen: CreateOnceRule = defineVamanaRule({
+export const noTryCatchInEffectGen: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

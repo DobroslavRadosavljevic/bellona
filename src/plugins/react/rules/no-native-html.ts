@@ -3,7 +3,7 @@ import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { readNativeHtmlReplacements } from '../options.ts';
 
 export const HIGH_CONFIDENCE_TAGS = [
@@ -118,9 +118,9 @@ function suggestComponent(tag: string): string {
   return tag.charAt(0).toUpperCase() + tag.slice(1);
 }
 
-export const noNativeHtmlName = vmRuleName('no-native-html');
+export const noNativeHtmlName = bnRuleName('no-native-html');
 
-export const noNativeHtml: CreateOnceRule = defineVamanaRule({
+export const noNativeHtml: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

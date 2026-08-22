@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   ELYSIA_LIFECYCLE_METHODS,
   ELYSIA_ROUTES_INDEX_ALLOWED_METHODS,
@@ -17,9 +17,9 @@ import {
  * `routes/index.ts` is a mount table only: `new Elysia` + `.use` / `.as`.
  * No route verbs or lifecycle handlers.
  */
-export const routesIndexMountOnlyName = vmRuleName('routes-index-mount-only');
+export const routesIndexMountOnlyName = bnRuleName('routes-index-mount-only');
 
-export const routesIndexMountOnly: CreateOnceRule = defineVamanaRule({
+export const routesIndexMountOnly: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

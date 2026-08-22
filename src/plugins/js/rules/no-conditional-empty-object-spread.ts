@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 function unwrapParentheses(node: ESTree.Expression): ESTree.Expression {
   let current = node;
@@ -25,9 +25,9 @@ function isConditionalEmptyObjectSpread(node: ESTree.Expression): boolean {
 }
 
 /** Ban conditional empty-object spreads without changing their omission semantics. */
-export const noConditionalEmptyObjectSpreadName = vmRuleName('no-conditional-empty-object-spread');
+export const noConditionalEmptyObjectSpreadName = bnRuleName('no-conditional-empty-object-spread');
 
-export const noConditionalEmptyObjectSpread: CreateOnceRule = defineVamanaRule({
+export const noConditionalEmptyObjectSpread: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

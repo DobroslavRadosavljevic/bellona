@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   getBindingNameForInitializer,
   getStringLiteral,
@@ -15,7 +15,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const requireEffectFnNameName = vmRuleName('require-effect-fn-name');
+export const requireEffectFnNameName = bnRuleName('require-effect-fn-name');
 
 function appliedCallBindingName(factoryCall: Parameters<typeof parentOf>[0]): string | undefined {
   const parent = parentOf(factoryCall);
@@ -32,7 +32,7 @@ function namesMatch(spanName: string, binding: string): boolean {
   return spanName === binding || spanName.endsWith(`.${binding}`);
 }
 
-export const requireEffectFnName: CreateOnceRule = defineVamanaRule({
+export const requireEffectFnName: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

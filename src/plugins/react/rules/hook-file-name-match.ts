@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
 import {
   basenameWithoutExtension,
@@ -12,9 +12,9 @@ import {
 } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 
-export const hookFileNameMatchName = vmRuleName('hook-file-name-match');
+export const hookFileNameMatchName = bnRuleName('hook-file-name-match');
 
-export const hookFileNameMatch: CreateOnceRule = defineVamanaRule({
+export const hookFileNameMatch: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

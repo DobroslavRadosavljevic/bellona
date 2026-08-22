@@ -1,5 +1,5 @@
 {
-  "name": "vamana",
+  "name": "bellona",
   "version": "0.1.0",
   "description": "Opt-in Oxlint JS plugins for JS/TS, React, Base UI, Zod, TanStack Router, Elysia, and Effect.",
   "keywords": [
@@ -16,9 +16,9 @@
     "typescript",
     "zod"
   ],
-  "homepage": "https://github.com/DobroslavRadosavljevic/vamana#readme",
+  "homepage": "https://github.com/DobroslavRadosavljevic/bellona#readme",
   "bugs": {
-    "url": "https://github.com/DobroslavRadosavljevic/vamana/issues"
+    "url": "https://github.com/DobroslavRadosavljevic/bellona/issues"
   },
   "license": "MIT",
   "author": {
@@ -27,11 +27,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DobroslavRadosavljevic/vamana.git"
+    "url": "git+https://github.com/DobroslavRadosavljevic/bellona.git"
   },
   "files": [
     "dist",
-    "skills/vamana"
+    "skills/bellona"
   ],
   "type": "module",
   "sideEffects": false,

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   DEFAULT_SCHEMA_REQUIRED_METHODS,
   getElysiaRouteHandler,
@@ -20,9 +20,9 @@ import { shouldSkipElysiaFile } from '../options.ts';
  * on mutating Elysia routes, plus `params` for `/:param` paths and schemas
  * matching destructured handler props (honors enclosing `.guard()` / `.group()`).
  */
-export const requireRouteSchemaName = vmRuleName('require-route-schema');
+export const requireRouteSchemaName = bnRuleName('require-route-schema');
 
-export const requireRouteSchema: CreateOnceRule = defineVamanaRule({
+export const requireRouteSchema: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     let methods = new Set<string>(DEFAULT_SCHEMA_REQUIRED_METHODS);
 

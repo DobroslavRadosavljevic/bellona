@@ -1,4 +1,4 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import { noDateNowInEffect, noDateNowInEffectName } from './rules/no-date-now-in-effect.ts';
 import { noItEffectScoped, noItEffectScopedName } from './rules/no-it-effect-scoped.ts';
 import { noPipeOnEffectFn, noPipeOnEffectFnName } from './rules/no-pipe-on-effect-fn.ts';
@@ -43,7 +43,7 @@ import {
 import { schemaNoLegacyFilter, schemaNoLegacyFilterName } from './rules/schema-no-legacy-filter.ts';
 import { schemaUnionArray, schemaUnionArrayName } from './rules/schema-union-array.ts';
 
-const effect = defineVamanaPlugin('effect', {
+const effect = defineBellonaPlugin('effect', {
   [noDateNowInEffectName]: noDateNowInEffect,
   [noItEffectScopedName]: noItEffectScoped,
   [noPipeOnEffectFnName]: noPipeOnEffectFn,

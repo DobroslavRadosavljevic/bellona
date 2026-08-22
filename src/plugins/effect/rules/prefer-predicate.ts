@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   ALLOW_OPTION_SCHEMA,
   DEFAULT_ALLOW_OPTIONS,
@@ -23,7 +23,7 @@ const PREDICATE_NAMES = new Set([
   'isNullish',
 ]);
 
-export const preferPredicateName = vmRuleName('prefer-predicate');
+export const preferPredicateName = bnRuleName('prefer-predicate');
 
 function declaredName(node: ESTree.Node): string | undefined {
   if (node.type === 'FunctionDeclaration' && node.id?.type === 'Identifier') {
@@ -39,7 +39,7 @@ function declaredName(node: ESTree.Node): string | undefined {
   return undefined;
 }
 
-export const preferPredicate: CreateOnceRule = defineVamanaRule({
+export const preferPredicate: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

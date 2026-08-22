@@ -3,13 +3,13 @@
  * off until the consumer enables them by id (`<plugin-name>/<rule>`).
  */
 export const plugins = {
-  js: 'vamana/js',
-  react: 'vamana/react',
-  baseUi: 'vamana/base-ui',
-  zod: 'vamana/zod',
-  tanstackRouter: 'vamana/tanstack-router',
-  elysia: 'vamana/elysia',
-  effect: 'vamana/effect',
-} satisfies Record<string, `vamana/${string}`>;
+  js: 'bellona/js',
+  react: 'bellona/react',
+  baseUi: 'bellona/base-ui',
+  zod: 'bellona/zod',
+  tanstackRouter: 'bellona/tanstack-router',
+  elysia: 'bellona/elysia',
+  effect: 'bellona/effect',
+} satisfies Record<string, `bellona/${string}`>;
 
-export type VamanaPluginSpecifier = (typeof plugins)[keyof typeof plugins];
+export type BellonaPluginSpecifier = (typeof plugins)[keyof typeof plugins];

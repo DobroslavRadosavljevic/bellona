@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { ROUTER_HOOK_NAMES, TANSTACK_ROUTER_MODULES } from '../router.ts';
@@ -37,9 +37,9 @@ function isBoundRouteHookCall(node: ESTree.CallExpression): boolean {
   return object.type === 'CallExpression' && isGetRouteApiCall(object);
 }
 
-export const noGetRouteApiName = vmRuleName('no-get-route-api');
+export const noGetRouteApiName = bnRuleName('no-get-route-api');
 
-export const noGetRouteApi: CreateOnceRule = defineVamanaRule({
+export const noGetRouteApi: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { booleanField, objectOptionAt } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike } from '../ast.ts';
 import {
   getElysiaRouteHandler,
@@ -19,9 +19,9 @@ import { shouldSkipElysiaFile } from '../options.ts';
  * Default: all routes. Also flags handlers that use `status()` / `redirect()`
  * when `requireAllRoutes` is false, and redirects missing redirect status keys.
  */
-export const requireResponseSchemaName = vmRuleName('require-response-schema');
+export const requireResponseSchemaName = bnRuleName('require-response-schema');
 
-export const requireResponseSchema: CreateOnceRule = defineVamanaRule({
+export const requireResponseSchema: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     let requireAllRoutes = true;
 

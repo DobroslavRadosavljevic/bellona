@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, SourceCode } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
 
 type Parameter = ESTree.ParamPattern;
@@ -34,9 +34,9 @@ function parameterName(parameter: Parameter, sourceCode: SourceCode): string {
 }
 
 /** Ban the broad object type on function inputs, including local aliases to object. */
-export const noObjectParametersName = vmRuleName('no-object-parameters');
+export const noObjectParametersName = bnRuleName('no-object-parameters');
 
-export const noObjectParameters: CreateOnceRule = defineVamanaRule({
+export const noObjectParameters: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

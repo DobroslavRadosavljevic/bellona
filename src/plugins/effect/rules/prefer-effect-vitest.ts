@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, pipeRoot, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -17,7 +17,7 @@ import {
   shouldSkipNonTestEffectFile,
 } from '../options.ts';
 
-export const preferEffectVitestName = vmRuleName('prefer-effect-vitest');
+export const preferEffectVitestName = bnRuleName('prefer-effect-vitest');
 
 function callbackReturnsEffect(fn: ESTree.Node, bindings: EffectBindings): boolean {
   if (!isFunctionLike(fn)) {
@@ -52,7 +52,7 @@ function isEffectful(node: ESTree.Node | undefined, bindings: EffectBindings): b
   return isEffectNamespaceCall(root, bindings);
 }
 
-export const preferEffectVitest: CreateOnceRule = defineVamanaRule({
+export const preferEffectVitest: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

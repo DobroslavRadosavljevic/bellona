@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
@@ -25,9 +25,9 @@ function reportIfAsserted(
   }
 }
 
-export const noRouterTypeAssertionName = vmRuleName('no-router-type-assertion');
+export const noRouterTypeAssertionName = bnRuleName('no-router-type-assertion');
 
-export const noRouterTypeAssertion: CreateOnceRule = defineVamanaRule({
+export const noRouterTypeAssertion: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isInsideSuperClass, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -15,7 +15,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferSchemaTaggedErrorName = vmRuleName('prefer-schema-tagged-error');
+export const preferSchemaTaggedErrorName = bnRuleName('prefer-schema-tagged-error');
 
 function calleeRoot(node: ESTree.Node | undefined): ESTree.Node | undefined {
   let current = unwrapExpression(node);
@@ -36,7 +36,7 @@ function isDataTaggedErrorSuper(node: ESTree.Node | undefined, bindings: EffectB
   return isModuleMember(calleeRoot(node), bindings, 'data', 'TaggedError');
 }
 
-export const preferSchemaTaggedError: CreateOnceRule = defineVamanaRule({
+export const preferSchemaTaggedError: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

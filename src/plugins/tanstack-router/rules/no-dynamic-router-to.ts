@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
   getJsxAttrValue,
@@ -24,9 +24,9 @@ function reportIfDynamicTo(
   }
 }
 
-export const noDynamicRouterToName = vmRuleName('no-dynamic-router-to');
+export const noDynamicRouterToName = bnRuleName('no-dynamic-router-to');
 
-export const noDynamicRouterTo: CreateOnceRule = defineVamanaRule({
+export const noDynamicRouterTo: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

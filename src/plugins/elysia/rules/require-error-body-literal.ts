@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsNumber } from '../../../lib/js-kind.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import {
   getObjectPropertyValue,
@@ -42,9 +42,9 @@ const shouldCheckErrorBody = (
  * const string Identifier) for `code`: not templates or member access.
  * `message` may be dynamic (e.g. permission text).
  */
-export const requireErrorBodyLiteralName = vmRuleName('require-error-body-literal');
+export const requireErrorBodyLiteralName = bnRuleName('require-error-body-literal');
 
-export const requireErrorBodyLiteral: CreateOnceRule = defineVamanaRule({
+export const requireErrorBodyLiteral: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

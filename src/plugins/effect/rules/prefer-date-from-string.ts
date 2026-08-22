@@ -1,11 +1,11 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const preferDateFromStringName = vmRuleName('prefer-date-from-string');
+export const preferDateFromStringName = bnRuleName('prefer-date-from-string');
 
 function reportDateSchema(
   node: ESTree.Node | undefined,
@@ -25,7 +25,7 @@ function reportDateSchema(
   }
 }
 
-export const preferDateFromString: CreateOnceRule = defineVamanaRule({
+export const preferDateFromString: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

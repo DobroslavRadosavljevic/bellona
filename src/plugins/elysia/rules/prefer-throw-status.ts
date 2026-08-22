@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
@@ -11,9 +11,9 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * inside Elysia handlers / lifecycle hooks. (`throw status(...)` remains
  * valid for onError-style paths.)
  */
-export const preferThrowStatusName = vmRuleName('prefer-throw-status');
+export const preferThrowStatusName = bnRuleName('prefer-throw-status');
 
-export const preferThrowStatus: CreateOnceRule = defineVamanaRule({
+export const preferThrowStatus: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

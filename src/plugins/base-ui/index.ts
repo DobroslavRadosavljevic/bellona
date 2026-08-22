@@ -1,10 +1,10 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import {
   requireNativeButtonWithRender,
   requireNativeButtonWithRenderName,
 } from './rules/require-native-button-with-render.ts';
 
-const baseUi = defineVamanaPlugin('base-ui', {
+const baseUi = defineBellonaPlugin('base-ui', {
   [requireNativeButtonWithRenderName]: requireNativeButtonWithRender,
 });
 

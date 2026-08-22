@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest';
 import zod from '../../../../src/plugins/zod/index.ts';
 
 describe('zod plugin', () => {
-  it('registers every Zod rule under a vm- id', () => {
+  it('registers every Zod rule under a bn- id', () => {
     expect(Object.keys(zod.rules)).toEqual([
-      'vm-zod-modern-format-validators',
-      'vm-zod-schema-naming',
+      'bn-zod-modern-format-validators',
+      'bn-zod-schema-naming',
     ]);
   });
 });

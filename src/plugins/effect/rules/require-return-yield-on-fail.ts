@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction, isReturnedNode, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -11,9 +11,9 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const requireReturnYieldOnFailName = vmRuleName('require-return-yield-on-fail');
+export const requireReturnYieldOnFailName = bnRuleName('require-return-yield-on-fail');
 
-export const requireReturnYieldOnFail: CreateOnceRule = defineVamanaRule({
+export const requireReturnYieldOnFail: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

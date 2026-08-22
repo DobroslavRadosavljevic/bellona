@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument, hasStaticClassMember, objectHasMakeOption } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -14,9 +14,9 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const requireServiceStaticLayerName = vmRuleName('require-service-static-layer');
+export const requireServiceStaticLayerName = bnRuleName('require-service-static-layer');
 
-export const requireServiceStaticLayer: CreateOnceRule = defineVamanaRule({
+export const requireServiceStaticLayer: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

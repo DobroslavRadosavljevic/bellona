@@ -1,17 +1,17 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName, getStaticPropertyName, isFunctionLike } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
 import { functionReturnsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noRenderHelperFunctionsInComponentsName = vmRuleName(
+export const noRenderHelperFunctionsInComponentsName = bnRuleName(
   'no-render-helper-functions-in-components',
 );
 
-export const noRenderHelperFunctionsInComponents: CreateOnceRule = defineVamanaRule({
+export const noRenderHelperFunctionsInComponents: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

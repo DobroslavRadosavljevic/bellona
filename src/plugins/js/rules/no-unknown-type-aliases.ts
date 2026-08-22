@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 function referencedAliasName(type: ESTree.TSType): string | null {
   if (type.type === 'TSParenthesizedType') return referencedAliasName(type.typeAnnotation);
@@ -14,9 +14,9 @@ function referencedAliasName(type: ESTree.TSType): string | null {
 }
 
 /** Ban named aliases that merely conceal TypeScript's unknown top type. */
-export const noUnknownTypeAliasesName = vmRuleName('no-unknown-type-aliases');
+export const noUnknownTypeAliasesName = bnRuleName('no-unknown-type-aliases');
 
-export const noUnknownTypeAliases: CreateOnceRule = defineVamanaRule({
+export const noUnknownTypeAliases: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,11 +1,11 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { DEFAULT_MAX_CLASSES, readMaxClassesOptions } from '../options.ts';
 
-export const maxClassesName = vmRuleName('max-classes');
+export const maxClassesName = bnRuleName('max-classes');
 
-export const maxClasses: CreateOnceRule = defineVamanaRule({
+export const maxClasses: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

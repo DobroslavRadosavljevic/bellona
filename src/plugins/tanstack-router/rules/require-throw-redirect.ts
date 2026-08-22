@@ -1,12 +1,12 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { isRedirectHandled, isRouterRedirectCall } from '../route.ts';
 
-export const requireThrowRedirectName = vmRuleName('require-throw-redirect');
+export const requireThrowRedirectName = bnRuleName('require-throw-redirect');
 
-export const requireThrowRedirect: CreateOnceRule = defineVamanaRule({
+export const requireThrowRedirect: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

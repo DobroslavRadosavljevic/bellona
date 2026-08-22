@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { isSchemaName } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipZodFile } from '../options.ts';
@@ -140,9 +140,9 @@ function isZodSchemaBuilderCall(init: ESTree.Expression | undefined): boolean {
   return false;
 }
 
-export const zodSchemaNamingName = vmRuleName('zod-schema-naming');
+export const zodSchemaNamingName = bnRuleName('zod-schema-naming');
 
-export const zodSchemaNaming: CreateOnceRule = defineVamanaRule({
+export const zodSchemaNaming: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

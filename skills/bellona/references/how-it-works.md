@@ -1,9 +1,9 @@
-# How vamana works
+# How bellona works
 
 ## Package shape
 
-- **Runtime:** ESM (`"type": "module"`). The npm tarball is `dist/` plus `skills/vamana/`. npm also adds `README.md`, `LICENSE`, and `CHANGELOG.md`.
-- **Build:** tsdown 0.22, one entry per plugin plus the catalog (`src/index.ts` → `vamana`).
+- **Runtime:** ESM (`"type": "module"`). The npm tarball is `dist/` plus `skills/bellona/`. npm also adds `README.md`, `LICENSE`, and `CHANGELOG.md`.
+- **Build:** tsdown 0.22, one entry per plugin plus the catalog (`src/index.ts` → `bellona`).
 - **Lint API:** `@oxlint/plugins` `CreateOnceRule`. No ESLint `create`. No `eslintCompatPlugin`.
 - **Peer:** `oxlint` ^1.78. **Dependency:** `@oxlint/plugins` ^1.78.
 
@@ -20,14 +20,14 @@
 | `./elysia` | `src/plugins/elysia/index.ts` |
 | `./effect` | `src/plugins/effect/index.ts` |
 
-Each plugin default-export is `{ meta: { name }, rules }`. `meta.name` **must** equal the last export segment so Oxlint ids are `<name>/vm-<slug>`.
+Each plugin default-export is `{ meta: { name }, rules }`. `meta.name` **must** equal the last export segment so Oxlint ids are `<name>/bn-<slug>`.
 
 ## Load path
 
-1. Consumer lists `'vamana/effect'` in `jsPlugins`.
+1. Consumer lists `'bellona/effect'` in `jsPlugins`.
 2. Oxlint resolves the package export relative to the config file.
-3. The plugin object registers rule keys such as `vm-prefer-effect-fn`.
-4. Consumer sets `'effect/vm-prefer-effect-fn': 'error'`.
+3. The plugin object registers rule keys such as `bn-prefer-effect-fn`.
+4. Consumer sets `'effect/bn-prefer-effect-fn': 'error'`.
 5. For each file, Oxlint calls the rule’s `createOnce` visitors (shared across files). `before()` may return `false` to skip the file.
 
 ## `createOnce` vs `create`
@@ -57,9 +57,9 @@ createOnce(context) {
 
 | Helper | File | Role |
 | --- | --- | --- |
-| `defineVamanaPlugin(name, rules)` | `src/lib/plugin.ts` | `{ meta, rules }` |
-| `defineVamanaRule(rule)` | `src/lib/rule.ts` | preserves `createOnce` typing (do not annotate as `Rule`) |
-| `vmRuleName('slug')` | `src/lib/rule.ts` | returns `vm-${slug}` |
+| `defineBellonaPlugin(name, rules)` | `src/lib/plugin.ts` | `{ meta, rules }` |
+| `defineBellonaRule(rule)` | `src/lib/rule.ts` | preserves `createOnce` typing (do not annotate as `Rule`) |
+| `bnRuleName('slug')` | `src/lib/rule.ts` | returns `bn-${slug}` |
 | `objectOptionAt` / `integerField` / `stringField` / `stringListField` / `booleanField` / `namedImportHintMap` | `src/lib/options.ts` | typed option readers |
 
 Do not use `as` / `any` to hide option or AST types. Narrow in `src/lib/`.
@@ -82,7 +82,7 @@ Most domain rules stack these checks in `before()`:
    - React JSX rules: filename ends with `.tsx` / `.jsx` (some React rules also run on `.ts` hook files)
    - Base UI: **no** `@base-ui/react` import required (JSX name matching)
    - JS: **no** import gate
-2. **Test skip** — see [setup.md](setup.md). Not used by most `js` rules. Effect: some rules skip tests; `vm-prefer-effect-vitest` runs **only** on tests.
+2. **Test skip** — see [setup.md](setup.md). Not used by most `js` rules. Effect: some rules skip tests; `bn-prefer-effect-vitest` runs **only** on tests.
 3. **`allow`** — path substring / basename.
 4. **Path gate** (Elysia / Effect entry):
    - Elysia routes leaf: `/routes/` and not `index.*`
@@ -113,7 +113,7 @@ Several `js` rules walk TypeScript AST plus a file-local alias environment (`src
 ```
 src/lib/                 shared factories
 src/plugins/<id>/
-  index.ts               defineVamanaPlugin
+  index.ts               defineBellonaPlugin
   options.ts             allow / skip / option readers
   ast.ts, filename.ts    local helpers
   rules/<slug>.ts        one rule per file

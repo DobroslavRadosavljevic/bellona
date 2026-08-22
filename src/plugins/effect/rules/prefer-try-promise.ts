@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -8,9 +8,9 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferTryPromiseName = vmRuleName('prefer-try-promise');
+export const preferTryPromiseName = bnRuleName('prefer-try-promise');
 
-export const preferTryPromise: CreateOnceRule = defineVamanaRule({
+export const preferTryPromise: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

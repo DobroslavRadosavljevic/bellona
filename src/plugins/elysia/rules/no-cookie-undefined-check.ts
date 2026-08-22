@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { isCookieJarMember } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
@@ -17,9 +17,9 @@ const isUndefinedIdentifier = (node: ReturnType<typeof unwrapExpression>): boole
  * Elysia `cookie.name` is a Proxy that is always defined: check
  * `cookie.name.value` instead of treating the jar entry as optional.
  */
-export const noCookieUndefinedCheckName = vmRuleName('no-cookie-undefined-check');
+export const noCookieUndefinedCheckName = bnRuleName('no-cookie-undefined-check');
 
-export const noCookieUndefinedCheck: CreateOnceRule = defineVamanaRule({
+export const noCookieUndefinedCheck: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     /** Report when a cookie jar member is used in a nullish check. */
     const reportJar = (node: ESTree.Node | undefined) => {

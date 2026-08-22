@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, isZStringSchemaExpression, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipZodFile } from '../options.ts';
 
@@ -74,9 +74,9 @@ function formatReplacement(method: string): string | undefined {
   }
 }
 
-export const zodModernFormatValidatorsName = vmRuleName('zod-modern-format-validators');
+export const zodModernFormatValidatorsName = bnRuleName('zod-modern-format-validators');
 
-export const zodModernFormatValidators: CreateOnceRule = defineVamanaRule({
+export const zodModernFormatValidators: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { classNameOf, enclosingClass, getCallArgument, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -15,9 +15,9 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferServiceOfName = vmRuleName('prefer-service-of');
+export const preferServiceOfName = bnRuleName('prefer-service-of');
 
-export const preferServiceOf: CreateOnceRule = defineVamanaRule({
+export const preferServiceOf: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

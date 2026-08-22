@@ -1,18 +1,18 @@
-# vamana/effect rules
+# bellona/effect rules
 
-Plugin name: `effect`. Ids: `effect/vm-<slug>`. Target **Effect v4** (`effect@rc`). Do not mix v3 APIs.
+Plugin name: `effect`. Ids: `effect/bn-<slug>`. Target **Effect v4** (`effect@rc`). Do not mix v3 APIs.
 
 **Skip (all):** files that do not import `effect`, `effect/…`, or `@effect/…`, and `allow` matches.
 
 **Also skip tests** (style rules): marked **tests skipped** below.
 
-**Tests only:** `vm-prefer-effect-vitest`.
+**Tests only:** `bn-prefer-effect-vitest`.
 
 Bindings follow namespace and named imports (`Effect.fn` and `import { fn } from 'effect/Effect'`). See [how-it-works.md](how-it-works.md).
 
 ## v3 → v4
 
-### `effect/vm-no-v3-imports`
+### `effect/bn-no-v3-imports`
 
 Disallow moved v3 specifiers. Exact map (partial):
 
@@ -39,7 +39,7 @@ Disallow moved v3 specifiers. Exact map (partial):
 
 Current v4 packages are **not** flagged: `effect`, `effect/…`, `@effect/vitest`, `@effect/platform-*`, `@effect/sql-*`, `@effect/ai-*`, `@effect/atom-*`, `@effect/opentelemetry` (SDK, not the old Otlp helpers).
 
-### `effect/vm-no-v3-effect-apis`
+### `effect/bn-no-v3-effect-apis`
 
 | Old | New |
 | --- | --- |
@@ -61,11 +61,11 @@ Current v4 packages are **not** flagged: `effect`, `effect/…`, `@effect/vitest
 | `Stream.async` | `Stream.callback` |
 | `Scope.extend` | `Scope.provide` |
 
-### `effect/vm-no-v3-service-tags`
+### `effect/bn-no-v3-service-tags`
 
 Disallow `Context.Tag`, `GenericTag`, `Effect.Tag`, `Effect.Service`. Use `Context.Service`.
 
-### `effect/vm-prefer-decode-unknown-effect`
+### `effect/bn-prefer-decode-unknown-effect`
 
 | Old | New |
 | --- | --- |
@@ -82,7 +82,7 @@ Object-form `Schema.decode({ … })` transforms are not flagged.
 
 ## Effect.fn / gen
 
-### `effect/vm-prefer-effect-fn`
+### `effect/bn-prefer-effect-fn`
 
 Prefer `Effect.fn("name")` over a function that **returns** `Effect.gen`. Do not wrap `Effect.gen` in a plain function. Vitest `it.effect` callbacks are excluded.
 
@@ -93,33 +93,33 @@ export const loadUser = Effect.fn('loadUser')(function* (id: string) {
 })
 ```
 
-### `effect/vm-require-effect-fn-name`
+### `effect/bn-require-effect-fn-name`
 
 `Effect.fn` must take a string span name. It should match the binding (`loadUser` or `users.loadUser`).
 
-### `effect/vm-no-pipe-on-effect-fn`
+### `effect/bn-no-pipe-on-effect-fn`
 
 Do not `.pipe` the result of `Effect.fn(...)(...)`. Pass extra combinators as extra arguments to `Effect.fn`.
 
-### `effect/vm-no-try-catch-in-effect-gen`
+### `effect/bn-no-try-catch-in-effect-gen`
 
 Disallow `try/catch` inside `Effect.gen` / `Effect.fn` generators. Use Effect error combinators.
 
-### `effect/vm-no-throw-in-effect-gen`
+### `effect/bn-no-throw-in-effect-gen`
 
 Disallow `throw` inside those generators. Use `return yield* Effect.fail(...)` or `Schema.TaggedError`.
 
-### `effect/vm-require-return-yield-on-fail`
+### `effect/bn-require-return-yield-on-fail`
 
 Fail with `return yield*` so TypeScript narrows the rest of the generator (`yield* Effect.fail` without `return` is flagged).
 
-### `effect/vm-no-yield-ref-handle`
+### `effect/bn-no-yield-ref-handle`
 
 Do not `yield*` a `Ref` / `Fiber` / `Deferred` **handle**. Use `Ref.get`, `Fiber.join`, `Deferred.await`.
 
 ## Schema / errors / time
 
-### `effect/vm-schema-union-array`
+### `effect/bn-schema-union-array`
 
 `Schema.Union`, `Tuple`, `TemplateLiteral` take an **array**. Multi `Schema.Literal` → `Schema.Literals([...])`.
 
@@ -128,51 +128,51 @@ Schema.Union([A, B])
 Schema.Literals(['a', 'b'])
 ```
 
-### `effect/vm-schema-no-legacy-filter`
+### `effect/bn-schema-no-legacy-filter`
 
 Disallow v3 Schema methods: `filter`, `optionalWith`, `positive`, `negative`, `nonNegative`, `nonPositive`, `pattern`, plus exports `nonEmptyString`.
 
 Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.String.check(Schema.isNonEmpty())`.
 
-### `effect/vm-prefer-date-from-string`
+### `effect/bn-prefer-date-from-string`
 
 `Schema.Date` is `Date` instances in v4. ISO strings → `Schema.DateFromString`. `Schema.DateFromNumber` → `Schema.DateFromMillis`.
 
-### `effect/vm-prefer-schema-tagged-error`
+### `effect/bn-prefer-schema-tagged-error`
 
 **Tests skipped.** Prefer `Schema.TaggedError` over `class X extends Error`, `Data.TaggedError`, and `Effect.fail(new Error(...))`.
 
-### `effect/vm-prefer-predicate`
+### `effect/bn-prefer-predicate`
 
 **Tests skipped.** Do not write local `isString` / `isObject` / `isNumber` / `isBoolean` / `isUndefined` / `isNull` / `isFunction` / `isDate` / `isPromise` / `isError` / `isNullish` / `isRecord` helpers. Use `Predicate.*`.
 
-### `effect/vm-no-date-now-in-effect`
+### `effect/bn-no-date-now-in-effect`
 
 **Tests skipped.** No `Date.now()` or `new Date()` for “now”. Use `Clock.currentTimeMillis` / `DateTime.now`.
 
-### `effect/vm-prefer-clock-sleep`
+### `effect/bn-prefer-clock-sleep`
 
 **Tests skipped.** Inside generators, prefer `Effect.sleep` over `setTimeout` / `setInterval` so `TestClock` can control time.
 
-### `effect/vm-prefer-try-promise`
+### `effect/bn-prefer-try-promise`
 
 **Tests skipped.** Prefer `Effect.tryPromise({ try, catch })`. `Effect.promise` maps rejection to a defect.
 
 ## Services / runtime
 
-### `effect/vm-require-service-id-path`
+### `effect/bn-require-service-id-path`
 
 **Tests skipped.** `Context.Service` ids must look like `pkg/dir/Name` (two or more non-empty `/` segments). Not `"Database"`.
 
-### `effect/vm-require-service-static-layer`
+### `effect/bn-require-service-static-layer`
 
 **Tests skipped.** `Context.Service` classes need `static readonly layer` (or `options.make`). v4 has no `.Default`.
 
-### `effect/vm-prefer-service-of`
+### `effect/bn-prefer-service-of`
 
 **Tests skipped.** Return `Database.of({ ... })`, not a plain object, when implementing a `Context.Service`.
 
-### `effect/vm-no-run-promise-in-modules`
+### `effect/bn-no-run-promise-in-modules`
 
 **Tests skipped.** Keep `Effect.runPromise` / `runSync` / `runFork` / `runCallback` (and `*With` / `*Exit` variants) at process entry files.
 
@@ -185,10 +185,10 @@ Prefer `NodeRuntime.runMain` / `BunRuntime.runMain` / `Layer.launch` / `ManagedR
 
 ## Tests
 
-### `effect/vm-no-it-effect-scoped`
+### `effect/bn-no-it-effect-scoped`
 
 Do not wrap `it.effect` / `it.live` in `Effect.scoped` (already scoped). `it.scopedLive` is removed → `it.live`.
 
-### `effect/vm-prefer-effect-vitest`
+### `effect/bn-prefer-effect-vitest`
 
 **Test files only.** If a bare `it` / `test` callback returns an Effect, use `it.effect` from `@effect/vitest`.

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
@@ -36,7 +36,7 @@ const STREAM_REPLACEMENTS = new Map<string, string>([['async', 'Stream.callback'
 
 const SCOPE_REPLACEMENTS = new Map<string, string>([['extend', 'Scope.provide']]);
 
-export const noV3EffectApisName = vmRuleName('no-v3-effect-apis');
+export const noV3EffectApisName = bnRuleName('no-v3-effect-apis');
 
 function v3ApiOf(
   node: ESTree.Node | undefined,
@@ -70,7 +70,7 @@ function isCalleeOfCall(node: ESTree.Node): boolean {
   return parent?.type === 'CallExpression' && unwrapExpression(parent.callee) === node;
 }
 
-export const noV3EffectApis: CreateOnceRule = defineVamanaRule({
+export const noV3EffectApis: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

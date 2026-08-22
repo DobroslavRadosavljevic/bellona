@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
   getJsxAttrValue,
@@ -30,9 +30,9 @@ function reportIfBannedHref(
   report({ messageId: 'routerHref', node: hrefValue });
 }
 
-export const noRouterHrefName = vmRuleName('no-router-href');
+export const noRouterHrefName = bnRuleName('no-router-href');
 
-export const noRouterHref: CreateOnceRule = defineVamanaRule({
+export const noRouterHref: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,14 +1,14 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName, isFunctionLike, unwrapExpression } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
 import { functionReturnsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noJsxIifeInComponentsName = vmRuleName('no-jsx-iife-in-components');
+export const noJsxIifeInComponentsName = bnRuleName('no-jsx-iife-in-components');
 
-export const noJsxIifeInComponents: CreateOnceRule = defineVamanaRule({
+export const noJsxIifeInComponents: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

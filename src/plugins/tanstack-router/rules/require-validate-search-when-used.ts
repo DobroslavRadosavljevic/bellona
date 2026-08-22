@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
@@ -14,7 +14,7 @@ import {
   type CreatedRoute,
 } from '../route.ts';
 
-export const requireValidateSearchWhenUsedName = vmRuleName('require-validate-search-when-used');
+export const requireValidateSearchWhenUsedName = bnRuleName('require-validate-search-when-used');
 
 function isBoundUseSearch(node: ESTree.CallExpression): boolean {
   const callee = unwrapExpression(node.callee);
@@ -42,7 +42,7 @@ function routeReadsSearchHere(
   return useSearchFroms.some((from) => from !== undefined && from === route.routePath);
 }
 
-export const requireValidateSearchWhenUsed: CreateOnceRule = defineVamanaRule({
+export const requireValidateSearchWhenUsed: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

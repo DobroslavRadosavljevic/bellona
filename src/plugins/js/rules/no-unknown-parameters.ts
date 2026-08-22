@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type Parameter = ESTree.ParamPattern;
 type ParameterOwner =
@@ -43,9 +43,9 @@ function parameterName(parameter: Parameter, sourceText: string): string {
 }
 
 /** Disallow unknown inputs except explicitly named error-cause enrichment. */
-export const noUnknownParametersName = vmRuleName('no-unknown-parameters');
+export const noUnknownParametersName = bnRuleName('no-unknown-parameters');
 
-export const noUnknownParameters: CreateOnceRule = defineVamanaRule({
+export const noUnknownParameters: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

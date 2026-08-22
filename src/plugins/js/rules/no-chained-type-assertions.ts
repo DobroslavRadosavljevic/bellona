@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type TypeAssertionExpression = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
 
@@ -53,9 +53,9 @@ function isForbiddenAssertionChain(node: TypeAssertionExpression): boolean {
 }
 
 /** Disallow nested TypeScript type assertions, while permitting chains made only of const assertions. */
-export const noChainedTypeAssertionsName = vmRuleName('no-chained-type-assertions');
+export const noChainedTypeAssertionsName = bnRuleName('no-chained-type-assertions');
 
-export const noChainedTypeAssertions: CreateOnceRule = defineVamanaRule({
+export const noChainedTypeAssertions: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

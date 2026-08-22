@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
 
 type FunctionWithReturnType =
@@ -24,9 +24,9 @@ function referencedAliasName(type: ESTree.TSType): string | null {
 }
 
 /** Ban function contracts that return unknown instead of a parsed domain type. */
-export const noUnknownReturnsName = vmRuleName('no-unknown-returns');
+export const noUnknownReturnsName = bnRuleName('no-unknown-returns');
 
-export const noUnknownReturns: CreateOnceRule = defineVamanaRule({
+export const noUnknownReturns: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

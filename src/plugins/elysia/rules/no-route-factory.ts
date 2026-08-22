@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isExportedNode } from '../elysia.ts';
 import { shouldSkipRouteFactoryFile } from '../options.ts';
 
@@ -55,9 +55,9 @@ const reportIfFactory = (
  * Ban exported HTTP/route factory helpers (`make*Route`, `*HttpMapper`, …)
  * under `modules/` / `routes/`. Keep one route plugin per file instead.
  */
-export const noRouteFactoryName = vmRuleName('no-route-factory');
+export const noRouteFactoryName = bnRuleName('no-route-factory');
 
-export const noRouteFactory: CreateOnceRule = defineVamanaRule({
+export const noRouteFactory: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     let patterns = compilePatterns(DEFAULT_ROUTE_FACTORY_PATTERNS);
 

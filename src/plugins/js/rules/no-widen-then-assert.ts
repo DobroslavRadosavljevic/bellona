@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, Variable } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type BroadTypeKind = 'top' | 'object' | 'record';
 
@@ -314,9 +314,9 @@ function assertionIsNarrower(
 }
 
 /** Detect immutable local bindings that erase a known type and are later asserted back to a narrower type. */
-export const noWidenThenAssertName = vmRuleName('no-widen-then-assert');
+export const noWidenThenAssertName = bnRuleName('no-widen-then-assert');
 
-export const noWidenThenAssert: CreateOnceRule = defineVamanaRule({
+export const noWidenThenAssert: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

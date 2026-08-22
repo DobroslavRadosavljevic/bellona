@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -23,9 +23,9 @@ const LEGACY_DECODERS = new Map<string, string>([
 
 const TRANSFORM_DECODERS = new Set(['decode', 'encode']);
 
-export const preferDecodeUnknownEffectName = vmRuleName('prefer-decode-unknown-effect');
+export const preferDecodeUnknownEffectName = bnRuleName('prefer-decode-unknown-effect');
 
-export const preferDecodeUnknownEffect: CreateOnceRule = defineVamanaRule({
+export const preferDecodeUnknownEffect: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

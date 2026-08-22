@@ -1,11 +1,11 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument, isArrayExpressionArgument } from '../ast.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const schemaUnionArrayName = vmRuleName('schema-union-array');
+export const schemaUnionArrayName = bnRuleName('schema-union-array');
 
 interface VariadicCall {
   readonly replacement: string;
@@ -19,7 +19,7 @@ const VARIADIC = new Map<string, VariadicCall>([
   ['Literal', { replacement: 'Schema.Literals(["a", "b"])', minArgs: 2 }],
 ]);
 
-export const schemaUnionArray: CreateOnceRule = defineVamanaRule({
+export const schemaUnionArray: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

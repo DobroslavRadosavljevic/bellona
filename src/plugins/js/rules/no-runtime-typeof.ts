@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { booleanField, objectOptionAt } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type RuntimeFunction = ESTree.ArrowFunctionExpression | ESTree.Function;
 
@@ -26,9 +26,9 @@ function isInsideTypeGuard(node: ESTree.Node): boolean {
 }
 
 /** Disallow runtime typeof checks that narrow unparsed values instead of decoding them. */
-export const noRuntimeTypeofName = vmRuleName('no-runtime-typeof');
+export const noRuntimeTypeofName = bnRuleName('no-runtime-typeof');
 
-export const noRuntimeTypeof: CreateOnceRule = defineVamanaRule({
+export const noRuntimeTypeof: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
@@ -26,9 +26,9 @@ function needsFromForTo(toValue: ESTree.Node | undefined): boolean {
   return value !== undefined && isRelativeRoutePath(value);
 }
 
-export const noRelativeRouterToWithoutFromName = vmRuleName('no-relative-router-to-without-from');
+export const noRelativeRouterToWithoutFromName = bnRuleName('no-relative-router-to-without-from');
 
-export const noRelativeRouterToWithoutFrom: CreateOnceRule = defineVamanaRule({
+export const noRelativeRouterToWithoutFrom: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

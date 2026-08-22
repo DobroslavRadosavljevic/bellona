@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction, getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -33,9 +33,9 @@ function isTimerCallee(node: ReturnType<typeof unwrapExpression>): boolean {
   return object.name === 'globalThis' || object.name === 'window' || object.name === 'global';
 }
 
-export const preferClockSleepName = vmRuleName('prefer-clock-sleep');
+export const preferClockSleepName = bnRuleName('prefer-clock-sleep');
 
-export const preferClockSleep: CreateOnceRule = defineVamanaRule({
+export const preferClockSleep: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

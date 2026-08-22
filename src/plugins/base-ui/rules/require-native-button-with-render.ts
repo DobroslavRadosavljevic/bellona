@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   classifyRenderHost,
   defaultNativeButton,
@@ -18,7 +18,7 @@ import {
   type NativeButtonWithRenderOptions,
 } from '../options.ts';
 
-export const requireNativeButtonWithRenderName = vmRuleName('require-native-button-with-render');
+export const requireNativeButtonWithRenderName = bnRuleName('require-native-button-with-render');
 
 const STRING_NAME_LIST_SCHEMA = {
   type: 'array',
@@ -26,7 +26,7 @@ const STRING_NAME_LIST_SCHEMA = {
   uniqueItems: true,
 } as const;
 
-export const requireNativeButtonWithRender: CreateOnceRule = defineVamanaRule({
+export const requireNativeButtonWithRender: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

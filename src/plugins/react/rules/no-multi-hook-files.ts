@@ -1,14 +1,14 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
 import { isHookFile, isHookName, matchesAllow } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 
-export const noMultiHookFilesName = vmRuleName('no-multi-hook-files');
+export const noMultiHookFilesName = bnRuleName('no-multi-hook-files');
 
-export const noMultiHookFiles: CreateOnceRule = defineVamanaRule({
+export const noMultiHookFiles: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -31,7 +31,7 @@ const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
   ['pattern', 'Schema.check(Schema.isPattern(regex))'],
 ]);
 
-export const schemaNoLegacyFilterName = vmRuleName('schema-no-legacy-filter');
+export const schemaNoLegacyFilterName = bnRuleName('schema-no-legacy-filter');
 
 function isSchemaReceiver(
   node: ReturnType<typeof unwrapExpression>,
@@ -62,7 +62,7 @@ function isSchemaReceiver(
   return false;
 }
 
-export const schemaNoLegacyFilter: CreateOnceRule = defineVamanaRule({
+export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

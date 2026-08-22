@@ -1,13 +1,13 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { getCreateRouteOptions, sortRoutePropertiesByOrder } from '../route.ts';
 
-export const createRoutePropertyOrderName = vmRuleName('create-route-property-order');
+export const createRoutePropertyOrderName = bnRuleName('create-route-property-order');
 
-export const createRoutePropertyOrder: CreateOnceRule = defineVamanaRule({
+export const createRoutePropertyOrder: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

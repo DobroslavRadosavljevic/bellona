@@ -1,12 +1,12 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { isHookCall, isInsideRouteLifecycle } from '../route.ts';
 
-export const noHooksInRouteLifecycleName = vmRuleName('no-hooks-in-route-lifecycle');
+export const noHooksInRouteLifecycleName = bnRuleName('no-hooks-in-route-lifecycle');
 
-export const noHooksInRouteLifecycle: CreateOnceRule = defineVamanaRule({
+export const noHooksInRouteLifecycle: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

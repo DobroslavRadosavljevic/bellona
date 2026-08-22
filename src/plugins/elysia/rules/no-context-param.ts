@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getParamTypeName, isContextTypeName } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
 
@@ -16,9 +16,9 @@ const isClassBodyMethod = (node: ESTree.Node): boolean => {
  *
  * Class methods are covered by `no-controller-context-class`.
  */
-export const noContextParamName = vmRuleName('no-context-param');
+export const noContextParamName = bnRuleName('no-context-param');
 
-export const noContextParam: CreateOnceRule = defineVamanaRule({
+export const noContextParam: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     /** Report handler parameters typed as Elysia `Context`. */
     const reportContextParams = (params: readonly ESTree.Node[]) => {

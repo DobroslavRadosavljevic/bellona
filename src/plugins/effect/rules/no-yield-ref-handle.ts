@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression, walkFunctionBody } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -11,7 +11,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noYieldRefHandleName = vmRuleName('no-yield-ref-handle');
+export const noYieldRefHandleName = bnRuleName('no-yield-ref-handle');
 
 function yieldCallee(node: ESTree.YieldExpression): ESTree.CallExpression | undefined {
   const argument = unwrapExpression(node.argument);
@@ -28,7 +28,7 @@ function markHandle(
   }
 }
 
-export const noYieldRefHandle: CreateOnceRule = defineVamanaRule({
+export const noYieldRefHandle: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

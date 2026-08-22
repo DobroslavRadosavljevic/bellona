@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getParamTypeName, isContextTypeName } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
 
@@ -9,9 +9,9 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * Disallow class methods typed with Elysia `Context`. Keep controllers
  * decoupled from HTTP context (best-practice).
  */
-export const noControllerContextClassName = vmRuleName('no-controller-context-class');
+export const noControllerContextClassName = bnRuleName('no-controller-context-class');
 
-export const noControllerContextClass: CreateOnceRule = defineVamanaRule({
+export const noControllerContextClass: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     /** Report class methods whose parameters are typed as Elysia `Context`. */
     const reportIfContextParams = (params: readonly ESTree.Node[], reportNode: ESTree.Node) => {

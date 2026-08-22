@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapAssignmentTarget, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 
@@ -36,9 +36,9 @@ function isHistoryObject(node: ESTree.Expression | undefined): boolean {
 const LOCATION_MUTATORS = new Set(['assign', 'replace', 'reload']);
 const HISTORY_MUTATORS = new Set(['pushState', 'replaceState', 'push', 'replace']);
 
-export const noImperativeLocationNavigationName = vmRuleName('no-imperative-location-navigation');
+export const noImperativeLocationNavigationName = bnRuleName('no-imperative-location-navigation');
 
-export const noImperativeLocationNavigation: CreateOnceRule = defineVamanaRule({
+export const noImperativeLocationNavigation: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

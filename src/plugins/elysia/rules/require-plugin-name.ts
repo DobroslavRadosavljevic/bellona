@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { chainIncludesListen, elysiaOptionsHasName, isNewElysiaExpression } from '../elysia.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -32,9 +32,9 @@ const isExportedElysiaInstance = (node: ESTree.Node): boolean => {
  * Require `{ name: "…" }` on **exported** `new Elysia(...)` plugins so
  * lifecycle deduplication works. Skips `.listen(...)` chains and entry paths.
  */
-export const requirePluginNameName = vmRuleName('require-plugin-name');
+export const requirePluginNameName = bnRuleName('require-plugin-name');
 
-export const requirePluginName: CreateOnceRule = defineVamanaRule({
+export const requirePluginName: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

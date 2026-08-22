@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, SourceCode } from '@oxlint/plugins';
 
 import { objectOptionAt, stringField } from '../../../lib/options.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type TypeAssertion = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
 
@@ -39,11 +39,11 @@ function hasSafetyComment(sourceCode: SourceCode, node: TypeAssertion, marker: s
 }
 
 /** Require every non-const type assertion to state the invariant TypeScript cannot express. */
-export const requireSafetyCommentForTypeAssertionName = vmRuleName(
+export const requireSafetyCommentForTypeAssertionName = bnRuleName(
   'require-safety-comment-for-type-assertion',
 );
 
-export const requireSafetyCommentForTypeAssertion: CreateOnceRule = defineVamanaRule({
+export const requireSafetyCommentForTypeAssertion: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

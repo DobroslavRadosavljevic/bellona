@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, Scope, SourceCode, Variable } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 const moduleMockMethods = new Set(['doMock', 'mock', 'unstable_mockModule']);
 
@@ -69,9 +69,9 @@ function moduleMockCall(sourceCode: SourceCode, callee: ESTree.Expression): bool
 }
 
 /** Ban test framework module mocking in favor of real dependency seams. */
-export const noModuleMockingName = vmRuleName('no-module-mocking');
+export const noModuleMockingName = bnRuleName('no-module-mocking');
 
-export const noModuleMocking: CreateOnceRule = defineVamanaRule({
+export const noModuleMocking: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

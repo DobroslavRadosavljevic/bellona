@@ -1,13 +1,13 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noV3ServiceTagsName = vmRuleName('no-v3-service-tags');
+export const noV3ServiceTagsName = bnRuleName('no-v3-service-tags');
 
-export const noV3ServiceTags: CreateOnceRule = defineVamanaRule({
+export const noV3ServiceTags: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

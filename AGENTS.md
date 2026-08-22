@@ -52,23 +52,23 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 ## Layout
 
 - One plugin per `src/plugins/<id>/`; default export is the Oxlint plugin object
-- Shared factories: `src/lib/` (`defineVamanaPlugin`, `defineVamanaRule`, option readers)
+- Shared factories: `src/lib/` (`defineBellonaPlugin`, `defineBellonaRule`, option readers)
 - Per plugin: `index.ts`, local helpers (`options.ts`, `ast.ts`, `filename.ts`, `route.ts`, `shared/`), rules in `rules/`
-- `src/index.ts` is a specifier catalog only — **not** a plugin; consumers import `vamana/js` (see `package.json` `exports`)
+- `src/index.ts` is a specifier catalog only — **not** a plugin; consumers import `bellona/js` (see `package.json` `exports`)
 - Tests: `tests/unit/plugins/<id>/` (`fixtures.ts`, `harness.ts`, `*.test.ts`); shared: `tests/unit/lib/` (`getRule` wraps `create` for `RuleTester` only)
 - Generated: `dist/` — do not edit by hand
-- Public consumer skill: `skills/vamana/` (skills.sh). `.agents/skills/vamana` is a symlink to that tree
+- Public consumer skill: `skills/bellona/` (skills.sh). `.agents/skills/bellona` is a symlink to that tree
 - Oxfmt/Oxlint already ignore `.agents/`, `.claude/`, `agent/`, `skills/` — do not format or lint those trees
 
 ## Project rules
 
-- New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `vamana/js`.
-- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`, `effect`) so ids are `<name>/vm-<slug>`
-- Register with `vmRuleName('slug')` (`vm-max-classes`, never bare `max-classes`)
+- New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `bellona/js`.
+- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`, `effect`) so ids are `<name>/bn-<slug>`
+- Register with `bnRuleName('slug')` (`bn-max-classes`, never bare `max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure
 - Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`
-- Type rules with `defineVamanaRule` so `createOnce` stays; do not annotate as `Rule` (widens)
+- Type rules with `defineBellonaRule` so `createOnce` stays; do not annotate as `Rule` (widens)
 - Do not use `as` / `any` to hide option or AST types — narrow in `src/lib/`
 - `node.parent` is `Node | null`. Coerce with `?? undefined` before `ESTree.Node | undefined` walks
 - `lib` is ES2022: no `Array#toSorted`. Copy then insert, or accept a local mutate of a fresh array
@@ -93,7 +93,7 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 | -------------------------- | -------------------------------------------------------------- |
 | Human setup / consumer API | `README.md`                                                    |
 | Changelog / versions       | `CHANGELOG.md`                                                 |
-| Consumer agent skill       | `skills/vamana/`                                               |
+| Consumer agent skill       | `skills/bellona/`                                               |
 | Plugin entries / publish   | `package.json`, `tsdown.config.ts`, `.npmrc`                   |
 | Lint / format              | `oxlint.config.ts`, `oxfmt.config.ts`                          |
 | Oxlint JS plugins          | https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html |

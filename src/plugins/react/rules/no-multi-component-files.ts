@@ -1,14 +1,14 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isModuleLevelDeclaration, unwrapComponentInit } from '../ast.ts';
 import { isPrimaryComponentName } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noMultiComponentFilesName = vmRuleName('no-multi-component-files');
+export const noMultiComponentFilesName = bnRuleName('no-multi-component-files');
 
-export const noMultiComponentFiles: CreateOnceRule = defineVamanaRule({
+export const noMultiComponentFiles: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -9,9 +9,9 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noThrowInEffectGenName = vmRuleName('no-throw-in-effect-gen');
+export const noThrowInEffectGenName = bnRuleName('no-throw-in-effect-gen');
 
-export const noThrowInEffectGen: CreateOnceRule = defineVamanaRule({
+export const noThrowInEffectGen: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

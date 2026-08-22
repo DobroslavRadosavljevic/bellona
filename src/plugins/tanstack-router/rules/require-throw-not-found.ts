@@ -1,12 +1,12 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { isNotFoundHandled, isRouterNotFoundCall } from '../route.ts';
 
-export const requireThrowNotFoundName = vmRuleName('require-throw-not-found');
+export const requireThrowNotFoundName = bnRuleName('require-throw-not-found');
 
-export const requireThrowNotFound: CreateOnceRule = defineVamanaRule({
+export const requireThrowNotFound: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

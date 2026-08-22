@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { pathHasParamToken } from '../route.ts';
 import {
@@ -29,9 +29,9 @@ function reportIfMissingParams(
   report({ messageId: 'missingParams', node: toValue });
 }
 
-export const requireParamsWithPathTokensName = vmRuleName('require-params-with-path-tokens');
+export const requireParamsWithPathTokensName = bnRuleName('require-params-with-path-tokens');
 
-export const requireParamsWithPathTokens: CreateOnceRule = defineVamanaRule({
+export const requireParamsWithPathTokens: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

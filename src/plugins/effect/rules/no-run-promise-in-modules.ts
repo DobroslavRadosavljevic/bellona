@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
 import {
   DEFAULT_ENTRY_OPTIONS,
@@ -22,9 +22,9 @@ const RUNNERS = [
   'runCallbackWith',
 ] as const;
 
-export const noRunPromiseInModulesName = vmRuleName('no-run-promise-in-modules');
+export const noRunPromiseInModulesName = bnRuleName('no-run-promise-in-modules');
 
-export const noRunPromiseInModules: CreateOnceRule = defineVamanaRule({
+export const noRunPromiseInModules: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

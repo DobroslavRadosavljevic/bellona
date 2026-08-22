@@ -2,7 +2,7 @@
 
 ## Plugin does not load
 
-- Specifier must be a **subpath**: `vamana/js`, not `vamana`.
+- Specifier must be a **subpath**: `bellona/js`, not `bellona`.
 - `oxlint` must be installed (peer). JS plugins need a Node-capable Oxlint, not a standalone binary without JS plugin support.
 - Pin `oxlint` to ^1.78. Alpha JS plugins break across Oxlint minors.
 - Config must use `jsPlugins`, not `plugins`. `plugins` is the built-in Oxlint plugin list (`eslint`, `typescript`, `unicorn`, …).
@@ -10,23 +10,23 @@
 
 ## Rule never reports
 
-1. Confirm the id is `<meta.name>/vm-<slug>` and severity is not `'off'`.
+1. Confirm the id is `<meta.name>/bn-<slug>` and severity is not `'off'`.
 2. Confirm that plugin is in `jsPlugins`.
 3. Import gate: Zod/Router/Elysia/Effect skip files with no matching import. Add a real import or pick another file.
 4. Test skip: most domain rules ignore `*.test.ts`, `*.spec.ts`, `*.stories.*`, and paths under `test` / `tests` / `__tests__` / `fixtures`.
 5. `allow`: a substring such as `/generated/` skips the whole file.
-6. Path gate (Elysia): `vm-one-route-method-per-file` only runs on `/routes/` leaf files, not `routes/index.ts`.
-7. Effect style rules (`shouldSkipEffectStyleFile`) skip tests; `vm-prefer-effect-vitest` runs **only** on tests.
+6. Path gate (Elysia): `bn-one-route-method-per-file` only runs on `/routes/` leaf files, not `routes/index.ts`.
+7. Effect style rules (`shouldSkipEffectStyleFile`) skip tests; `bn-prefer-effect-vitest` runs **only** on tests.
 8. `before()` returned `false` because an option list was empty (Base UI: both component lists empty).
 
 ## Wrong plugin prefix
 
 | You wrote | Actual |
 | --- | --- |
-| `vamana/vm-max-classes` | `js/vm-max-classes` |
-| `baseui/vm-…` | `base-ui/vm-…` |
-| `tanstack/vm-…` | `tanstack-router/vm-…` |
-| `effect/prefer-effect-fn` | `effect/vm-prefer-effect-fn` |
+| `bellona/bn-max-classes` | `js/bn-max-classes` |
+| `baseui/bn-…` | `base-ui/bn-…` |
+| `tanstack/bn-…` | `tanstack-router/bn-…` |
+| `effect/prefer-effect-fn` | `effect/bn-prefer-effect-fn` |
 
 ## File looks clean but the pattern exists
 
@@ -46,12 +46,12 @@ If every file sees the first file’s options, you read `context.options` in the
 
 ## Oxlint vs formatter
 
-Vamana does not format. Use Oxfmt (this repo) or the consumer’s formatter. Do not enable Oxlint style rules as a Prettier replacement.
+Bellona does not format. Use Oxfmt (this repo) or the consumer’s formatter. Do not enable Oxlint style rules as a Prettier replacement.
 
 ## Disable noise without turning the rule off
 
 ```ts
-// oxlint-disable-next-line effect/vm-no-date-now-in-effect -- clock is injected above
+// oxlint-disable-next-line effect/bn-no-date-now-in-effect -- clock is injected above
 ```
 
 Prefer a small `allow` path list for generated code over repo-wide `'off'`.

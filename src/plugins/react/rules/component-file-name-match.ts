@@ -1,14 +1,14 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getExportedExpressionName, unwrapComponentInit } from '../ast.ts';
 import { basenameWithoutExtension, isPrimaryComponentName, kebabToPascal } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const componentFileNameMatchName = vmRuleName('component-file-name-match');
+export const componentFileNameMatchName = bnRuleName('component-file-name-match');
 
-export const componentFileNameMatch: CreateOnceRule = defineVamanaRule({
+export const componentFileNameMatch: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

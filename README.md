@@ -1,20 +1,20 @@
-# vamana
+# bellona
 
-[![npm](https://img.shields.io/npm/v/vamana.svg)](https://www.npmjs.com/package/vamana)
-[![license](https://img.shields.io/npm/l/vamana.svg)](./LICENSE)
-[![skills.sh](https://skills.sh/b/DobroslavRadosavljevic/vamana)](https://skills.sh/DobroslavRadosavljevic/vamana)
+[![npm](https://img.shields.io/npm/v/bellona.svg)](https://www.npmjs.com/package/bellona)
+[![license](https://img.shields.io/npm/l/bellona.svg)](./LICENSE)
+[![skills.sh](https://skills.sh/b/DobroslavRadosavljevic/bellona)](https://skills.sh/DobroslavRadosavljevic/bellona)
 
 **Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins** for TypeScript, React, Base UI, Zod, TanStack Router, Elysia, and Effect.
 
 Load only the stacks you use. Turn rules on by id. Nothing is enabled by default.
 
-> Oxlint JS plugins are still **alpha** (outside Oxlint semver). Pin `oxlint` to `^1.78` next to vamana.
+> Oxlint JS plugins are still **alpha** (outside Oxlint semver). Pin `oxlint` to `^1.78` next to bellona.
 
 ## Features
 
 - ⚡ Built for **Oxlint JS plugins** — fast lint, same config you already use
-- 🔌 **One subpath per stack** — install one package, load `vamana/react` or `vamana/effect` only when you need it
-- 🎛️ **Fully opt-in** — no recommended preset; you pick each `vm-*` rule
+- 🔌 **One subpath per stack** — install one package, load `bellona/react` or `bellona/effect` only when you need it
+- 🎛️ **Fully opt-in** — no recommended preset; you pick each `bn-*` rule
 - 🛡️ TypeScript **evidence** rules (widening, `unknown`, unsafe dictionaries, mocks, assertions)
 - ⚛️ React file and JSX rules, plus Base UI `nativeButton` / `render` checks
 - 🧭 Zod, TanStack Router, Elysia, and Effect v4 style and API rules
@@ -23,20 +23,20 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 
 | Package subpath          | When to load                        |
 | ------------------------ | ----------------------------------- |
-| `vamana/js`              | TypeScript / JavaScript evidence    |
-| `vamana/react`           | React components, hooks, JSX        |
-| `vamana/base-ui`         | Base UI `nativeButton` and `render` |
-| `vamana/zod`             | Zod 4 schemas                       |
-| `vamana/tanstack-router` | TanStack Router / Start             |
-| `vamana/elysia`          | Elysia HTTP apps                    |
-| `vamana/effect`          | Effect v4 (`effect@rc`)             |
+| `bellona/js`              | TypeScript / JavaScript evidence    |
+| `bellona/react`           | React components, hooks, JSX        |
+| `bellona/base-ui`         | Base UI `nativeButton` and `render` |
+| `bellona/zod`             | Zod 4 schemas                       |
+| `bellona/tanstack-router` | TanStack Router / Start             |
+| `bellona/elysia`          | Elysia HTTP apps                    |
+| `bellona/effect`          | Effect v4 (`effect@rc`)             |
 
-Rule ids are `<plugin>/<rule>`, for example `js/vm-max-classes` and `effect/vm-prefer-effect-fn`.
+Rule ids are `<plugin>/<rule>`, for example `js/bn-max-classes` and `effect/bn-prefer-effect-fn`.
 
 ## Install
 
 ```sh
-bun add -D vamana oxlint
+bun add -D bellona oxlint
 ```
 
 npm, pnpm, and yarn work too. Peer: `oxlint` `^1.78.0`. Node: `^20.19.0 || >=22.12.0`.
@@ -49,23 +49,23 @@ import { defineConfig } from 'oxlint';
 
 export default defineConfig({
   jsPlugins: [
-    'vamana/js',
-    'vamana/react',
-    'vamana/base-ui',
-    'vamana/zod',
-    'vamana/tanstack-router',
-    'vamana/elysia',
-    'vamana/effect',
+    'bellona/js',
+    'bellona/react',
+    'bellona/base-ui',
+    'bellona/zod',
+    'bellona/tanstack-router',
+    'bellona/elysia',
+    'bellona/effect',
   ],
   rules: {
-    'js/vm-max-classes': ['error', { max: 5 }],
-    'react/vm-no-react-namespace': 'error',
-    'base-ui/vm-require-native-button-with-render': 'error',
-    'zod/vm-zod-schema-naming': 'error',
-    'tanstack-router/vm-no-dynamic-router-to': 'error',
-    'tanstack-router/vm-require-router-hook-from': 'error',
-    'elysia/vm-no-context-param': 'error',
-    'effect/vm-prefer-effect-fn': 'error',
+    'js/bn-max-classes': ['error', { max: 5 }],
+    'react/bn-no-react-namespace': 'error',
+    'base-ui/bn-require-native-button-with-render': 'error',
+    'zod/bn-zod-schema-naming': 'error',
+    'tanstack-router/bn-no-dynamic-router-to': 'error',
+    'tanstack-router/bn-require-router-hook-from': 'error',
+    'elysia/bn-no-context-param': 'error',
+    'effect/bn-prefer-effect-fn': 'error',
   },
 });
 ```
@@ -76,142 +76,142 @@ Many domain rules skip test and spec files. Most of them also skip files that ne
 
 ## Rules
 
-### `vamana/js`
+### `bellona/js`
 
-- `vm-max-classes`
-- `vm-no-chained-type-assertions`
-- `vm-no-conditional-empty-object-spread`
-- `vm-no-known-value-widening`
-- `vm-no-module-mocking`
-- `vm-no-object-parameters`
-- `vm-no-reflect-apply`
-- `vm-no-reflect-get`
-- `vm-no-runtime-typeof` (`allowInTypeGuards`, default `false`)
-- `vm-no-shape-in-symbol-names` (`term`, `caseSensitive`; matching is case-insensitive by default)
-- `vm-no-unknown-parameters` (`allow`, default `["cause"]`)
-- `vm-no-unknown-returns`
-- `vm-no-unknown-type-aliases`
-- `vm-no-unsafe-dictionary-type`
-- `vm-no-widen-then-assert`
-- `vm-require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
+- `bn-max-classes`
+- `bn-no-chained-type-assertions`
+- `bn-no-conditional-empty-object-spread`
+- `bn-no-known-value-widening`
+- `bn-no-module-mocking`
+- `bn-no-object-parameters`
+- `bn-no-reflect-apply`
+- `bn-no-reflect-get`
+- `bn-no-runtime-typeof` (`allowInTypeGuards`, default `false`)
+- `bn-no-shape-in-symbol-names` (`term`, `caseSensitive`; matching is case-insensitive by default)
+- `bn-no-unknown-parameters` (`allow`, default `["cause"]`)
+- `bn-no-unknown-returns`
+- `bn-no-unknown-type-aliases`
+- `bn-no-unsafe-dictionary-type`
+- `bn-no-widen-then-assert`
+- `bn-require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
 
 ```ts
 rules: {
-  'js/vm-no-chained-type-assertions': 'error',
-  'js/vm-no-runtime-typeof': ['error', { allowInTypeGuards: false }],
-  'js/vm-no-unknown-parameters': ['error', { allow: ['cause'] }],
-  'js/vm-no-shape-in-symbol-names': ['error', { term: 'shape', caseSensitive: false }],
-  'js/vm-require-safety-comment-for-type-assertion': ['error', { marker: 'SAFETY' }],
+  'js/bn-no-chained-type-assertions': 'error',
+  'js/bn-no-runtime-typeof': ['error', { allowInTypeGuards: false }],
+  'js/bn-no-unknown-parameters': ['error', { allow: ['cause'] }],
+  'js/bn-no-shape-in-symbol-names': ['error', { term: 'shape', caseSensitive: false }],
+  'js/bn-require-safety-comment-for-type-assertion': ['error', { marker: 'SAFETY' }],
 }
 ```
 
-### `vamana/react`
+### `bellona/react`
 
 Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 
-- `vm-component-file-name-match`
-- `vm-hook-file-name-match`
-- `vm-no-jsx-iife-in-components`
-- `vm-no-jsx-local-constants-in-components`
-- `vm-no-jsx-module-constants`
-- `vm-no-jsx-variable-reassignment-in-components`
-- `vm-no-multi-component-files`
-- `vm-no-multi-hook-files`
-- `vm-no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
-- `vm-no-react-namespace`
-- `vm-no-render-helper-functions-in-components`
+- `bn-component-file-name-match`
+- `bn-hook-file-name-match`
+- `bn-no-jsx-iife-in-components`
+- `bn-no-jsx-local-constants-in-components`
+- `bn-no-jsx-module-constants`
+- `bn-no-jsx-variable-reassignment-in-components`
+- `bn-no-multi-component-files`
+- `bn-no-multi-hook-files`
+- `bn-no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
+- `bn-no-react-namespace`
+- `bn-no-render-helper-functions-in-components`
 
-### `vamana/base-ui`
+### `bellona/base-ui`
 
-- `vm-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
+- `bn-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
 
 `components` and `nonNativeButtonComponents` replace the default part lists. `buttonHosts` and `nonButtonHosts` add names to the built-in `render` host lists. The rule matches JSX names (`Dialog.Trigger` or `DialogTrigger`) and does not require an `@base-ui/react` import.
 
-### `vamana/zod`
+### `bellona/zod`
 
 Test and spec files are skipped.
 
-- `vm-zod-modern-format-validators`
-- `vm-zod-schema-naming`
+- `bn-zod-modern-format-validators`
+- `bn-zod-schema-naming`
 
-### `vamana/tanstack-router`
+### `bellona/tanstack-router`
 
 Test and spec files are skipped.
 
-- `vm-create-route-property-order`
-- `vm-no-dynamic-router-to`
-- `vm-no-get-route-api`
-- `vm-no-hooks-in-route-lifecycle`
-- `vm-no-imperative-location-navigation`
-- `vm-no-relative-router-to-without-from`
-- `vm-no-router-href`
-- `vm-no-router-type-assertion`
-- `vm-no-search-in-loader`
-- `vm-require-params-with-path-tokens`
-- `vm-require-router-hook-from`
-- `vm-require-throw-not-found`
-- `vm-require-throw-redirect`
-- `vm-require-validate-search-when-used`
+- `bn-create-route-property-order`
+- `bn-no-dynamic-router-to`
+- `bn-no-get-route-api`
+- `bn-no-hooks-in-route-lifecycle`
+- `bn-no-imperative-location-navigation`
+- `bn-no-relative-router-to-without-from`
+- `bn-no-router-href`
+- `bn-no-router-type-assertion`
+- `bn-no-search-in-loader`
+- `bn-require-params-with-path-tokens`
+- `bn-require-router-hook-from`
+- `bn-require-throw-not-found`
+- `bn-require-throw-redirect`
+- `bn-require-validate-search-when-used`
 
-### `vamana/elysia`
+### `bellona/elysia`
 
-Test and spec files are skipped. Files that do not import `elysia` are skipped except `vm-no-route-factory`.
+Test and spec files are skipped. Files that do not import `elysia` are skipped except `bn-no-route-factory`.
 
-- `vm-no-context-param`
-- `vm-no-controller-context-class`
-- `vm-no-cookie-undefined-check`
-- `vm-no-functional-plugin-callback`
-- `vm-no-route-factory` (`patterns`; `modules/` or `routes/` only)
-- `vm-one-route-method-per-file` (`routes/` leaf files)
-- `vm-prefer-resolve-for-auth` (`/plugins/` paths)
-- `vm-prefer-status-helper`
-- `vm-prefer-throw-status`
-- `vm-require-error-body-literal`
-- `vm-require-plugin-name` (also skips `/main.ts`, `/server.ts`, `/index.ts`, `/app.ts`)
-- `vm-require-response-schema` (`requireAllRoutes`, default `true`)
-- `vm-require-route-export-name` (`routes/` leaf files)
-- `vm-require-route-schema` (`methods`, default `post`/`put`/`patch`)
-- `vm-routes-index-mount-only` (`routes/index` files)
+- `bn-no-context-param`
+- `bn-no-controller-context-class`
+- `bn-no-cookie-undefined-check`
+- `bn-no-functional-plugin-callback`
+- `bn-no-route-factory` (`patterns`; `modules/` or `routes/` only)
+- `bn-one-route-method-per-file` (`routes/` leaf files)
+- `bn-prefer-resolve-for-auth` (`/plugins/` paths)
+- `bn-prefer-status-helper`
+- `bn-prefer-throw-status`
+- `bn-require-error-body-literal`
+- `bn-require-plugin-name` (also skips `/main.ts`, `/server.ts`, `/index.ts`, `/app.ts`)
+- `bn-require-response-schema` (`requireAllRoutes`, default `true`)
+- `bn-require-route-export-name` (`routes/` leaf files)
+- `bn-require-route-schema` (`methods`, default `post`/`put`/`patch`)
+- `bn-routes-index-mount-only` (`routes/index` files)
 
-### `vamana/effect`
+### `bellona/effect`
 
 Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some style rules also skip test files (marked below).
 
-- `vm-no-v3-effect-apis`
-- `vm-no-v3-imports`
-- `vm-no-v3-service-tags`
-- `vm-prefer-effect-fn`
-- `vm-require-effect-fn-name`
-- `vm-no-pipe-on-effect-fn`
-- `vm-no-try-catch-in-effect-gen`
-- `vm-no-throw-in-effect-gen`
-- `vm-require-return-yield-on-fail`
-- `vm-schema-union-array`
-- `vm-prefer-date-from-string`
-- `vm-prefer-decode-unknown-effect`
-- `vm-no-it-effect-scoped`
-- `vm-no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
-- `vm-require-service-id-path` (test files skipped)
-- `vm-require-service-static-layer` (test files skipped)
-- `vm-prefer-service-of` (test files skipped)
-- `vm-no-date-now-in-effect` (test files skipped)
-- `vm-prefer-clock-sleep` (test files skipped)
-- `vm-prefer-schema-tagged-error` (test files skipped)
-- `vm-prefer-try-promise` (test files skipped)
-- `vm-prefer-predicate` (test files skipped)
-- `vm-no-yield-ref-handle`
-- `vm-prefer-effect-vitest` (test files only)
-- `vm-schema-no-legacy-filter`
+- `bn-no-v3-effect-apis`
+- `bn-no-v3-imports`
+- `bn-no-v3-service-tags`
+- `bn-prefer-effect-fn`
+- `bn-require-effect-fn-name`
+- `bn-no-pipe-on-effect-fn`
+- `bn-no-try-catch-in-effect-gen`
+- `bn-no-throw-in-effect-gen`
+- `bn-require-return-yield-on-fail`
+- `bn-schema-union-array`
+- `bn-prefer-date-from-string`
+- `bn-prefer-decode-unknown-effect`
+- `bn-no-it-effect-scoped`
+- `bn-no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
+- `bn-require-service-id-path` (test files skipped)
+- `bn-require-service-static-layer` (test files skipped)
+- `bn-prefer-service-of` (test files skipped)
+- `bn-no-date-now-in-effect` (test files skipped)
+- `bn-prefer-clock-sleep` (test files skipped)
+- `bn-prefer-schema-tagged-error` (test files skipped)
+- `bn-prefer-try-promise` (test files skipped)
+- `bn-prefer-predicate` (test files skipped)
+- `bn-no-yield-ref-handle`
+- `bn-prefer-effect-vitest` (test files only)
+- `bn-schema-no-legacy-filter`
 
 ## Agent skill
 
-Coding agents can install the vamana skill from [skills.sh](https://www.skills.sh/):
+Coding agents can install the bellona skill from [skills.sh](https://www.skills.sh/):
 
 ```sh
-npx skills add DobroslavRadosavljevic/vamana --skill vamana
+npx skills add DobroslavRadosavljevic/bellona --skill bellona
 ```
 
-Use `--skill vamana` so only this skill is installed.
+Use `--skill bellona` so only this skill is installed.
 
 ## License
 

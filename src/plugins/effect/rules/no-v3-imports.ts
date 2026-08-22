@@ -2,13 +2,13 @@ import type { Context, CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { matchesAllow } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 import { v3ImportReplacement } from '../v3-imports.ts';
 
-export const noV3ImportsName = vmRuleName('no-v3-imports');
+export const noV3ImportsName = bnRuleName('no-v3-imports');
 
 function reportMoved(context: Context, sourceNode: ESTree.Node, source: string): void {
   const replacement = v3ImportReplacement(source);
@@ -30,7 +30,7 @@ function reportSpecifierLiteral(context: Context, node: ESTree.Node | null | und
   reportMoved(context, expression, expression.value);
 }
 
-export const noV3Imports: CreateOnceRule = defineVamanaRule({
+export const noV3Imports: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

@@ -1,12 +1,12 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { hasFromOrStrictFalse, isBareRouterHookCall } from '../router.ts';
 
-export const requireRouterHookFromName = vmRuleName('require-router-hook-from');
+export const requireRouterHookFromName = bnRuleName('require-router-hook-from');
 
-export const requireRouterHookFrom: CreateOnceRule = defineVamanaRule({
+export const requireRouterHookFrom: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

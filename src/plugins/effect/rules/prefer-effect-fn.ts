@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, walkFunctionBody } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -11,7 +11,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const preferEffectFnName = vmRuleName('prefer-effect-fn');
+export const preferEffectFnName = bnRuleName('prefer-effect-fn');
 
 function returnsEffectGen(fn: ESTree.Node, bindings: EffectBindings): boolean {
   if (!isFunctionLike(fn)) {
@@ -42,7 +42,7 @@ function returnsEffectGen(fn: ESTree.Node, bindings: EffectBindings): boolean {
   return found;
 }
 
-export const preferEffectFn: CreateOnceRule = defineVamanaRule({
+export const preferEffectFn: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

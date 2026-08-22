@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallName, getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
@@ -9,9 +9,9 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * Prefer `status(code, value)` over `set.status = code` in Elysia handlers /
  * lifecycle hooks for typed responses / Eden narrowing.
  */
-export const preferStatusHelperName = vmRuleName('prefer-status-helper');
+export const preferStatusHelperName = bnRuleName('prefer-status-helper');
 
-export const preferStatusHelper: CreateOnceRule = defineVamanaRule({
+export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

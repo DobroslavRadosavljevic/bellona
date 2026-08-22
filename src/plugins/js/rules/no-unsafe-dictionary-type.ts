@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   classifyUnsafeDictionary,
   classifyUnsafeDictionaryValue,
@@ -85,9 +85,9 @@ function shouldReportType(node: ESTree.TSType, environment: TypeEnvironment): bo
 }
 
 /** Disallow object-dictionary contracts whose direct value type is an unsafe escape hatch. */
-export const noUnsafeDictionaryTypeName = vmRuleName('no-unsafe-dictionary-type');
+export const noUnsafeDictionaryTypeName = bnRuleName('no-unsafe-dictionary-type');
 
-export const noUnsafeDictionaryType: CreateOnceRule = defineVamanaRule({
+export const noUnsafeDictionaryType: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

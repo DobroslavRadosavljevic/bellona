@@ -1,4 +1,4 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import { noContextParam, noContextParamName } from './rules/no-context-param.ts';
 import {
   noControllerContextClass,
@@ -36,7 +36,7 @@ import {
 import { requireRouteSchema, requireRouteSchemaName } from './rules/require-route-schema.ts';
 import { routesIndexMountOnly, routesIndexMountOnlyName } from './rules/routes-index-mount-only.ts';
 
-const elysia = defineVamanaPlugin('elysia', {
+const elysia = defineBellonaPlugin('elysia', {
   [noContextParamName]: noContextParam,
   [noControllerContextClassName]: noControllerContextClass,
   [noCookieUndefinedCheckName]: noCookieUndefinedCheck,

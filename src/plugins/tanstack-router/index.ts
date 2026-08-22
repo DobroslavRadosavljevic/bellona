@@ -1,4 +1,4 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import {
   createRoutePropertyOrder,
   createRoutePropertyOrderName,
@@ -38,7 +38,7 @@ import {
   requireValidateSearchWhenUsedName,
 } from './rules/require-validate-search-when-used.ts';
 
-const tanstackRouter = defineVamanaPlugin('tanstack-router', {
+const tanstackRouter = defineBellonaPlugin('tanstack-router', {
   [createRoutePropertyOrderName]: createRoutePropertyOrder,
   [noDynamicRouterToName]: noDynamicRouterTo,
   [noGetRouteApiName]: noGetRouteApi,

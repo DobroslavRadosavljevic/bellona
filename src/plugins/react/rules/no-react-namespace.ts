@@ -1,11 +1,11 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipReactFile } from '../options.ts';
 
-export const noReactNamespaceName = vmRuleName('no-react-namespace');
+export const noReactNamespaceName = bnRuleName('no-react-namespace');
 
-export const noReactNamespace: CreateOnceRule = defineVamanaRule({
+export const noReactNamespace: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

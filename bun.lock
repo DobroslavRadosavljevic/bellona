@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "vamana",
+      "name": "bellona",
       "dependencies": {
         "@oxlint/plugins": "^1.78.0",
       },

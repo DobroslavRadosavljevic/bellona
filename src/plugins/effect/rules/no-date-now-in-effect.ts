@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -8,7 +8,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const noDateNowInEffectName = vmRuleName('no-date-now-in-effect');
+export const noDateNowInEffectName = bnRuleName('no-date-now-in-effect');
 
 function isDateConstructor(node: ReturnType<typeof unwrapExpression>): boolean {
   if (node?.type === 'Identifier' && node.name === 'Date') {
@@ -20,7 +20,7 @@ function isDateConstructor(node: ReturnType<typeof unwrapExpression>): boolean {
   return false;
 }
 
-export const noDateNowInEffect: CreateOnceRule = defineVamanaRule({
+export const noDateNowInEffect: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

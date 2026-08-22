@@ -3,19 +3,19 @@ import { describe, expect, it } from 'vitest';
 import react from '../../../../src/plugins/react/index.ts';
 
 describe('react plugin', () => {
-  it('registers every React rule under a vm- id', () => {
+  it('registers every React rule under a bn- id', () => {
     expect(Object.keys(react.rules)).toEqual([
-      'vm-component-file-name-match',
-      'vm-hook-file-name-match',
-      'vm-no-jsx-iife-in-components',
-      'vm-no-jsx-local-constants-in-components',
-      'vm-no-jsx-module-constants',
-      'vm-no-jsx-variable-reassignment-in-components',
-      'vm-no-multi-component-files',
-      'vm-no-multi-hook-files',
-      'vm-no-native-html',
-      'vm-no-react-namespace',
-      'vm-no-render-helper-functions-in-components',
+      'bn-component-file-name-match',
+      'bn-hook-file-name-match',
+      'bn-no-jsx-iife-in-components',
+      'bn-no-jsx-local-constants-in-components',
+      'bn-no-jsx-module-constants',
+      'bn-no-jsx-variable-reassignment-in-components',
+      'bn-no-multi-component-files',
+      'bn-no-multi-hook-files',
+      'bn-no-native-html',
+      'bn-no-react-namespace',
+      'bn-no-render-helper-functions-in-components',
     ]);
   });
 });

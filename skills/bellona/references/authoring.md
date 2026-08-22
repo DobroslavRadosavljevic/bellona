@@ -1,6 +1,6 @@
-# Authoring a vamana plugin or rule
+# Authoring a bellona plugin or rule
 
-Use this only when changing the **vamana package**. For consumer config, use [setup.md](setup.md).
+Use this only when changing the **bellona package**. For consumer config, use [setup.md](setup.md).
 
 ## New domain plugin
 
@@ -12,7 +12,7 @@ A new framework/domain is a new `src/plugins/<id>/` plus:
 4. `tests/unit/plugins/<id>/` (`harness.ts`, `fixtures.ts`, `*.test.ts`)
 5. README + this skill’s catalog
 
-TypeScript evidence rules stay on `vamana/js`. Do not start a second JS plugin.
+TypeScript evidence rules stay on `bellona/js`. Do not start a second JS plugin.
 
 `meta.name` must equal the last export segment (`elysia`, `base-ui`, …).
 
@@ -23,8 +23,8 @@ Ask before: new runtime dependencies, new plugin subpaths, oxlint major bumps, p
 ## New rule (copy this path)
 
 1. Copy `src/plugins/js/rules/max-classes.ts`.
-2. Export `vmRuleName('your-slug')` as `yourRuleName` (`vm-your-slug`, never bare `your-slug`).
-3. Use `defineVamanaRule` + `createOnce`. Type with `defineVamanaRule`; do not annotate as `Rule` (widens).
+2. Export `bnRuleName('your-slug')` as `yourRuleName` (`bn-your-slug`, never bare `your-slug`).
+3. Use `defineBellonaRule` + `createOnce`. Type with `defineBellonaRule`; do not annotate as `Rule` (widens).
 4. Prefer `schema` + `defaultOptions`. Read options with `objectOptionAt` / field helpers from visitors or `before`, not from the `createOnce` closure.
 5. Register in `src/plugins/<id>/index.ts`.
 6. Add `tests/unit/plugins/<id>/<rule>.test.ts` with `valid` / `invalid` `RuleTester` cases:
@@ -90,4 +90,4 @@ v3 specifier maps belong in `src/plugins/effect/v3-imports.ts`.
 
 ## Self-lint
 
-This repo loads **source** `vamana/js` in `oxlint.config.ts` (`jsPlugins: ['./src/plugins/js/index.ts']`) and turns **all** js rules on for the package itself. Consumer apps should not copy that “enable every js rule” loop unless they want it.
+This repo loads **source** `bellona/js` in `oxlint.config.ts` (`jsPlugins: ['./src/plugins/js/index.ts']`) and turns **all** js rules on for the package itself. Consumer apps should not copy that “enable every js rule” loop unless they want it.

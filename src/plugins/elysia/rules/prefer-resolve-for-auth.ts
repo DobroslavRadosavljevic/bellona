@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getElysiaDeriveCallback, isAuthRelatedDeriveCallback } from '../elysia.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -12,9 +12,9 @@ import {
  * Prefer `.resolve` / macros over `.derive` for session/auth context in
  * plugin files. IP-only derives are allowed.
  */
-export const preferResolveForAuthName = vmRuleName('prefer-resolve-for-auth');
+export const preferResolveForAuthName = bnRuleName('prefer-resolve-for-auth');
 
-export const preferResolveForAuth: CreateOnceRule = defineVamanaRule({
+export const preferResolveForAuth: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

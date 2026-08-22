@@ -1,13 +1,13 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isAtModuleScope, isFunctionLike } from '../ast.ts';
 import { expressionContainsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noJsxModuleConstantsName = vmRuleName('no-jsx-module-constants');
+export const noJsxModuleConstantsName = bnRuleName('no-jsx-module-constants');
 
-export const noJsxModuleConstants: CreateOnceRule = defineVamanaRule({
+export const noJsxModuleConstants: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

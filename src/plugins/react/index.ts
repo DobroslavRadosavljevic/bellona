@@ -1,4 +1,4 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import {
   componentFileNameMatch,
   componentFileNameMatchName,
@@ -29,7 +29,7 @@ import {
   noRenderHelperFunctionsInComponentsName,
 } from './rules/no-render-helper-functions-in-components.ts';
 
-const react = defineVamanaPlugin('react', {
+const react = defineBellonaPlugin('react', {
   [componentFileNameMatchName]: componentFileNameMatch,
   [hookFileNameMatchName]: hookFileNameMatch,
   [noJsxIifeInComponentsName]: noJsxIifeInComponents,

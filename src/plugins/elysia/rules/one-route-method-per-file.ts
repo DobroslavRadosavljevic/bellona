@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isElysiaRouteMethodCall } from '../elysia.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -12,9 +12,9 @@ import {
  * Leaf `routes/<action>.ts` files may register at most one Elysia route method
  * (`.get` / `.post` / …). Mount tables belong in `routes/index.ts`.
  */
-export const oneRouteMethodPerFileName = vmRuleName('one-route-method-per-file');
+export const oneRouteMethodPerFileName = bnRuleName('one-route-method-per-file');
 
-export const oneRouteMethodPerFile: CreateOnceRule = defineVamanaRule({
+export const oneRouteMethodPerFile: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     let routeMethodCount = 0;
 

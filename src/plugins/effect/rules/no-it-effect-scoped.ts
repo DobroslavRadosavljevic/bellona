@@ -1,7 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, pipeRoot, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
@@ -13,7 +13,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noItEffectScopedName = vmRuleName('no-it-effect-scoped');
+export const noItEffectScopedName = bnRuleName('no-it-effect-scoped');
 
 function isEffectScopedCall(
   node: ReturnType<typeof unwrapExpression>,
@@ -60,7 +60,7 @@ function wrapsEffectScoped(
   return false;
 }
 
-export const noItEffectScoped: CreateOnceRule = defineVamanaRule({
+export const noItEffectScoped: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {

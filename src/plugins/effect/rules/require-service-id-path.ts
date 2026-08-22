@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   collectEffectBindings,
   isContextServiceClassKeyCall,
@@ -15,9 +15,9 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const requireServiceIdPathName = vmRuleName('require-service-id-path');
+export const requireServiceIdPathName = bnRuleName('require-service-id-path');
 
-export const requireServiceIdPath: CreateOnceRule = defineVamanaRule({
+export const requireServiceIdPath: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {

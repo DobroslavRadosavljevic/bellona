@@ -1,6 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
+import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import {
   camelCaseToScreamingSnake,
@@ -21,9 +21,9 @@ import {
  * `…Route` / `…Routes` bindings. `new Elysia({ name })` stays SCREAMING_SNAKE
  * and must equal the camelCase export converted to SCREAMING_SNAKE.
  */
-export const requireRouteExportNameName = vmRuleName('require-route-export-name');
+export const requireRouteExportNameName = bnRuleName('require-route-export-name');
 
-export const requireRouteExportName: CreateOnceRule = defineVamanaRule({
+export const requireRouteExportName: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     return {
       before() {

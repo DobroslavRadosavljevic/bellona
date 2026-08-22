@@ -1,4 +1,4 @@
-import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import { defineBellonaPlugin } from '../../lib/plugin.ts';
 import { maxClasses, maxClassesName } from './rules/max-classes.ts';
 import {
   noChainedTypeAssertions,
@@ -28,7 +28,7 @@ import {
   requireSafetyCommentForTypeAssertionName,
 } from './rules/require-safety-comment-for-type-assertion.ts';
 
-const js = defineVamanaPlugin('js', {
+const js = defineBellonaPlugin('js', {
   [maxClassesName]: maxClasses,
   [noChainedTypeAssertionsName]: noChainedTypeAssertions,
   [noConditionalEmptyObjectSpreadName]: noConditionalEmptyObjectSpread,
