@@ -9,6 +9,7 @@ export const plugins = {
   zod: 'vamana/zod',
   tanstackRouter: 'vamana/tanstack-router',
   elysia: 'vamana/elysia',
+  effect: 'vamana/effect',
 } satisfies Record<string, `vamana/${string}`>;
 
 export type VamanaPluginSpecifier = (typeof plugins)[keyof typeof plugins];

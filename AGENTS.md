@@ -57,7 +57,7 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 ## Project rules
 
 - New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `vamana/js`.
-- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`) so ids are `<name>/vm-<slug>`
+- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`, `effect`) so ids are `<name>/vm-<slug>`
 - Register with `vmRuleName('slug')` (`vm-max-classes`, never bare `max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure

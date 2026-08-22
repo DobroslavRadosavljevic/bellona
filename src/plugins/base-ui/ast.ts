@@ -79,6 +79,11 @@ export function asExpression(node: ESTree.Node | null | undefined): ESTree.Expre
     case 'JSXElement':
     case 'JSXFragment':
     case 'MetaProperty':
+    case 'TSAsExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSNonNullExpression':
+    case 'TSTypeAssertion':
+    case 'TSInstantiationExpression':
       return node;
     default:
       return undefined;

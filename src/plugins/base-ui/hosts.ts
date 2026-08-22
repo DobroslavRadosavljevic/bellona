@@ -3,39 +3,13 @@ import type { ESTree } from '@oxlint/plugins';
 import { isAstNode } from '../../lib/ast-node.ts';
 import { isJsBoolean } from '../../lib/js-kind.ts';
 import { asExpression, isFunctionLike, unwrapExpression } from './ast.ts';
-
-export const NATIVE_BUTTON_DEFAULT_COMPONENTS = [
-  'Button',
-  'DialogTrigger',
-  'DialogClose',
-  'AlertDialogTrigger',
-  'AlertDialogCancel',
-  'AlertDialogAction',
-  'SheetTrigger',
-  'SheetClose',
-  'PopoverTrigger',
-  'PopoverClose',
-  'DropdownMenuTrigger',
-  'DropdownMenuSubTrigger',
-  'ContextMenuTrigger',
-  'ContextMenuSubTrigger',
-  'MenubarTrigger',
-  'MenubarSubTrigger',
-  'TabsTab',
-  'AccordionTrigger',
-  'CollapsibleTrigger',
-  'SelectTrigger',
-  'ComboboxTrigger',
-  'AutocompleteTrigger',
-  'ToolbarButton',
-  'Toggle',
-] as const;
-
-export const BUTTON_RENDER_HOST_COMPONENTS = ['Button', 'SidebarMenuButton'] as const;
-
-export const NON_BUTTON_RENDER_HOST_COMPONENTS = ['Link', 'ButtonAnchor', 'NavLink'] as const;
+import { buildRenderHostCatalog, nameSetHas, type RenderHostCatalog } from './options.ts';
 
 export type RenderHostKind = 'button' | 'non-button' | 'unknown';
+
+export type NativeButtonLiteral = boolean | undefined | 'dynamic';
+
+export const DEFAULT_RENDER_HOST_CATALOG: RenderHostCatalog = buildRenderHostCatalog();
 
 export function getJsxAttrValue(
   opening: ESTree.JSXOpeningElement,
@@ -107,24 +81,33 @@ export function getJsxName(opening: ESTree.JSXOpeningElement): string | undefine
   return undefined;
 }
 
-export function getNativeButtonLiteral(
-  opening: ESTree.JSXOpeningElement,
-): boolean | undefined | 'dynamic' {
-  if (!jsxHasAttr(opening, 'nativeButton')) {
-    return undefined;
-  }
-  const value = getJsxAttrValue(opening, 'nativeButton');
-  if (value === undefined) {
-    return true;
-  }
-  const expression = unwrapExpression(asExpression(value));
-  if (expression === undefined) {
+export function getNativeButtonLiteral(opening: ESTree.JSXOpeningElement): NativeButtonLiteral {
+  for (const attribute of opening.attributes) {
+    if (attribute.type !== 'JSXAttribute') {
+      continue;
+    }
+    if (attribute.name.type !== 'JSXIdentifier' || attribute.name.name !== 'nativeButton') {
+      continue;
+    }
+    const { value } = attribute;
+    if (value === null || value === undefined) {
+      return true;
+    }
+    if (value.type === 'JSXExpressionContainer' && value.expression.type === 'JSXEmptyExpression') {
+      return 'dynamic';
+    }
+    const expression = unwrapExpression(
+      asExpression(value.type === 'JSXExpressionContainer' ? value.expression : value),
+    );
+    if (expression === undefined) {
+      return 'dynamic';
+    }
+    if (expression.type === 'Literal' && isJsBoolean(expression.value)) {
+      return expression.value;
+    }
     return 'dynamic';
   }
-  if (expression.type === 'Literal' && isJsBoolean(expression.value)) {
-    return expression.value;
-  }
-  return 'dynamic';
+  return undefined;
 }
 
 function jsxElementOpeningName(node: ESTree.Node | undefined): string | undefined {
@@ -135,39 +118,35 @@ function jsxElementOpeningName(node: ESTree.Node | undefined): string | undefine
   return getJsxName(expression.openingElement);
 }
 
-function leafName(name: string): string {
-  return name.split('.').at(-1) ?? name;
-}
-
-const BUTTON_HOSTS = new Set<string>(BUTTON_RENDER_HOST_COMPONENTS);
-const NON_BUTTON_HOSTS = new Set<string>(NON_BUTTON_RENDER_HOST_COMPONENTS);
-
-export function classifyJsxHostName(name: string | undefined): RenderHostKind {
+export function classifyJsxHostName(
+  name: string | undefined,
+  catalog: RenderHostCatalog = DEFAULT_RENDER_HOST_CATALOG,
+): RenderHostKind {
   if (name === undefined) {
     return 'unknown';
   }
   if (name === name.toLowerCase()) {
     return name === 'button' ? 'button' : 'non-button';
   }
-  const leaf = leafName(name);
-  if (BUTTON_HOSTS.has(name) || BUTTON_HOSTS.has(leaf)) {
-    return 'button';
-  }
-  if (NON_BUTTON_HOSTS.has(name) || NON_BUTTON_HOSTS.has(leaf)) {
+  if (nameSetHas(catalog.nonButtonNames, name)) {
     return 'non-button';
+  }
+  if (nameSetHas(catalog.buttonNames, name)) {
+    return 'button';
   }
   return 'unknown';
 }
 
 function classifyFunctionRender(
   node: ESTree.Function | ESTree.ArrowFunctionExpression,
+  catalog: RenderHostCatalog,
 ): RenderHostKind {
   const { body } = node;
   if (body === null || body === undefined) {
     return 'unknown';
   }
   if (body.type !== 'BlockStatement') {
-    return classifyRenderHost(body);
+    return classifyRenderHost(body, catalog);
   }
 
   let sawButton = false;
@@ -176,7 +155,7 @@ function classifyFunctionRender(
 
   const visit = (current: ESTree.Node): void => {
     if (current.type === 'ReturnStatement') {
-      const kind = classifyRenderHost(current.argument);
+      const kind = classifyRenderHost(current.argument, catalog);
       if (kind === 'button') {
         sawButton = true;
       } else if (kind === 'non-button') {
@@ -218,14 +197,27 @@ function classifyFunctionRender(
   return 'unknown';
 }
 
-export function classifyRenderHost(node: ESTree.Node | null | undefined): RenderHostKind {
+function combineHostKinds(left: RenderHostKind, right: RenderHostKind): RenderHostKind {
+  if (left === 'non-button' || right === 'non-button') {
+    return 'non-button';
+  }
+  if (left === 'button' && right === 'button') {
+    return 'button';
+  }
+  return 'unknown';
+}
+
+export function classifyRenderHost(
+  node: ESTree.Node | null | undefined,
+  catalog: RenderHostCatalog = DEFAULT_RENDER_HOST_CATALOG,
+): RenderHostKind {
   const expression = unwrapExpression(asExpression(node));
   if (expression === undefined) {
     return 'unknown';
   }
 
   if (expression.type === 'JSXElement') {
-    return classifyJsxHostName(jsxElementOpeningName(expression));
+    return classifyJsxHostName(jsxElementOpeningName(expression), catalog);
   }
 
   if (expression.type === 'JSXFragment') {
@@ -233,32 +225,36 @@ export function classifyRenderHost(node: ESTree.Node | null | undefined): Render
   }
 
   if (isFunctionLike(expression)) {
-    return classifyFunctionRender(expression);
+    return classifyFunctionRender(expression, catalog);
   }
 
   if (expression.type === 'ConditionalExpression') {
-    const consequent = classifyRenderHost(expression.consequent);
-    const alternate = classifyRenderHost(expression.alternate);
-    if (consequent === 'non-button' || alternate === 'non-button') {
-      return 'non-button';
-    }
-    if (consequent === 'button' && alternate === 'button') {
-      return 'button';
-    }
-    return 'unknown';
+    return combineHostKinds(
+      classifyRenderHost(expression.consequent, catalog),
+      classifyRenderHost(expression.alternate, catalog),
+    );
   }
 
   if (expression.type === 'LogicalExpression') {
-    const left = classifyRenderHost(expression.left);
-    const right = classifyRenderHost(expression.right);
-    if (left === 'non-button' || right === 'non-button') {
-      return 'non-button';
-    }
-    if (left === 'button' && right === 'button') {
-      return 'button';
-    }
-    return 'unknown';
+    return combineHostKinds(
+      classifyRenderHost(expression.left, catalog),
+      classifyRenderHost(expression.right, catalog),
+    );
   }
 
   return 'unknown';
+}
+
+export function defaultNativeButton(
+  name: string,
+  nativeButtonNames: ReadonlySet<string>,
+  nonNativeButtonNames: ReadonlySet<string>,
+): boolean | undefined {
+  if (nameSetHas(nativeButtonNames, name)) {
+    return true;
+  }
+  if (nameSetHas(nonNativeButtonNames, name)) {
+    return false;
+  }
+  return undefined;
 }

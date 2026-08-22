@@ -24,6 +24,7 @@ export default defineConfig({
     'vamana/zod',
     'vamana/tanstack-router',
     'vamana/elysia',
+    'vamana/effect',
   ],
   rules: {
     'js/vm-max-classes': ['error', { max: 5 }],
@@ -33,6 +34,7 @@ export default defineConfig({
     'tanstack-router/vm-no-dynamic-router-to': 'error',
     'tanstack-router/vm-require-router-hook-from': 'error',
     'elysia/vm-no-context-param': 'error',
+    'effect/vm-prefer-effect-fn': 'error',
   },
 });
 ```
@@ -47,6 +49,7 @@ Omit a subpath if you do not want that plugin loaded.
 | `vamana/zod`             | `zod`             | See list below |
 | `vamana/tanstack-router` | `tanstack-router` | See list below |
 | `vamana/elysia`          | `elysia`          | See list below |
+| `vamana/effect`          | `effect`          | See list below |
 
 `vamana/js` includes `vm-max-classes` and these TypeScript evidence rules:
 
@@ -94,7 +97,9 @@ rules: {
 
 `vamana/base-ui` rules:
 
-- `vm-require-native-button-with-render` (`components`, `requireExplicitWhenUnknown`)
+- `vm-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
+
+`components` and `nonNativeButtonComponents` replace the default part lists. `buttonHosts` and `nonButtonHosts` add names to the built-in `render` host lists. The rule matches JSX names (`Dialog.Trigger` or `DialogTrigger`) and does not require an `@base-ui/react` import.
 
 `vamana/zod` rules (`allow` path substrings skip a file; test/spec files are skipped):
 
@@ -135,6 +140,34 @@ rules: {
 - `vm-require-route-export-name` (`routes/` leaf files)
 - `vm-require-route-schema` (`methods`, default `post`/`put`/`patch`)
 - `vm-routes-index-mount-only` (`routes/index` files)
+
+`vamana/effect` rules (`allow` path substrings skip a file). Files that do not import `effect` / `effect/*` / `@effect/*` are skipped. Some style rules also skip test files (marked below).
+
+- `vm-no-v3-effect-apis`
+- `vm-no-v3-imports`
+- `vm-no-v3-service-tags`
+- `vm-prefer-effect-fn`
+- `vm-require-effect-fn-name`
+- `vm-no-pipe-on-effect-fn`
+- `vm-no-try-catch-in-effect-gen`
+- `vm-no-throw-in-effect-gen`
+- `vm-require-return-yield-on-fail`
+- `vm-schema-union-array`
+- `vm-prefer-date-from-string`
+- `vm-prefer-decode-unknown-effect`
+- `vm-no-it-effect-scoped`
+- `vm-no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
+- `vm-require-service-id-path` (test files skipped)
+- `vm-require-service-static-layer` (test files skipped)
+- `vm-prefer-service-of` (test files skipped)
+- `vm-no-date-now-in-effect` (test files skipped)
+- `vm-prefer-clock-sleep` (test files skipped)
+- `vm-prefer-schema-tagged-error` (test files skipped)
+- `vm-prefer-try-promise` (test files skipped)
+- `vm-prefer-predicate` (test files skipped)
+- `vm-no-yield-ref-handle`
+- `vm-prefer-effect-vitest` (test files only)
+- `vm-schema-no-legacy-filter`
 
 ## Develop a rule
 

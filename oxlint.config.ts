@@ -15,7 +15,7 @@ export default defineConfig({
     suspicious: 'warn',
   },
   env: { node: true },
-  ignorePatterns: ['dist/**', 'coverage/**', '.agents/**', '.claude/**', 'agent/**'],
+  ignorePatterns: ['dist/**', 'coverage/**', '.temp/**', '.agents/**', '.claude/**', 'agent/**'],
   jsPlugins: [jsPluginSpecifier],
   rules: jsRules,
   overrides: [

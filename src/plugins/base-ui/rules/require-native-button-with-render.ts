@@ -1,30 +1,43 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
-import { booleanField, objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineVamanaRule, vmRuleName } from '../../../lib/rule.ts';
 import {
-  NATIVE_BUTTON_DEFAULT_COMPONENTS,
   classifyRenderHost,
+  defaultNativeButton,
   getJsxAttrValue,
   getJsxName,
   getNativeButtonLiteral,
   jsxHasAttr,
 } from '../hosts.ts';
+import {
+  BUTTON_RENDER_HOST_COMPONENTS,
+  NATIVE_BUTTON_COMPONENTS,
+  NON_BUTTON_RENDER_HOST_COMPONENTS,
+  NON_NATIVE_BUTTON_COMPONENTS,
+  readNativeButtonWithRenderOptions,
+  type NativeButtonWithRenderOptions,
+} from '../options.ts';
 
 export const requireNativeButtonWithRenderName = vmRuleName('require-native-button-with-render');
+
+const STRING_NAME_LIST_SCHEMA = {
+  type: 'array',
+  items: { type: 'string', minLength: 1 },
+  uniqueItems: true,
+} as const;
 
 export const requireNativeButtonWithRender: CreateOnceRule = defineVamanaRule({
   meta: {
     type: 'problem',
     docs: {
       description:
-        'Align Base UI `nativeButton` with whether `render` mounts a real `<button>` DOM node',
+        'Align Base UI `nativeButton` with whether `render` mounts a real `<button>` DOM node. Matching is by JSX name so design-system wrappers are covered without an `@base-ui/react` import.',
     },
     messages: {
       requireFalse:
-        '`<{{component}}>` defaults to a native button. Set `nativeButton={false}` when `render` mounts a non-`<button>` (for example `<Link>`, `<a>`, or `<div>`). Keep the default when composing `render={<Button />}`.',
+        '`<{{component}}>` `render` mounts a non-`<button>` host. Set `nativeButton={false}`. Base UI warns when `nativeButton` disagrees with the DOM node.',
       requireTrue:
-        '`<{{component}}>` has `nativeButton={false}` but `render` mounts a `<button>` (or `<Button>`). Remove `nativeButton={false}` or set `nativeButton` / `nativeButton={true}`. Base UI warns when the prop disagrees with the DOM node.',
+        '`<{{component}}>` `render` mounts a `<button>` host. Set `nativeButton` or `nativeButton={true}`. Base UI warns when `nativeButton` disagrees with the DOM node.',
       requireExplicit:
         '`<{{component}}>` uses `render` with an unknown host. Set `nativeButton={false}` for non-button hosts, or omit/`nativeButton={true}` when the host mounts a real `<button>`.',
     },
@@ -33,40 +46,49 @@ export const requireNativeButtonWithRender: CreateOnceRule = defineVamanaRule({
         type: 'object',
         additionalProperties: false,
         properties: {
-          components: {
-            type: 'array',
-            items: { type: 'string', minLength: 1 },
-            uniqueItems: true,
-          },
+          components: STRING_NAME_LIST_SCHEMA,
+          nonNativeButtonComponents: STRING_NAME_LIST_SCHEMA,
+          buttonHosts: STRING_NAME_LIST_SCHEMA,
+          nonButtonHosts: STRING_NAME_LIST_SCHEMA,
           requireExplicitWhenUnknown: { type: 'boolean' },
         },
       },
     ],
     defaultOptions: [
       {
-        components: [...NATIVE_BUTTON_DEFAULT_COMPONENTS],
+        components: [...NATIVE_BUTTON_COMPONENTS],
+        nonNativeButtonComponents: [...NON_NATIVE_BUTTON_COMPONENTS],
+        buttonHosts: [...BUTTON_RENDER_HOST_COMPONENTS],
+        nonButtonHosts: [...NON_BUTTON_RENDER_HOST_COMPONENTS],
         requireExplicitWhenUnknown: false,
       },
     ],
   },
   createOnce(context) {
-    let components = new Set<string>(NATIVE_BUTTON_DEFAULT_COMPONENTS);
-    let requireExplicitWhenUnknown = false;
+    let options: NativeButtonWithRenderOptions | undefined;
 
     return {
       before() {
-        const options = objectOptionAt(context, 0);
-        components = new Set(
-          stringListField(options, 'components', NATIVE_BUTTON_DEFAULT_COMPONENTS),
-        );
-        requireExplicitWhenUnknown = booleanField(options, 'requireExplicitWhenUnknown', false);
-        if (components.size === 0) {
+        options = readNativeButtonWithRenderOptions(context);
+        if (options.nativeButtonNames.size === 0 && options.nonNativeButtonNames.size === 0) {
           return false;
         }
       },
       JSXOpeningElement(node) {
+        const current = options;
+        if (current === undefined) {
+          return;
+        }
         const name = getJsxName(node);
-        if (name === undefined || !components.has(name)) {
+        if (name === undefined) {
+          return;
+        }
+        const defaultNative = defaultNativeButton(
+          name,
+          current.nativeButtonNames,
+          current.nonNativeButtonNames,
+        );
+        if (defaultNative === undefined) {
           return;
         }
         if (!jsxHasAttr(node, 'render')) {
@@ -74,11 +96,14 @@ export const requireNativeButtonWithRender: CreateOnceRule = defineVamanaRule({
         }
 
         const nativeButton = getNativeButtonLiteral(node);
-        const renderValue = getJsxAttrValue(node, 'render');
-        const hostKind = classifyRenderHost(renderValue);
+        if (nativeButton === 'dynamic') {
+          return;
+        }
+
+        const hostKind = classifyRenderHost(getJsxAttrValue(node, 'render'), current.catalog);
 
         if (hostKind === 'non-button') {
-          if (nativeButton === false) {
+          if (nativeButton === false || (nativeButton === undefined && defaultNative === false)) {
             return;
           }
           context.report({
@@ -90,17 +115,18 @@ export const requireNativeButtonWithRender: CreateOnceRule = defineVamanaRule({
         }
 
         if (hostKind === 'button') {
-          if (nativeButton === false) {
-            context.report({
-              messageId: 'requireTrue',
-              data: { component: name },
-              node: node.name,
-            });
+          if (nativeButton === true || (nativeButton === undefined && defaultNative === true)) {
+            return;
           }
+          context.report({
+            messageId: 'requireTrue',
+            data: { component: name },
+            node: node.name,
+          });
           return;
         }
 
-        if (!requireExplicitWhenUnknown) {
+        if (!current.requireExplicitWhenUnknown) {
           return;
         }
         if (nativeButton !== undefined) {

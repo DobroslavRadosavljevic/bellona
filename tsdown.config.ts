@@ -9,6 +9,7 @@ export default defineConfig({
     zod: './src/plugins/zod/index.ts',
     'tanstack-router': './src/plugins/tanstack-router/index.ts',
     elysia: './src/plugins/elysia/index.ts',
+    effect: './src/plugins/effect/index.ts',
   },
   format: 'esm',
   dts: true,
