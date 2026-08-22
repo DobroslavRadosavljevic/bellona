@@ -52,7 +52,8 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 - `src/index.ts` is a specifier catalog only — **not** a plugin; consumers import `vamana/js` (see `package.json` `exports`)
 - Tests: `tests/unit/plugins/<id>/` (`fixtures.ts`, `harness.ts`, `*.test.ts`); shared: `tests/unit/lib/` (`getRule` wraps `create` for `RuleTester` only)
 - Generated: `dist/` — do not edit by hand
-- Oxfmt/Oxlint already ignore `.agents/`, `.claude/`, `agent/` — do not format or lint those trees
+- Public consumer skill: `skills/vamana/` (skills.sh). `.agents/skills/vamana` is a symlink to that tree
+- Oxfmt/Oxlint already ignore `.agents/`, `.claude/`, `agent/`, `skills/` — do not format or lint those trees
 
 ## Project rules
 
@@ -85,6 +86,7 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 | Topic                      | Document                                                       |
 | -------------------------- | -------------------------------------------------------------- |
 | Human setup / consumer API | `README.md`                                                    |
+| Consumer agent skill       | `skills/vamana/`                                               |
 | Plugin entries             | `package.json`, `tsdown.config.ts`                             |
 | Lint / format              | `oxlint.config.ts`, `oxfmt.config.ts`                          |
 | Oxlint JS plugins          | https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html |

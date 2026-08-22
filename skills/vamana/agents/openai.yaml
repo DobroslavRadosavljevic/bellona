@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vamana"
+  short_description: "Configure opt-in Oxlint JS plugins from vamana"
+  default_prompt: "Use $vamana to install, configure, enable, or debug vamana Oxlint JS plugins and vm-* rules."

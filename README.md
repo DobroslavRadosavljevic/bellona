@@ -1,5 +1,7 @@
 # vamana
 
+[![skills.sh](https://skills.sh/b/DobroslavRadosavljevic/vamana)](https://skills.sh/DobroslavRadosavljevic/vamana)
+
 Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins. Install the package, add only the subpaths you need, then turn rules on by id. Nothing is enabled by default.
 
 JS plugins are still **alpha** in Oxlint (outside semver). Pin `oxlint` in consuming apps.
@@ -168,6 +170,18 @@ rules: {
 - `vm-no-yield-ref-handle`
 - `vm-prefer-effect-vitest` (test files only)
 - `vm-schema-no-legacy-filter`
+
+## Agent skill
+
+Coding agents can load this package skill from [skills.sh](https://www.skills.sh/):
+
+```sh
+npx skills add DobroslavRadosavljevic/vamana --skill vamana
+```
+
+Use `--skill vamana` so only this skill is installed. This repo also has other skills under `.agents/skills/`.
+
+Source: [`skills/vamana/`](./skills/vamana/).
 
 ## Develop a rule
 

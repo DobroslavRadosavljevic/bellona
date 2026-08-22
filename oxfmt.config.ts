@@ -6,5 +6,13 @@ export default defineConfig({
   semi: true,
   trailingComma: 'all',
   sortImports: true,
-  ignorePatterns: ['dist/**', 'coverage/**', '.temp/**', '.agents/**', '.claude/**', 'agent/**'],
+  ignorePatterns: [
+    'dist/**',
+    'coverage/**',
+    '.temp/**',
+    '.agents/**',
+    '.claude/**',
+    'agent/**',
+    'skills/**',
+  ],
 });
