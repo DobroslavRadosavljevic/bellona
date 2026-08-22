@@ -1,10 +1,37 @@
 # vamana
 
+[![npm](https://img.shields.io/npm/v/vamana.svg)](https://www.npmjs.com/package/vamana)
+[![license](https://img.shields.io/npm/l/vamana.svg)](./LICENSE)
 [![skills.sh](https://skills.sh/b/DobroslavRadosavljevic/vamana)](https://skills.sh/DobroslavRadosavljevic/vamana)
 
-Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins. Install the package, add only the subpaths you need, then turn rules on by id. Nothing is enabled by default.
+**Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins** for TypeScript, React, Base UI, Zod, TanStack Router, Elysia, and Effect.
 
-JS plugins are still **alpha** in Oxlint (outside semver). Pin `oxlint` in consuming apps.
+Load only the stacks you use. Turn rules on by id. Nothing is enabled by default.
+
+> Oxlint JS plugins are still **alpha** (outside Oxlint semver). Pin `oxlint` to `^1.78` next to vamana.
+
+## Features
+
+- ⚡ Built for **Oxlint JS plugins** — fast lint, same config you already use
+- 🔌 **One subpath per stack** — install one package, load `vamana/react` or `vamana/effect` only when you need it
+- 🎛️ **Fully opt-in** — no recommended preset; you pick each `vm-*` rule
+- 🛡️ TypeScript **evidence** rules (widening, `unknown`, unsafe dictionaries, mocks, assertions)
+- ⚛️ React file and JSX rules, plus Base UI `nativeButton` / `render` checks
+- 🧭 Zod, TanStack Router, Elysia, and Effect v4 style and API rules
+
+## Plugins
+
+| Package subpath          | When to load                        |
+| ------------------------ | ----------------------------------- |
+| `vamana/js`              | TypeScript / JavaScript evidence    |
+| `vamana/react`           | React components, hooks, JSX        |
+| `vamana/base-ui`         | Base UI `nativeButton` and `render` |
+| `vamana/zod`             | Zod 4 schemas                       |
+| `vamana/tanstack-router` | TanStack Router / Start             |
+| `vamana/elysia`          | Elysia HTTP apps                    |
+| `vamana/effect`          | Effect v4 (`effect@rc`)             |
+
+Rule ids are `<plugin>/<rule>`, for example `js/vm-max-classes` and `effect/vm-prefer-effect-fn`.
 
 ## Install
 
@@ -12,7 +39,9 @@ JS plugins are still **alpha** in Oxlint (outside semver). Pin `oxlint` in consu
 bun add -D vamana oxlint
 ```
 
-## Use
+npm, pnpm, and yarn work too. Peer: `oxlint` `^1.78.0`. Node: `^20.19.0 || >=22.12.0`.
+
+## Quick start
 
 ```ts
 // oxlint.config.ts
@@ -41,20 +70,15 @@ export default defineConfig({
 });
 ```
 
-Omit a subpath if you do not want that plugin loaded.
+Omit a subpath you do not use. Loading a plugin does not turn its rules on — you still set each id in `rules`.
 
-| Subpath                  | Plugin name       | Rules          |
-| ------------------------ | ----------------- | -------------- |
-| `vamana/js`              | `js`              | See list below |
-| `vamana/react`           | `react`           | See list below |
-| `vamana/base-ui`         | `base-ui`         | See list below |
-| `vamana/zod`             | `zod`             | See list below |
-| `vamana/tanstack-router` | `tanstack-router` | See list below |
-| `vamana/elysia`          | `elysia`          | See list below |
-| `vamana/effect`          | `effect`          | See list below |
+Many domain rules skip test and spec files. Most of them also skip files that never import that stack. Pass `allow` as a list of path substrings to skip extra files.
 
-`vamana/js` includes `vm-max-classes` and these TypeScript evidence rules:
+## Rules
 
+### `vamana/js`
+
+- `vm-max-classes`
 - `vm-no-chained-type-assertions`
 - `vm-no-conditional-empty-object-spread`
 - `vm-no-known-value-widening`
@@ -71,8 +95,6 @@ Omit a subpath if you do not want that plugin loaded.
 - `vm-no-widen-then-assert`
 - `vm-require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
 
-Those rules stay **off** until you enable them:
-
 ```ts
 rules: {
   'js/vm-no-chained-type-assertions': 'error',
@@ -83,7 +105,9 @@ rules: {
 }
 ```
 
-`vamana/react` rules (`allow` path substrings skip a file; test/spec files are skipped; most rules apply to `.tsx` / `.jsx`):
+### `vamana/react`
+
+Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 
 - `vm-component-file-name-match`
 - `vm-hook-file-name-match`
@@ -97,18 +121,22 @@ rules: {
 - `vm-no-react-namespace`
 - `vm-no-render-helper-functions-in-components`
 
-`vamana/base-ui` rules:
+### `vamana/base-ui`
 
 - `vm-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
 
 `components` and `nonNativeButtonComponents` replace the default part lists. `buttonHosts` and `nonButtonHosts` add names to the built-in `render` host lists. The rule matches JSX names (`Dialog.Trigger` or `DialogTrigger`) and does not require an `@base-ui/react` import.
 
-`vamana/zod` rules (`allow` path substrings skip a file; test/spec files are skipped):
+### `vamana/zod`
+
+Test and spec files are skipped.
 
 - `vm-zod-modern-format-validators`
 - `vm-zod-schema-naming`
 
-`vamana/tanstack-router` rules (`allow` path substrings skip a file; test/spec files are skipped):
+### `vamana/tanstack-router`
+
+Test and spec files are skipped.
 
 - `vm-create-route-property-order`
 - `vm-no-dynamic-router-to`
@@ -125,7 +153,9 @@ rules: {
 - `vm-require-throw-redirect`
 - `vm-require-validate-search-when-used`
 
-`vamana/elysia` rules (`allow` path substrings skip a file; test/spec files are skipped; files that do not import `elysia` are skipped except `vm-no-route-factory`):
+### `vamana/elysia`
+
+Test and spec files are skipped. Files that do not import `elysia` are skipped except `vm-no-route-factory`.
 
 - `vm-no-context-param`
 - `vm-no-controller-context-class`
@@ -143,7 +173,9 @@ rules: {
 - `vm-require-route-schema` (`methods`, default `post`/`put`/`patch`)
 - `vm-routes-index-mount-only` (`routes/index` files)
 
-`vamana/effect` rules (`allow` path substrings skip a file). Files that do not import `effect` / `effect/*` / `@effect/*` are skipped. Some style rules also skip test files (marked below).
+### `vamana/effect`
+
+Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some style rules also skip test files (marked below).
 
 - `vm-no-v3-effect-apis`
 - `vm-no-v3-imports`
@@ -173,19 +205,14 @@ rules: {
 
 ## Agent skill
 
-Coding agents can load this package skill from [skills.sh](https://www.skills.sh/):
+Coding agents can install the vamana skill from [skills.sh](https://www.skills.sh/):
 
 ```sh
 npx skills add DobroslavRadosavljevic/vamana --skill vamana
 ```
 
-Use `--skill vamana` so only this skill is installed. This repo also has other skills under `.agents/skills/`.
+Use `--skill vamana` so only this skill is installed.
 
-Source: [`skills/vamana/`](./skills/vamana/).
+## License
 
-## Develop a rule
-
-1. Add `src/plugins/<name>/rules/<rule>.ts` with `defineVamanaRule` + `createOnce`. Read options in visitors via `objectOptionAt`.
-2. Register it in `src/plugins/<name>/index.ts`.
-3. Test with `tests/unit/plugins/<name>/<rule>.test.ts` using the `vmRuleName` id.
-4. `bun run test` then `bun run check`.
+[MIT](./LICENSE)

@@ -2,7 +2,7 @@
 
 ## Package shape
 
-- **Runtime:** ESM (`"type": "module"`). Published files are `dist/` only.
+- **Runtime:** ESM (`"type": "module"`). The npm tarball is `dist/` plus `skills/vamana/`. npm also adds `README.md`, `LICENSE`, and `CHANGELOG.md`.
 - **Build:** tsdown 0.22, one entry per plugin plus the catalog (`src/index.ts` → `vamana`).
 - **Lint API:** `@oxlint/plugins` `CreateOnceRule`. No ESLint `create`. No `eslintCompatPlugin`.
 - **Peer:** `oxlint` ^1.78. **Dependency:** `@oxlint/plugins` ^1.78.

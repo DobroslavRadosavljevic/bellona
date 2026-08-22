@@ -18,6 +18,9 @@
 - Format: `bun run format` / `bun run format:check`
 - Build / watch: `bun run build` / `bun run dev`
 - Gate (local stand-in for CI): `bun run check`
+- Pack lint: `bun run pack:lint` (needs a current `dist/`)
+- Publish dry-run: `bun run pack:dry` (runs `prepublishOnly` → `check`)
+- Publish: `bun publish` from this machine after `npm login`. No GitHub Actions.
 
 ## Communication (ASD-STE100)
 
@@ -79,14 +82,16 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 
 - Always: run focused Vitest on the plugin you touched, then `bun run check` before a PR
 - Ask first: new runtime dependencies, new plugin subpaths, oxlint major bumps, publishing, push
-- Never: commit secrets; edit `dist/`; use `bun test`; format/lint skill trees
+- Never: commit secrets (including npm tokens); edit `dist/`; use `bun test`; format/lint skill trees; add GitHub CI for publish
+- Publish is local only: bump `package.json` + `CHANGELOG.md`, `bun run check`, `bun run pack:dry`, then `bun publish`. Tokens stay in the user `~/.npmrc`
 
 ## Docs index
 
 | Topic                      | Document                                                       |
 | -------------------------- | -------------------------------------------------------------- |
 | Human setup / consumer API | `README.md`                                                    |
+| Changelog / versions       | `CHANGELOG.md`                                                 |
 | Consumer agent skill       | `skills/vamana/`                                               |
-| Plugin entries             | `package.json`, `tsdown.config.ts`                             |
+| Plugin entries / publish   | `package.json`, `tsdown.config.ts`, `.npmrc`                   |
 | Lint / format              | `oxlint.config.ts`, `oxfmt.config.ts`                          |
 | Oxlint JS plugins          | https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html |
