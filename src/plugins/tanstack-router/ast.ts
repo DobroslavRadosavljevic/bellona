@@ -78,6 +78,50 @@ export function getStaticPropertyName(node: ESTree.Node): string | undefined {
   return undefined;
 }
 
+function wrapperInnerExpression(node: ESTree.Node): ESTree.Expression | undefined {
+  switch (node.type) {
+    case 'TSAsExpression':
+    case 'TSTypeAssertion':
+    case 'TSNonNullExpression':
+    case 'TSSatisfiesExpression':
+    case 'TSInstantiationExpression':
+    case 'ParenthesizedExpression':
+    case 'ChainExpression':
+      return node.expression;
+    default:
+      return undefined;
+  }
+}
+
+/** Walk out of TS / paren wrappers to the outermost expression node. */
+function parentOf(node: ESTree.Node): ESTree.Node | undefined {
+  return node.parent ?? undefined;
+}
+
+export function outermostExpression(node: ESTree.Node): ESTree.Node {
+  let current = node;
+  let parent = parentOf(current);
+  while (parent !== undefined && wrapperInnerExpression(parent) === current) {
+    current = parent;
+    parent = parentOf(current);
+  }
+  return current;
+}
+
+export function isThrowArgument(node: ESTree.Node): boolean {
+  return outermostExpression(node).parent?.type === 'ThrowStatement';
+}
+
+export function isFunctionLike(
+  node: ESTree.Node,
+): node is ESTree.Function | ESTree.ArrowFunctionExpression {
+  return (
+    node.type === 'FunctionDeclaration' ||
+    node.type === 'FunctionExpression' ||
+    node.type === 'ArrowFunctionExpression'
+  );
+}
+
 export function getCallName(node: ESTree.CallExpression): string | undefined {
   const callee = unwrapExpression(node.callee);
   if (callee === undefined) {

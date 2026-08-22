@@ -103,13 +103,20 @@ rules: {
 
 `vamana/tanstack-router` rules (`allow` path substrings skip a file; test/spec files are skipped):
 
+- `vm-create-route-property-order`
 - `vm-no-dynamic-router-to`
 - `vm-no-get-route-api`
+- `vm-no-hooks-in-route-lifecycle`
 - `vm-no-imperative-location-navigation`
 - `vm-no-relative-router-to-without-from`
 - `vm-no-router-href`
 - `vm-no-router-type-assertion`
+- `vm-no-search-in-loader`
+- `vm-require-params-with-path-tokens`
 - `vm-require-router-hook-from`
+- `vm-require-throw-not-found`
+- `vm-require-throw-redirect`
+- `vm-require-validate-search-when-used`
 
 `vamana/elysia` rules (`allow` path substrings skip a file; test/spec files are skipped; files that do not import `elysia` are skipped except `vm-no-route-factory`):
 

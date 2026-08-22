@@ -1,25 +1,11 @@
 # AGENTS.md
 
-## Communication
-
-Always write to the user in **ASD-STE100 Simplified Technical English**. This applies to chat, summaries, and explanations. It does not apply to code, identifiers, commit messages, or quoted errors.
-
-ASD-STE100 is a controlled writing standard. The goal is easy reading. Many readers are not native English speakers. Clear text helps them do the work in a safe and correct way.
-
-- Use approved words only. Each word has one meaning.
-- Use one word for one idea. Do not use two words for the same thing.
-- Write short sentences. Use 20 words or less for instructions.
-- Use active voice. Write "Turn the switch", not "The switch must be turned".
-- Write short paragraphs. Keep one topic in each paragraph.
-
-Keep technical names (APIs, files, flags) when they are required. Define a new term in one short sentence on first use.
-
 ## Stack
 
-- TypeScript (strict) on Bun 1.3; package manager is **Bun** (`bun.lock`), not npm/pnpm/yarn
-- Oxlint JS plugins (`@oxlint/plugins` 1.78, `createOnce` only — no ESLint `create` / `eslintCompatPlugin`)
+- TypeScript 7 (strict, `exactOptionalPropertyTypes`, `erasableSyntaxOnly`, `lib: ES2022`) on Bun; package manager is **Bun** (`bun.lock`), not npm/pnpm/yarn
+- Oxlint JS plugins: `@oxlint/plugins` / `oxlint` 1.78, `createOnce` only — no ESLint `create` / `eslintCompatPlugin`
 - Tests: Vitest 4 (`bun run test` / `bunx vitest`, **not** `bun test`)
-- Build: tsdown 0.22 ESM + dts; format: Oxfmt; lint: Oxlint
+- Build: tsdown 0.22 ESM + dts; format: Oxfmt; lint: Oxlint (`oxlint.config.ts` + `oxfmt.config.ts`)
 
 ## Commands
 
@@ -30,48 +16,75 @@ Keep technical names (APIs, files, flags) when they are required. Define a new t
 - Lint: `bun run lint` / `bun run lint:fix`
 - Types: `bun run typecheck`
 - Format: `bun run format` / `bun run format:check`
-- Build: `bun run build`
-- Gate (matches CI): `bun run check`
+- Build / watch: `bun run build` / `bun run dev`
+- Gate (local stand-in for CI): `bun run check`
+
+## Communication (ASD-STE100)
+
+Hard rule for all agent text to humans. Also covers names in the codebase. Do not skip for tone, polish, or expertise.
+
+**ASD-STE100 Simplified Technical English** is a controlled writing standard. Aerospace and defense groups made it. It helps people write clear technical text.
+
+**Key rules:**
+
+- **Use approved words only.** Treat simple common English as the word list. Each word has one meaning.
+- **Use one word for one idea.** Do not use two words for the same thing.
+- **Write short sentences.** Use 20 words or less for instructions. Use 25 words or less for other sentences.
+- **Use active voice.** Write "Turn the switch", not "The switch must be turned".
+- **Write short paragraphs.** Keep one topic in each paragraph.
+
+**Also:**
+
+- Prefer common verbs: `use`, `start`, `stop`, `show`, `set`, `get`, `fix`, `add`, `remove`.
+- Keep exact API names, errors, paths, and code. Define a hard term in one short sentence the first time. Then reuse that term.
+- Match the user’s word for a thing. Do not rename it in prose.
+- Names must read like English intent. No riddles, meme names, or opaque abbreviation piles.
+- Lead with the outcome or the next action. Put raw dumps last.
+- Do not send a reply until the prose passes these checks.
+
+**Goal:** The goal is easy reading. Many readers are not native English speakers. Clear text helps them do the work in a safe and correct way.
 
 ## Layout
 
-- One plugin per subpath under `src/plugins/<id>/`; default export is the Oxlint plugin object
-- Shared: `src/lib/` (plugin/rule factories, option readers)
-- Per plugin: `src/plugins/<id>/index.ts`, plugin-local helpers (`options.ts`, `ast.ts`, `filename.ts`, `shared/`), and rules in `src/plugins/<id>/rules/`
-- `src/index.ts` is a specifier catalog only — **not** a plugin; consumers use `vamana/js` etc.
-- Tests: `tests/unit/plugins/<id>/` (`fixtures.ts`, `harness.ts`, `*.test.ts`); shared test helpers: `tests/unit/lib/`
-- Generated: `dist/` — do not edit
-- Ignore agent skill trees (`.agents/`, `.claude/`, `agent/`) in Oxfmt/Oxlint configs
+- One plugin per `src/plugins/<id>/`; default export is the Oxlint plugin object
+- Shared factories: `src/lib/` (`defineVamanaPlugin`, `defineVamanaRule`, option readers)
+- Per plugin: `index.ts`, local helpers (`options.ts`, `ast.ts`, `filename.ts`, `route.ts`, `shared/`), rules in `rules/`
+- `src/index.ts` is a specifier catalog only — **not** a plugin; consumers import `vamana/js` (see `package.json` `exports`)
+- Tests: `tests/unit/plugins/<id>/` (`fixtures.ts`, `harness.ts`, `*.test.ts`); shared: `tests/unit/lib/` (`getRule` wraps `create` for `RuleTester` only)
+- Generated: `dist/` — do not edit by hand
+- Oxfmt/Oxlint already ignore `.agents/`, `.claude/`, `agent/` — do not format or lint those trees
 
 ## Project rules
 
-- New framework/domain coverage = **new plugin folder + package `exports` entry + tsdown `entry`**, not a dump onto an existing plugin. TypeScript evidence rules live on `vamana/js`.
-- Plugin `meta.name` must match the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`) so rule ids are `<name>/vm-<slug>`
-- Register rules with `vmRuleName('slug')` (`vm-max-classes`, never a bare `max-classes`)
+- New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `vamana/js`.
+- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`) so ids are `<name>/vm-<slug>`
+- Register with `vmRuleName('slug')` (`vm-max-classes`, never bare `max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure
-- Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for new rules. Evidence-rule shared AST lives in `src/plugins/js/shared/`.
-- Do not annotate rules as `Rule` (widens); use `defineVamanaRule` so `createOnce` is preserved
-- Do not use `as` / `any` to paper over option or AST types — narrow with helpers in `src/lib/`
+- Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`
+- Type rules with `defineVamanaRule` so `createOnce` stays; do not annotate as `Rule` (widens)
+- Do not use `as` / `any` to hide option or AST types — narrow in `src/lib/`
+- `node.parent` is `Node | null`. Coerce with `?? undefined` before `ESTree.Node | undefined` walks
+- `lib` is ES2022: no `Array#toSorted`. Copy then insert, or accept a local mutate of a fresh array
 - Use `.ts` import specifiers (`allowImportingTsExtensions`); tsdown strips them in `dist/`
-- `getRule` is test-only (adds `create` for `RuleTester`). Do not publish ESLint compatibility
-- Do not treat Oxlint as a formatter
+- Do not publish ESLint compatibility. Do not treat Oxlint as a formatter
 
 ## Testing
 
-- Add `valid`/`invalid` `RuleTester` cases (including option variants) for every rule change
-- Finish with `bun run check` before a PR
+- For every rule change, add `valid`/`invalid` `RuleTester` cases, including `allow` / option variants and a no-import skip
+- Iterate with focused Vitest on that plugin; finish with `bun run check` before a PR
 
 ## Boundaries
 
-- Always: run focused Vitest on the plugin you touched, then `bun run check` before PR
-- Ask first: new runtime dependencies, new plugin subpaths, oxlint major bumps, publishing
-- Never: commit secrets; edit `dist/`; use `bun test`; format/lint the skill trees
+- Always: run focused Vitest on the plugin you touched, then `bun run check` before a PR
+- Ask first: new runtime dependencies, new plugin subpaths, oxlint major bumps, publishing, push
+- Never: commit secrets; edit `dist/`; use `bun test`; format/lint skill trees
 
 ## Docs index
 
 | Topic                      | Document                                                       |
 | -------------------------- | -------------------------------------------------------------- |
 | Human setup / consumer API | `README.md`                                                    |
-| CI                         | `.github/workflows/ci.yml`                                     |
+| Plugin entries             | `package.json`, `tsdown.config.ts`                             |
+| Lint / format              | `oxlint.config.ts`, `oxfmt.config.ts`                          |
 | Oxlint JS plugins          | https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html |

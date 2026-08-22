@@ -1,6 +1,14 @@
 import { defineVamanaPlugin } from '../../lib/plugin.ts';
+import {
+  createRoutePropertyOrder,
+  createRoutePropertyOrderName,
+} from './rules/create-route-property-order.ts';
 import { noDynamicRouterTo, noDynamicRouterToName } from './rules/no-dynamic-router-to.ts';
 import { noGetRouteApi, noGetRouteApiName } from './rules/no-get-route-api.ts';
+import {
+  noHooksInRouteLifecycle,
+  noHooksInRouteLifecycleName,
+} from './rules/no-hooks-in-route-lifecycle.ts';
 import {
   noImperativeLocationNavigation,
   noImperativeLocationNavigationName,
@@ -14,27 +22,49 @@ import {
   noRouterTypeAssertion,
   noRouterTypeAssertionName,
 } from './rules/no-router-type-assertion.ts';
+import { noSearchInLoader, noSearchInLoaderName } from './rules/no-search-in-loader.ts';
+import {
+  requireParamsWithPathTokens,
+  requireParamsWithPathTokensName,
+} from './rules/require-params-with-path-tokens.ts';
 import {
   requireRouterHookFrom,
   requireRouterHookFromName,
 } from './rules/require-router-hook-from.ts';
+import { requireThrowNotFound, requireThrowNotFoundName } from './rules/require-throw-not-found.ts';
+import { requireThrowRedirect, requireThrowRedirectName } from './rules/require-throw-redirect.ts';
+import {
+  requireValidateSearchWhenUsed,
+  requireValidateSearchWhenUsedName,
+} from './rules/require-validate-search-when-used.ts';
 
 const tanstackRouter = defineVamanaPlugin('tanstack-router', {
+  [createRoutePropertyOrderName]: createRoutePropertyOrder,
   [noDynamicRouterToName]: noDynamicRouterTo,
   [noGetRouteApiName]: noGetRouteApi,
+  [noHooksInRouteLifecycleName]: noHooksInRouteLifecycle,
   [noImperativeLocationNavigationName]: noImperativeLocationNavigation,
   [noRelativeRouterToWithoutFromName]: noRelativeRouterToWithoutFrom,
   [noRouterHrefName]: noRouterHref,
   [noRouterTypeAssertionName]: noRouterTypeAssertion,
+  [noSearchInLoaderName]: noSearchInLoader,
+  [requireParamsWithPathTokensName]: requireParamsWithPathTokens,
   [requireRouterHookFromName]: requireRouterHookFrom,
+  [requireThrowNotFoundName]: requireThrowNotFound,
+  [requireThrowRedirectName]: requireThrowRedirect,
+  [requireValidateSearchWhenUsedName]: requireValidateSearchWhenUsed,
 });
 
 export default tanstackRouter;
 export {
+  createRoutePropertyOrder,
+  createRoutePropertyOrderName,
   noDynamicRouterTo,
   noDynamicRouterToName,
   noGetRouteApi,
   noGetRouteApiName,
+  noHooksInRouteLifecycle,
+  noHooksInRouteLifecycleName,
   noImperativeLocationNavigation,
   noImperativeLocationNavigationName,
   noRelativeRouterToWithoutFrom,
@@ -43,6 +73,16 @@ export {
   noRouterHrefName,
   noRouterTypeAssertion,
   noRouterTypeAssertionName,
+  noSearchInLoader,
+  noSearchInLoaderName,
+  requireParamsWithPathTokens,
+  requireParamsWithPathTokensName,
   requireRouterHookFrom,
   requireRouterHookFromName,
+  requireThrowNotFound,
+  requireThrowNotFoundName,
+  requireThrowRedirect,
+  requireThrowRedirectName,
+  requireValidateSearchWhenUsed,
+  requireValidateSearchWhenUsedName,
 };
