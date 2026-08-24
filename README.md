@@ -110,6 +110,7 @@ rules: {
 Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 
 - `bl-react/component-file-name-match`
+- `bl-react/component-props-type`
 - `bl-react/hook-file-name-match`
 - `bl-react/no-jsx-iife-in-components`
 - `bl-react/no-jsx-local-constants-in-components`

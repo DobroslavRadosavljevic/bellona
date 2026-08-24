@@ -1,7 +1,7 @@
 import type { Context } from '@oxlint/plugins';
 
 import { namedImportHintMap, objectOptionAt, stringListField } from '../../lib/options.ts';
-import { isJsxFilename, isTestFile, matchesAllow } from './filename.ts';
+import { isJsxFilename, isTestFile, isTsxFilename, matchesAllow } from './filename.ts';
 
 export const ALLOW_OPTION_SCHEMA = {
   type: 'object',
@@ -32,6 +32,15 @@ export function shouldSkipJsxFile(context: Context): boolean {
 
 export function shouldSkipReactFile(context: Context): boolean {
   return isTestFile(context.filename) || matchesAllow(context.filename, readAllowList(context));
+}
+
+export function shouldSkipTsxFile(context: Context): boolean {
+  const { filename } = context;
+  return (
+    !isTsxFilename(filename) ||
+    isTestFile(filename) ||
+    matchesAllow(filename, readAllowList(context))
+  );
 }
 
 export function readNativeHtmlReplacements(

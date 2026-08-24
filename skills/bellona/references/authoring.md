@@ -74,7 +74,7 @@ Reuse the plugin’s `shouldSkip*` instead of copying path regexes:
 
 | Plugin | Typical skip |
 | --- | --- |
-| react | `shouldSkipJsxFile` / `shouldSkipReactFile` |
+| react | `shouldSkipJsxFile` / `shouldSkipReactFile` / `shouldSkipTsxFile` |
 | zod | `shouldSkipZodFile` |
 | tanstack-router | `shouldSkipRouterFile` |
 | elysia | `shouldSkipElysiaFile` and path variants |

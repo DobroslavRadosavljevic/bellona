@@ -91,3 +91,7 @@ export function hookNameFromBasename(basename: string): string | undefined {
 export function isJsxFilename(filename: string): boolean {
   return filename.endsWith('.tsx') || filename.endsWith('.jsx');
 }
+
+export function isTsxFilename(filename: string): boolean {
+  return filename.endsWith('.tsx');
+}

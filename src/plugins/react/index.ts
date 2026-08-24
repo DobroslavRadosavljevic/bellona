@@ -3,6 +3,7 @@ import {
   componentFileNameMatch,
   componentFileNameMatchName,
 } from './rules/component-file-name-match.ts';
+import { componentPropsType, componentPropsTypeName } from './rules/component-props-type.ts';
 import { hookFileNameMatch, hookFileNameMatchName } from './rules/hook-file-name-match.ts';
 import {
   noJsxIifeInComponents,
@@ -31,6 +32,7 @@ import {
 
 const react = defineBellonaPlugin('bl-react', {
   [componentFileNameMatchName]: componentFileNameMatch,
+  [componentPropsTypeName]: componentPropsType,
   [hookFileNameMatchName]: hookFileNameMatch,
   [noJsxIifeInComponentsName]: noJsxIifeInComponents,
   [noJsxLocalConstantsInComponentsName]: noJsxLocalConstantsInComponents,
@@ -47,6 +49,8 @@ export default react;
 export {
   componentFileNameMatch,
   componentFileNameMatchName,
+  componentPropsType,
+  componentPropsTypeName,
   hookFileNameMatch,
   hookFileNameMatchName,
   noJsxIifeInComponents,

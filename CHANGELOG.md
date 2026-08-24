@@ -9,6 +9,10 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+### Added
+
+- `bl-react/component-props-type`: each primary component must use a non-empty `{Name}Props` type declared in the same file.
+
 ## [0.3.0] - 2026-08-24
 
 ### Changed

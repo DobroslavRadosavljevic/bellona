@@ -6,6 +6,7 @@ describe('react plugin', () => {
   it('registers every React rule under a react- id', () => {
     expect(Object.keys(react.rules)).toEqual([
       'component-file-name-match',
+      'component-props-type',
       'hook-file-name-match',
       'no-jsx-iife-in-components',
       'no-jsx-local-constants-in-components',

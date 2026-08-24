@@ -2,7 +2,7 @@
 
 Plugin name: `bl-react`. Ids: `bl-react/<slug>`.
 
-**Skip:** test/spec/stories files and `allow` matches. JSX-only rules also require `.tsx` / `.jsx`. Hook filename rules run on `use-*.ts(x)`.
+**Skip:** test/spec/stories files and `allow` matches. JSX-only rules also require `.tsx` / `.jsx`. `component-props-type` requires `.tsx`. Hook filename rules run on `use-*.ts(x)`.
 
 Primary component = PascalCase name that does **not** end in `Impl` / `Provider` / `Context`. Hook = `use` + PascalCase.
 
@@ -11,6 +11,26 @@ Primary component = PascalCase name that does **not** end in `Impl` / `Provider`
 The primary exported component name must match the file basename converted to PascalCase (`user-card.tsx` → `UserCard`).
 
 Skip: tests, `allow`, non-JSX files.
+
+## `bl-react/component-props-type`
+
+Each primary component must take a props type named `{Component}Props` (example: `MetricCard` → `MetricCardProps`).
+
+The type must live in the same file. Do not import it. The type must not be empty (`{}` or an empty interface).
+
+The file may declare only that `*Props` type besides the component. Extra aliases and interfaces fail.
+
+Skip: tests, `allow`, non-`.tsx` files. Helpers named `*Impl` / `*Provider` / `*Context` are not primary.
+
+```tsx
+type MetricCardProps = {
+  title: string
+}
+
+function MetricCard(props: MetricCardProps) {
+  return null
+}
+```
 
 ## `bl-react/hook-file-name-match`
 

@@ -7,6 +7,7 @@ import {
   isHookFile,
   isHookName,
   isJsxFilename,
+  isTsxFilename,
   isPrimaryComponentName,
   isTestFile,
   kebabToPascal,
@@ -50,6 +51,8 @@ describe('react filename helpers', () => {
     expect(isTestFile('card.tsx')).toBe(false);
     expect(isJsxFilename('card.tsx')).toBe(true);
     expect(isJsxFilename('card.ts')).toBe(false);
+    expect(isTsxFilename('card.tsx')).toBe(true);
+    expect(isTsxFilename('card.jsx')).toBe(false);
     expect(basenameWithoutExtension('src/user-card.tsx')).toBe('user-card');
   });
 
