@@ -5,7 +5,7 @@ import { getCallArgument, isArrayExpressionArgument } from '../ast.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const schemaUnionArrayName = bnRuleName('effect', 'schema-union-array');
+export const schemaUnionArrayName = bnRuleName('schema-union-array');
 
 interface VariadicCall {
   readonly replacement: string;

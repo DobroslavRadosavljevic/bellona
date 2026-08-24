@@ -6,7 +6,7 @@ import { isModuleLevelDeclaration, unwrapComponentInit } from '../ast.ts';
 import { isPrimaryComponentName } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noMultiComponentFilesName = bnRuleName('react', 'no-multi-component-files');
+export const noMultiComponentFilesName = bnRuleName('no-multi-component-files');
 
 export const noMultiComponentFiles: CreateOnceRule = defineBellonaRule({
   meta: {

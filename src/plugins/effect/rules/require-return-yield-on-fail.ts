@@ -11,7 +11,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const requireReturnYieldOnFailName = bnRuleName('effect', 'require-return-yield-on-fail');
+export const requireReturnYieldOnFailName = bnRuleName('require-return-yield-on-fail');
 
 export const requireReturnYieldOnFail: CreateOnceRule = defineBellonaRule({
   meta: {

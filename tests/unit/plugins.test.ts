@@ -10,23 +10,15 @@ import tanstackRouter from '../../src/plugins/tanstack-router/index.ts';
 import zod from '../../src/plugins/zod/index.ts';
 
 describe('plugins', () => {
-  it('uses the bellona plugin name and plugin-prefixed rule keys', () => {
-    expect(js.meta.name).toBe('bellona');
-    expect(react.meta.name).toBe('bellona');
-    expect(baseUi.meta.name).toBe('bellona');
-    expect(zod.meta.name).toBe('bellona');
-    expect(tanstackRouter.meta.name).toBe('bellona');
-    expect(elysia.meta.name).toBe('bellona');
-    expect(effect.meta.name).toBe('bellona');
-    expect(Object.keys(js.rules).every((name) => name.startsWith('js-'))).toBe(true);
-    expect(Object.keys(react.rules).every((name) => name.startsWith('react-'))).toBe(true);
-    expect(Object.keys(baseUi.rules).every((name) => name.startsWith('base-ui-'))).toBe(true);
-    expect(Object.keys(zod.rules).every((name) => name.startsWith('zod-'))).toBe(true);
-    expect(
-      Object.keys(tanstackRouter.rules).every((name) => name.startsWith('tanstack-router-')),
-    ).toBe(true);
-    expect(Object.keys(elysia.rules).every((name) => name.startsWith('elysia-'))).toBe(true);
-    expect(Object.keys(effect.rules).every((name) => name.startsWith('effect-'))).toBe(true);
+  it('uses unique bl-* plugin names and bare rule keys', () => {
+    expect(js.meta.name).toBe('bl-js');
+    expect(react.meta.name).toBe('bl-react');
+    expect(baseUi.meta.name).toBe('bl-base-ui');
+    expect(zod.meta.name).toBe('bl-zod');
+    expect(tanstackRouter.meta.name).toBe('bl-tanstack-router');
+    expect(elysia.meta.name).toBe('bl-elysia');
+    expect(effect.meta.name).toBe('bl-effect');
+    expect(Object.keys(js.rules).every((name) => !name.includes('/'))).toBe(true);
     expect(Object.keys(effect.rules)).toHaveLength(25);
     expect(plugins).toEqual({
       js: 'bellona/js',

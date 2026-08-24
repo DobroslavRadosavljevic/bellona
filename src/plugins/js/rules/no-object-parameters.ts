@@ -34,7 +34,7 @@ function parameterName(parameter: Parameter, sourceCode: SourceCode): string {
 }
 
 /** Ban the broad object type on function inputs, including local aliases to object. */
-export const noObjectParametersName = bnRuleName('js', 'no-object-parameters');
+export const noObjectParametersName = bnRuleName('no-object-parameters');
 
 export const noObjectParameters: CreateOnceRule = defineBellonaRule({
   meta: {

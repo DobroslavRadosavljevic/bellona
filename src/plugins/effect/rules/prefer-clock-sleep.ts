@@ -33,7 +33,7 @@ function isTimerCallee(node: ReturnType<typeof unwrapExpression>): boolean {
   return object.name === 'globalThis' || object.name === 'window' || object.name === 'global';
 }
 
-export const preferClockSleepName = bnRuleName('effect', 'prefer-clock-sleep');
+export const preferClockSleepName = bnRuleName('prefer-clock-sleep');
 
 export const preferClockSleep: CreateOnceRule = defineBellonaRule({
   meta: {

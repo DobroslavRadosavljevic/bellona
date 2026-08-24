@@ -20,7 +20,7 @@ import { shouldSkipElysiaFile } from '../options.ts';
  * on mutating Elysia routes, plus `params` for `/:param` paths and schemas
  * matching destructured handler props (honors enclosing `.guard()` / `.group()`).
  */
-export const requireRouteSchemaName = bnRuleName('elysia', 'require-route-schema');
+export const requireRouteSchemaName = bnRuleName('require-route-schema');
 
 export const requireRouteSchema: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

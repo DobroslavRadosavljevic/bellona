@@ -55,7 +55,7 @@ const reportIfFactory = (
  * Ban exported HTTP/route factory helpers (`make*Route`, `*HttpMapper`, …)
  * under `modules/` / `routes/`. Keep one route plugin per file instead.
  */
-export const noRouteFactoryName = bnRuleName('elysia', 'no-route-factory');
+export const noRouteFactoryName = bnRuleName('no-route-factory');
 
 export const noRouteFactory: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

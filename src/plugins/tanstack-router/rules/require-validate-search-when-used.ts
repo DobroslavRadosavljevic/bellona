@@ -14,10 +14,7 @@ import {
   type CreatedRoute,
 } from '../route.ts';
 
-export const requireValidateSearchWhenUsedName = bnRuleName(
-  'tanstack-router',
-  'require-validate-search-when-used',
-);
+export const requireValidateSearchWhenUsedName = bnRuleName('require-validate-search-when-used');
 
 function isBoundUseSearch(node: ESTree.CallExpression): boolean {
   const callee = unwrapExpression(node.callee);

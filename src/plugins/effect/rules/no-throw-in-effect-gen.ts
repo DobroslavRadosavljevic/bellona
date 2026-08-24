@@ -9,7 +9,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noThrowInEffectGenName = bnRuleName('effect', 'no-throw-in-gen');
+export const noThrowInEffectGenName = bnRuleName('no-throw-in-gen');
 
 export const noThrowInEffectGen: CreateOnceRule = defineBellonaRule({
   meta: {

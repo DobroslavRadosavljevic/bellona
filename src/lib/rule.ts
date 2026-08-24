@@ -4,10 +4,7 @@ export function defineBellonaRule<const Rule extends CreateOnceRule>(rule: Rule)
   return rule;
 }
 
-/** Published rule key. Full Oxlint id is `bellona/<plugin>-<slug>`. */
-export function bnRuleName<Plugin extends string, Slug extends string>(
-  plugin: Plugin,
-  slug: Slug,
-): `${Plugin}-${Slug}` {
-  return `${plugin}-${slug}`;
+/** Published rule key. Full Oxlint id is `bl-<plugin>/<slug>`. */
+export function bnRuleName<Slug extends string>(slug: Slug): Slug {
+  return slug;
 }

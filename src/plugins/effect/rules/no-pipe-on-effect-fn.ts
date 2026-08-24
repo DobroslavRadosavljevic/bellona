@@ -5,7 +5,7 @@ import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isEffectFnAppliedCall, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noPipeOnEffectFnName = bnRuleName('effect', 'no-pipe-on-fn');
+export const noPipeOnEffectFnName = bnRuleName('no-pipe-on-fn');
 
 export const noPipeOnEffectFn: CreateOnceRule = defineBellonaRule({
   meta: {

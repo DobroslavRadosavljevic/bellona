@@ -29,7 +29,7 @@ import {
   noRenderHelperFunctionsInComponentsName,
 } from './rules/no-render-helper-functions-in-components.ts';
 
-const react = defineBellonaPlugin({
+const react = defineBellonaPlugin('bl-react', {
   [componentFileNameMatchName]: componentFileNameMatch,
   [hookFileNameMatchName]: hookFileNameMatch,
   [noJsxIifeInComponentsName]: noJsxIifeInComponents,

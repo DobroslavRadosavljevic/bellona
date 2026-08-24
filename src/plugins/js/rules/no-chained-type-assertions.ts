@@ -53,7 +53,7 @@ function isForbiddenAssertionChain(node: TypeAssertionExpression): boolean {
 }
 
 /** Disallow nested TypeScript type assertions, while permitting chains made only of const assertions. */
-export const noChainedTypeAssertionsName = bnRuleName('js', 'no-chained-type-assertions');
+export const noChainedTypeAssertionsName = bnRuleName('no-chained-type-assertions');
 
 export const noChainedTypeAssertions: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -1,10 +1,10 @@
 # bellona/zod rules
 
-Plugin name: `bellona`. Ids: `bellona/zod-<slug>`.
+Plugin name: `bl-zod`. Ids: `bl-zod/<slug>`.
 
 **Skip:** files that do not import `zod` or `zod/…`, test/spec/stories files, and `allow` matches.
 
-## `bellona/zod-modern-format-validators`
+## `bl-zod/modern-format-validators`
 
 Prefer Zod 4 **top-level** format factories over deprecated `z.string().email()` (and friends).
 
@@ -51,7 +51,7 @@ z.iso.datetime()
 | `time` | `z.iso.time()` |
 | `duration` | `z.iso.duration()` |
 
-## `bellona/zod-schema-naming`
+## `bl-zod/schema-naming`
 
 Exported Zod schema bindings must be PascalCase names ending in `Schema` (`/^[A-Z][A-Za-z0-9]*Schema$/`).
 

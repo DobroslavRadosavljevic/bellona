@@ -43,7 +43,7 @@ import {
 import { schemaNoLegacyFilter, schemaNoLegacyFilterName } from './rules/schema-no-legacy-filter.ts';
 import { schemaUnionArray, schemaUnionArrayName } from './rules/schema-union-array.ts';
 
-const effect = defineBellonaPlugin({
+const effect = defineBellonaPlugin('bl-effect', {
   [noDateNowInEffectName]: noDateNowInEffect,
   [noItEffectScopedName]: noItEffectScoped,
   [noPipeOnEffectFnName]: noPipeOnEffectFn,

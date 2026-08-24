@@ -3,10 +3,10 @@ name: bellona
 description: >-
   Install, configure, and enable bellona Oxlint JS plugins (bellona/js, bellona/react,
   bellona/base-ui, bellona/zod, bellona/tanstack-router, bellona/elysia, bellona/effect).
-  Use when adding oxlint.config.ts jsPlugins, turning on bellona/<plugin>-* rules, debugging bellona
+  Use when adding oxlint.config.ts jsPlugins, turning on bl-* rules, debugging bellona
   lint, writing a new bellona rule with defineBellonaRule and createOnce, pinning oxlint
-  for JS plugins, or when the user mentions bellona, Oxlint JS plugins, bellona/js-max-classes,
-  bellona/effect-prefer-fn, bellona/react-no-native-html, or opt-in Oxlint plugins.
+  for JS plugins, or when the user mentions bellona, Oxlint JS plugins, bl-js/max-classes,
+  bl-effect/prefer-fn, bl-react/no-native-html, or opt-in Oxlint plugins.
 ---
 
 # Bellona
@@ -15,7 +15,7 @@ Bellona is a set of **opt-in Oxlint JS plugins**. Install the package, load only
 
 JS plugins are **alpha** in Oxlint (outside semver). Pin `oxlint` in the consuming app to the same minor as bellona’s peer (`oxlint` ^1.78).
 
-Use this skill when the work is: install/config, enable/tune `bellona/<plugin>-*` rules, interpret a bellona diagnostic, write code that satisfies a rule, or add a plugin/rule to the bellona package itself.
+Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rules, interpret a bellona diagnostic, write code that satisfies a rule, or add a plugin/rule to the bellona package itself.
 
 ## Workflow
 
@@ -32,27 +32,27 @@ Use this skill when the work is: install/config, enable/tune `bellona/<plugin>-*
 
 ## Core judgment
 
-- Subpath import = plugin load. Rule id = `bellona/<plugin>-<slug>` (example: `bellona/js-max-classes`). Plugin `meta.name` is always `bellona`. The rule key includes the subpath id (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`, `effect`).
+- Subpath import = plugin load. Rule id = `bl-<plugin>/<slug>` (example: `bl-js/max-classes`). Plugin `meta.name` is unique: `bl-js`, `bl-react`, `bl-base-ui`, `bl-zod`, `bl-tanstack-router`, `bl-elysia`, `bl-effect`.
 - The root `bellona` entry is a **specifier catalog only** (`plugins.js`, `plugins.react`, …). Consumers put those strings in `jsPlugins`. They do not import a plugin from `bellona`.
 - Rules ship **off**. Loading a plugin does not lint until you set the rule in `rules`.
 - Prefer `schema` + `defaultOptions`. Options are a single object at index `0`.
 - `allow` is a list of path substrings (and basename matches when the entry contains `.`). It skips the file. It is not a per-symbol allowlist.
 - Domain plugins (react / zod / tanstack-router / elysia / most effect style rules) also skip test/spec/stories files. See each catalog.
-- Zod / TanStack Router / Elysia / Effect rules skip files that do not import the matching package (Elysia `elysia-no-route-factory` is the exception: path-gated, no import required).
+- Zod / TanStack Router / Elysia / Effect rules skip files that do not import the matching package (Elysia `bl-elysia/no-route-factory` is the exception: path-gated, no import required).
 - Do not publish ESLint compatibility. Do not treat Oxlint as a formatter (use Oxfmt or another formatter).
 - Do not wrap bellona rules in `eslintCompatPlugin`. Published rules use `createOnce` only.
 
 ## Plugins
 
-| Subpath | Rule prefix | Enable when the app uses | Catalog |
+| Subpath | `meta.name` | Enable when the app uses | Catalog |
 | --- | --- | --- | --- |
-| `bellona/js` | `js-` | TS/JS evidence, mocks, class count | [js-rules.md](references/js-rules.md) |
-| `bellona/react` | `react-` | React components/hooks/JSX | [react-rules.md](references/react-rules.md) |
-| `bellona/base-ui` | `base-ui-` | Base UI `nativeButton` + `render` | [base-ui-rules.md](references/base-ui-rules.md) |
-| `bellona/zod` | `zod-` | Zod 4 schemas | [zod-rules.md](references/zod-rules.md) |
-| `bellona/tanstack-router` | `tanstack-router-` | TanStack Router / Start | [tanstack-router-rules.md](references/tanstack-router-rules.md) |
-| `bellona/elysia` | `elysia-` | Elysia HTTP apps | [elysia-rules.md](references/elysia-rules.md) |
-| `bellona/effect` | `effect-` | Effect v4 (`effect@rc`) | [effect-rules.md](references/effect-rules.md) |
+| `bellona/js` | `bl-js` | TS/JS evidence, mocks, class count | [js-rules.md](references/js-rules.md) |
+| `bellona/react` | `bl-react` | React components/hooks/JSX | [react-rules.md](references/react-rules.md) |
+| `bellona/base-ui` | `bl-base-ui` | Base UI `nativeButton` + `render` | [base-ui-rules.md](references/base-ui-rules.md) |
+| `bellona/zod` | `bl-zod` | Zod 4 schemas | [zod-rules.md](references/zod-rules.md) |
+| `bellona/tanstack-router` | `bl-tanstack-router` | TanStack Router / Start | [tanstack-router-rules.md](references/tanstack-router-rules.md) |
+| `bellona/elysia` | `bl-elysia` | Elysia HTTP apps | [elysia-rules.md](references/elysia-rules.md) |
+| `bellona/effect` | `bl-effect` | Effect v4 (`effect@rc`) | [effect-rules.md](references/effect-rules.md) |
 
 Omit a subpath if that stack is not in the repo.
 
@@ -65,7 +65,7 @@ import { defineConfig } from 'oxlint';
 export default defineConfig({
   jsPlugins: ['bellona/js'],
   rules: {
-    'bellona/js-max-classes': ['error', { max: 5 }],
+    'bl-js/max-classes': ['error', { max: 5 }],
   },
 });
 ```
@@ -84,7 +84,7 @@ Prefer the consumer’s scripts. For meaningful bellona work:
 
 - `bunx oxlint` (or `bun run lint`) on changed paths after enabling or fixing a rule.
 - `bunx oxlint --fix` only when the rule actually has a fix (most bellona rules do not).
-- After config edits, confirm the rule id is `bellona/<plugin>-<slug>` and the plugin is in `jsPlugins`.
+- After config edits, confirm the rule id is `bl-<plugin>/<slug>` and the plugin is in `jsPlugins`.
 - If a file is “silently clean”: check import skip, test-file skip, `allow`, and that the rule is not still off.
 
 When changing the bellona package: focused Vitest on that plugin, then `bun run check`. See [authoring.md](references/authoring.md).

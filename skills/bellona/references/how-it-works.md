@@ -20,14 +20,14 @@
 | `./elysia` | `src/plugins/elysia/index.ts` |
 | `./effect` | `src/plugins/effect/index.ts` |
 
-Each plugin default-export is `{ meta: { name: 'bellona' }, rules }`. Rule keys are `<plugin>-<slug>` so Oxlint ids are `bellona/<plugin>-<slug>`.
+Each plugin default-export is `{ meta: { name: 'bl-<plugin>' }, rules }`. Rule keys are the slug only. Oxlint ids are `bl-<plugin>/<slug>`.
 
 ## Load path
 
 1. Consumer lists `'bellona/effect'` in `jsPlugins`.
 2. Oxlint resolves the package export relative to the config file.
-3. The plugin object registers rule keys such as `effect-prefer-fn`.
-4. Consumer sets `'bellona/effect-prefer-fn': 'error'`.
+3. The plugin object registers rule keys such as `prefer-fn`.
+4. Consumer sets `'bl-effect/prefer-fn': 'error'`.
 5. For each file, Oxlint calls the rule’s `createOnce` visitors (shared across files). `before()` may return `false` to skip the file.
 
 ## `createOnce` vs `create`
@@ -57,9 +57,9 @@ createOnce(context) {
 
 | Helper | File | Role |
 | --- | --- | --- |
-| `defineBellonaPlugin(rules)` | `src/lib/plugin.ts` | `{ meta: { name: 'bellona' }, rules }` |
+| `defineBellonaPlugin('bl-js', rules)` | `src/lib/plugin.ts` | `{ meta: { name: 'bl-js' }, rules }` |
 | `defineBellonaRule(rule)` | `src/lib/rule.ts` | preserves `createOnce` typing (do not annotate as `Rule`) |
-| `bnRuleName('js', 'slug')` | `src/lib/rule.ts` | returns `js-slug` |
+| `bnRuleName('slug')` | `src/lib/rule.ts` | returns `slug` |
 | `objectOptionAt` / `integerField` / `stringField` / `stringListField` / `booleanField` / `namedImportHintMap` | `src/lib/options.ts` | typed option readers |
 
 Do not use `as` / `any` to hide option or AST types. Narrow in `src/lib/`.
@@ -82,7 +82,7 @@ Most domain rules stack these checks in `before()`:
    - React JSX rules: filename ends with `.tsx` / `.jsx` (some React rules also run on `.ts` hook files)
    - Base UI: **no** `@base-ui/react` import required (JSX name matching)
    - JS: **no** import gate
-2. **Test skip** — see [setup.md](setup.md). Not used by most `js` rules. Effect: some rules skip tests; `effect-prefer-vitest` runs **only** on tests.
+2. **Test skip** — see [setup.md](setup.md). Not used by most `js` rules. Effect: some rules skip tests; `bl-effect/prefer-vitest` runs **only** on tests.
 3. **`allow`** — path substring / basename.
 4. **Path gate** (Elysia / Effect entry):
    - Elysia routes leaf: `/routes/` and not `index.*`

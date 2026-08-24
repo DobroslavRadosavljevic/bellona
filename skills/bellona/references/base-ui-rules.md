@@ -1,10 +1,10 @@
 # bellona/base-ui rules
 
-Plugin name: `bellona`. Ids: `bellona/base-ui-<slug>`.
+Plugin name: `bl-base-ui`. Ids: `bl-base-ui/<slug>`.
 
 **No** `@base-ui/react` import required. Matching is by JSX name. `Dialog.Trigger` and `DialogTrigger` are the same canonical name (dots stripped).
 
-## `bellona/base-ui-require-native-button-with-render`
+## `bl-base-ui/require-native-button-with-render`
 
 Align Base UI `nativeButton` with whether `render` mounts a real `<button>`. Base UI warns when they disagree.
 
@@ -55,7 +55,7 @@ If both component lists are empty, the rule disables itself.
 Host classification also understands function `render={() => <button />}`, conditionals, and logical expressions. A fragment host is non-button. Mixed button/non-button branches count as non-button if any branch is.
 
 ```ts
-'bellona/base-ui-require-native-button-with-render': [
+'bl-base-ui/require-native-button-with-render': [
   'error',
   {
     buttonHosts: ['AppButton'],

@@ -69,7 +69,7 @@ function moduleMockCall(sourceCode: SourceCode, callee: ESTree.Expression): bool
 }
 
 /** Ban test framework module mocking in favor of real dependency seams. */
-export const noModuleMockingName = bnRuleName('js', 'no-module-mocking');
+export const noModuleMockingName = bnRuleName('no-module-mocking');
 
 export const noModuleMocking: CreateOnceRule = defineBellonaRule({
   meta: {

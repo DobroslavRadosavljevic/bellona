@@ -5,20 +5,20 @@ import tanstackRouter from '../../../../src/plugins/tanstack-router/index.ts';
 describe('tanstack-router plugin', () => {
   it('registers every router rule under a tanstack-router- id', () => {
     expect(Object.keys(tanstackRouter.rules)).toEqual([
-      'tanstack-router-create-route-property-order',
-      'tanstack-router-no-dynamic-to',
-      'tanstack-router-no-get-route-api',
-      'tanstack-router-no-hooks-in-route-lifecycle',
-      'tanstack-router-no-imperative-location-navigation',
-      'tanstack-router-no-relative-to-without-from',
-      'tanstack-router-no-href',
-      'tanstack-router-no-type-assertion',
-      'tanstack-router-no-search-in-loader',
-      'tanstack-router-require-params-with-path-tokens',
-      'tanstack-router-require-hook-from',
-      'tanstack-router-require-throw-not-found',
-      'tanstack-router-require-throw-redirect',
-      'tanstack-router-require-validate-search-when-used',
+      'create-route-property-order',
+      'no-dynamic-to',
+      'no-get-route-api',
+      'no-hooks-in-route-lifecycle',
+      'no-imperative-location-navigation',
+      'no-relative-to-without-from',
+      'no-href',
+      'no-type-assertion',
+      'no-search-in-loader',
+      'require-params-with-path-tokens',
+      'require-hook-from',
+      'require-throw-not-found',
+      'require-throw-redirect',
+      'require-validate-search-when-used',
     ]);
   });
 });

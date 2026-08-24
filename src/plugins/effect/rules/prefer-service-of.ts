@@ -15,7 +15,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferServiceOfName = bnRuleName('effect', 'prefer-service-of');
+export const preferServiceOfName = bnRuleName('prefer-service-of');
 
 export const preferServiceOf: CreateOnceRule = defineBellonaRule({
   meta: {

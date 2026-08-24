@@ -4,7 +4,7 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { hasFromOrStrictFalse, isBareRouterHookCall } from '../router.ts';
 
-export const requireRouterHookFromName = bnRuleName('tanstack-router', 'require-hook-from');
+export const requireRouterHookFromName = bnRuleName('require-hook-from');
 
 export const requireRouterHookFrom: CreateOnceRule = defineBellonaRule({
   meta: {

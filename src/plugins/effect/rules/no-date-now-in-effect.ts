@@ -8,7 +8,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const noDateNowInEffectName = bnRuleName('effect', 'no-date-now');
+export const noDateNowInEffectName = bnRuleName('no-date-now');
 
 function isDateConstructor(node: ReturnType<typeof unwrapExpression>): boolean {
   if (node?.type === 'Identifier' && node.name === 'Date') {

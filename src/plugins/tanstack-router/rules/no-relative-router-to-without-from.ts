@@ -26,10 +26,7 @@ function needsFromForTo(toValue: ESTree.Node | undefined): boolean {
   return value !== undefined && isRelativeRoutePath(value);
 }
 
-export const noRelativeRouterToWithoutFromName = bnRuleName(
-  'tanstack-router',
-  'no-relative-to-without-from',
-);
+export const noRelativeRouterToWithoutFromName = bnRuleName('no-relative-to-without-from');
 
 export const noRelativeRouterToWithoutFrom: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -5,22 +5,22 @@ import js from '../../../../src/plugins/js/index.ts';
 describe('js plugin', () => {
   it('registers every TypeScript evidence rule under a js- id', () => {
     expect(Object.keys(js.rules)).toEqual([
-      'js-max-classes',
-      'js-no-chained-type-assertions',
-      'js-no-conditional-empty-object-spread',
-      'js-no-known-value-widening',
-      'js-no-module-mocking',
-      'js-no-object-parameters',
-      'js-no-reflect-apply',
-      'js-no-reflect-get',
-      'js-no-runtime-typeof',
-      'js-no-shape-in-symbol-names',
-      'js-no-unknown-parameters',
-      'js-no-unknown-returns',
-      'js-no-unknown-type-aliases',
-      'js-no-unsafe-dictionary-type',
-      'js-no-widen-then-assert',
-      'js-require-safety-comment-for-type-assertion',
+      'max-classes',
+      'no-chained-type-assertions',
+      'no-conditional-empty-object-spread',
+      'no-known-value-widening',
+      'no-module-mocking',
+      'no-object-parameters',
+      'no-reflect-apply',
+      'no-reflect-get',
+      'no-runtime-typeof',
+      'no-shape-in-symbol-names',
+      'no-unknown-parameters',
+      'no-unknown-returns',
+      'no-unknown-type-aliases',
+      'no-unsafe-dictionary-type',
+      'no-widen-then-assert',
+      'require-safety-comment-for-type-assertion',
     ]);
   });
 });

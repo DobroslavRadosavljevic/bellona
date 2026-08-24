@@ -36,10 +36,7 @@ function isHistoryObject(node: ESTree.Expression | undefined): boolean {
 const LOCATION_MUTATORS = new Set(['assign', 'replace', 'reload']);
 const HISTORY_MUTATORS = new Set(['pushState', 'replaceState', 'push', 'replace']);
 
-export const noImperativeLocationNavigationName = bnRuleName(
-  'tanstack-router',
-  'no-imperative-location-navigation',
-);
+export const noImperativeLocationNavigationName = bnRuleName('no-imperative-location-navigation');
 
 export const noImperativeLocationNavigation: CreateOnceRule = defineBellonaRule({
   meta: {

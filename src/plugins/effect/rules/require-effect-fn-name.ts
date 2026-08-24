@@ -15,7 +15,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const requireEffectFnNameName = bnRuleName('effect', 'require-fn-name');
+export const requireEffectFnNameName = bnRuleName('require-fn-name');
 
 function appliedCallBindingName(factoryCall: Parameters<typeof parentOf>[0]): string | undefined {
   const parent = parentOf(factoryCall);

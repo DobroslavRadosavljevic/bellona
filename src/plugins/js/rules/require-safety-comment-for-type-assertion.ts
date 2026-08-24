@@ -40,7 +40,6 @@ function hasSafetyComment(sourceCode: SourceCode, node: TypeAssertion, marker: s
 
 /** Require every non-const type assertion to state the invariant TypeScript cannot express. */
 export const requireSafetyCommentForTypeAssertionName = bnRuleName(
-  'js',
   'require-safety-comment-for-type-assertion',
 );
 

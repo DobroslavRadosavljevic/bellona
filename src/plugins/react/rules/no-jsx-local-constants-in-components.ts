@@ -7,7 +7,6 @@ import { expressionContainsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
 export const noJsxLocalConstantsInComponentsName = bnRuleName(
-  'react',
   'no-jsx-local-constants-in-components',
 );
 

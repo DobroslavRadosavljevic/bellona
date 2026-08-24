@@ -118,7 +118,7 @@ function suggestComponent(tag: string): string {
   return tag.charAt(0).toUpperCase() + tag.slice(1);
 }
 
-export const noNativeHtmlName = bnRuleName('react', 'no-native-html');
+export const noNativeHtmlName = bnRuleName('no-native-html');
 
 export const noNativeHtml: CreateOnceRule = defineBellonaRule({
   meta: {

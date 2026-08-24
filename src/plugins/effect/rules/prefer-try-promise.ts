@@ -8,7 +8,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferTryPromiseName = bnRuleName('effect', 'prefer-try-promise');
+export const preferTryPromiseName = bnRuleName('prefer-try-promise');
 
 export const preferTryPromise: CreateOnceRule = defineBellonaRule({
   meta: {

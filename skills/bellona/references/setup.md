@@ -26,14 +26,14 @@ export default defineConfig({
     'bellona/effect',
   ],
   rules: {
-    'bellona/js-max-classes': ['error', { max: 5 }],
-    'bellona/react-no-namespace': 'error',
-    'bellona/base-ui-require-native-button-with-render': 'error',
-    'bellona/zod-schema-naming': 'error',
-    'bellona/tanstack-router-no-dynamic-to': 'error',
-    'bellona/tanstack-router-require-hook-from': 'error',
-    'bellona/elysia-no-context-param': 'error',
-    'bellona/effect-prefer-fn': 'error',
+    'bl-js/max-classes': ['error', { max: 5 }],
+    'bl-react/no-namespace': 'error',
+    'bl-base-ui/require-native-button-with-render': 'error',
+    'bl-zod/schema-naming': 'error',
+    'bl-tanstack-router/no-dynamic-to': 'error',
+    'bl-tanstack-router/require-hook-from': 'error',
+    'bl-elysia/no-context-param': 'error',
+    'bl-effect/prefer-fn': 'error',
   },
 });
 ```
@@ -46,7 +46,7 @@ JSON is valid too:
 {
   "jsPlugins": ["bellona/js"],
   "rules": {
-    "bellona/js-max-classes": ["error", { "max": 5 }]
+    "bl-js/max-classes": ["error", { "max": 5 }]
   }
 }
 ```
@@ -75,31 +75,31 @@ defineConfig({
 
 ## Rule ids
 
-Format: `bellona/<plugin>-<slug>`.
+Format: `bl-<plugin>/<slug>`.
 
-- Plugin `meta.name` is always `bellona`.
-- The rule key is `<plugin>-<slug>` (`js-max-classes`, `base-ui-require-native-button-with-render`).
+- Plugin `meta.name` is unique (`bl-js`, `bl-react`, `bl-base-ui`, …).
+- The rule key is the slug only (`max-classes`, `require-native-button-with-render`).
 - Severity: `'off' | 'warn' | 'error'` or `['error', { ...options }]`.
 
-Wrong: `js/bn-max-classes`, `js/max-classes`, `bn-max-classes`.
-Right: `bellona/js-max-classes`.
+Wrong: `bellona/js-max-classes`, `js/max-classes`, `bn-max-classes`.
+Right: `bl-js/max-classes`.
 
 ## Options
 
 One object at `rules` value index 1 (Oxlint options array index `0`):
 
 ```ts
-'bellona/js-no-runtime-typeof': ['error', { allowInTypeGuards: true }],
-'bellona/js-no-unknown-parameters': ['error', { allow: ['cause', 'input'] }],
-'bellona/react-no-native-html': [
+'bl-js/no-runtime-typeof': ['error', { allowInTypeGuards: true }],
+'bl-js/no-unknown-parameters': ['error', { allow: ['cause', 'input'] }],
+'bl-react/no-native-html': [
   'error',
   {
     tags: ['button', 'input'],
     replacements: { button: { component: 'Button', from: '@/ui/button' } },
   },
 ],
-'bellona/elysia-require-route-schema': ['error', { methods: ['post', 'put'] }],
-'bellona/effect-no-run-promise-in-modules': [
+'bl-elysia/require-route-schema': ['error', { methods: ['post', 'put'] }],
+'bl-effect/no-run-promise-in-modules': [
   'error',
   { entry: ['/main.ts', '/runtime.ts'], allow: ['/scripts/'] },
 ],
@@ -145,11 +145,11 @@ Most bellona rules have **no** autofix. `--fix` will not rewrite `Effect.fn` or 
 Prefer Oxlint directives:
 
 ```ts
-// oxlint-disable-next-line bellona/js-max-classes
+// oxlint-disable-next-line bl-js/max-classes
 ```
 
 ```ts
-/* oxlint-disable bellona/js-no-runtime-typeof -- boundary decoder lives in parse.ts */
+/* oxlint-disable bl-js/no-runtime-typeof -- boundary decoder lives in parse.ts */
 ```
 
 `eslint-disable` still works while migrating if `respectEslintDisableDirectives` is true (Oxlint default).
@@ -161,22 +161,22 @@ Rules stay off until listed. This is a consumer choice, not a package preset. Co
 ```ts
 rules: {
   // js
-  'bellona/js-max-classes': 'error',
-  'bellona/js-no-chained-type-assertions': 'error',
-  'bellona/js-no-conditional-empty-object-spread': 'error',
-  'bellona/js-no-known-value-widening': 'error',
-  'bellona/js-no-module-mocking': 'error',
-  'bellona/js-no-object-parameters': 'error',
-  'bellona/js-no-reflect-apply': 'error',
-  'bellona/js-no-reflect-get': 'error',
-  'bellona/js-no-runtime-typeof': 'error',
-  'bellona/js-no-shape-in-symbol-names': 'error',
-  'bellona/js-no-unknown-parameters': 'error',
-  'bellona/js-no-unknown-returns': 'error',
-  'bellona/js-no-unknown-type-aliases': 'error',
-  'bellona/js-no-unsafe-dictionary-type': 'error',
-  'bellona/js-no-widen-then-assert': 'error',
-  'bellona/js-require-safety-comment-for-type-assertion': 'error',
+  'bl-js/max-classes': 'error',
+  'bl-js/no-chained-type-assertions': 'error',
+  'bl-js/no-conditional-empty-object-spread': 'error',
+  'bl-js/no-known-value-widening': 'error',
+  'bl-js/no-module-mocking': 'error',
+  'bl-js/no-object-parameters': 'error',
+  'bl-js/no-reflect-apply': 'error',
+  'bl-js/no-reflect-get': 'error',
+  'bl-js/no-runtime-typeof': 'error',
+  'bl-js/no-shape-in-symbol-names': 'error',
+  'bl-js/no-unknown-parameters': 'error',
+  'bl-js/no-unknown-returns': 'error',
+  'bl-js/no-unknown-type-aliases': 'error',
+  'bl-js/no-unsafe-dictionary-type': 'error',
+  'bl-js/no-widen-then-assert': 'error',
+  'bl-js/require-safety-comment-for-type-assertion': 'error',
 }
 ```
 

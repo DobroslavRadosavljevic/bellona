@@ -12,7 +12,7 @@ import {
  * Leaf `routes/<action>.ts` files may register at most one Elysia route method
  * (`.get` / `.post` / …). Mount tables belong in `routes/index.ts`.
  */
-export const oneRouteMethodPerFileName = bnRuleName('elysia', 'one-route-method-per-file');
+export const oneRouteMethodPerFileName = bnRuleName('one-route-method-per-file');
 
 export const oneRouteMethodPerFile: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

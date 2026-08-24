@@ -29,10 +29,7 @@ function reportIfMissingParams(
   report({ messageId: 'missingParams', node: toValue });
 }
 
-export const requireParamsWithPathTokensName = bnRuleName(
-  'tanstack-router',
-  'require-params-with-path-tokens',
-);
+export const requireParamsWithPathTokensName = bnRuleName('require-params-with-path-tokens');
 
 export const requireParamsWithPathTokens: CreateOnceRule = defineBellonaRule({
   meta: {

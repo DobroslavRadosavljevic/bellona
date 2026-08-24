@@ -5,7 +5,7 @@ import {
 } from './rules/zod-modern-format-validators.ts';
 import { zodSchemaNaming, zodSchemaNamingName } from './rules/zod-schema-naming.ts';
 
-const zod = defineBellonaPlugin({
+const zod = defineBellonaPlugin('bl-zod', {
   [zodModernFormatValidatorsName]: zodModernFormatValidators,
   [zodSchemaNamingName]: zodSchemaNaming,
 });

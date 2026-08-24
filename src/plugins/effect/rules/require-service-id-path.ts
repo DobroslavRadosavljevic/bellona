@@ -15,7 +15,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const requireServiceIdPathName = bnRuleName('effect', 'require-service-id-path');
+export const requireServiceIdPathName = bnRuleName('require-service-id-path');
 
 export const requireServiceIdPath: CreateOnceRule = defineBellonaRule({
   meta: {

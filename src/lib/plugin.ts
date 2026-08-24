@@ -10,13 +10,12 @@ export interface BellonaPlugin<
   rules: Rules;
 }
 
-export const BELLONA_PLUGIN_NAME = 'bellona';
-
-export function defineBellonaPlugin<const Rules extends { [Key in keyof Rules]: CreateOnceRule }>(
-  rules: Rules,
-): BellonaPlugin<typeof BELLONA_PLUGIN_NAME, Rules> {
+export function defineBellonaPlugin<
+  const Name extends string,
+  const Rules extends { [Key in keyof Rules]: CreateOnceRule },
+>(name: Name, rules: Rules): BellonaPlugin<Name, Rules> {
   return {
-    meta: { name: BELLONA_PLUGIN_NAME },
+    meta: { name },
     rules,
   };
 }

@@ -4,7 +4,7 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { isNotFoundHandled, isRouterNotFoundCall } from '../route.ts';
 
-export const requireThrowNotFoundName = bnRuleName('tanstack-router', 'require-throw-not-found');
+export const requireThrowNotFoundName = bnRuleName('require-throw-not-found');
 
 export const requireThrowNotFound: CreateOnceRule = defineBellonaRule({
   meta: {

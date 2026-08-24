@@ -5,7 +5,7 @@ import { isAtModuleScope, isFunctionLike } from '../ast.ts';
 import { expressionContainsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noJsxModuleConstantsName = bnRuleName('react', 'no-jsx-module-constants');
+export const noJsxModuleConstantsName = bnRuleName('no-jsx-module-constants');
 
 export const noJsxModuleConstants: CreateOnceRule = defineBellonaRule({
   meta: {

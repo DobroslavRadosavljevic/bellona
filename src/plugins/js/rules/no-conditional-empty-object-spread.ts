@@ -25,10 +25,7 @@ function isConditionalEmptyObjectSpread(node: ESTree.Expression): boolean {
 }
 
 /** Ban conditional empty-object spreads without changing their omission semantics. */
-export const noConditionalEmptyObjectSpreadName = bnRuleName(
-  'js',
-  'no-conditional-empty-object-spread',
-);
+export const noConditionalEmptyObjectSpreadName = bnRuleName('no-conditional-empty-object-spread');
 
 export const noConditionalEmptyObjectSpread: CreateOnceRule = defineBellonaRule({
   meta: {

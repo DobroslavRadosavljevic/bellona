@@ -12,7 +12,7 @@ import {
 } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 
-export const hookFileNameMatchName = bnRuleName('react', 'hook-file-name-match');
+export const hookFileNameMatchName = bnRuleName('hook-file-name-match');
 
 export const hookFileNameMatch: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -85,7 +85,7 @@ function shouldReportType(node: ESTree.TSType, environment: TypeEnvironment): bo
 }
 
 /** Disallow object-dictionary contracts whose direct value type is an unsafe escape hatch. */
-export const noUnsafeDictionaryTypeName = bnRuleName('js', 'no-unsafe-dictionary-type');
+export const noUnsafeDictionaryTypeName = bnRuleName('no-unsafe-dictionary-type');
 
 export const noUnsafeDictionaryType: CreateOnceRule = defineBellonaRule({
   meta: {

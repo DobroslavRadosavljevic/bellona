@@ -63,8 +63,8 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 ## Project rules
 
 - New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `bellona/js`.
-- `meta.name` is always `bellona` so ids are `bellona/<plugin>-<slug>` (example: `bellona/js-max-classes`)
-- Register with `bnRuleName('js', 'slug')` (`js-max-classes`, never `bn-max-classes` or bare `max-classes`)
+- `meta.name` is unique per plugin (`bl-js`, `bl-react`, …) so ids are `bl-<plugin>/<slug>` (example: `bl-js/max-classes`)
+- Register with `bnRuleName('slug')` (`max-classes`, never `js-max-classes` or `bn-max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure
 - Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`

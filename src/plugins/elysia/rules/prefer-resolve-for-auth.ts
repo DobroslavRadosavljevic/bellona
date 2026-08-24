@@ -12,7 +12,7 @@ import {
  * Prefer `.resolve` / macros over `.derive` for session/auth context in
  * plugin files. IP-only derives are allowed.
  */
-export const preferResolveForAuthName = bnRuleName('elysia', 'prefer-resolve-for-auth');
+export const preferResolveForAuthName = bnRuleName('prefer-resolve-for-auth');
 
 export const preferResolveForAuth: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

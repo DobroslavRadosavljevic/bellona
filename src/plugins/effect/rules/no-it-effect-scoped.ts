@@ -13,7 +13,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noItEffectScopedName = bnRuleName('effect', 'no-it-scoped');
+export const noItEffectScopedName = bnRuleName('no-it-scoped');
 
 function isEffectScopedCall(
   node: ReturnType<typeof unwrapExpression>,

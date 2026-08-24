@@ -31,7 +31,7 @@ const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
   ['pattern', 'Schema.check(Schema.isPattern(regex))'],
 ]);
 
-export const schemaNoLegacyFilterName = bnRuleName('effect', 'schema-no-legacy-filter');
+export const schemaNoLegacyFilterName = bnRuleName('schema-no-legacy-filter');
 
 function isSchemaReceiver(
   node: ReturnType<typeof unwrapExpression>,

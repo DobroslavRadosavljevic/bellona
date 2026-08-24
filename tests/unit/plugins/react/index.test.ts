@@ -5,17 +5,17 @@ import react from '../../../../src/plugins/react/index.ts';
 describe('react plugin', () => {
   it('registers every React rule under a react- id', () => {
     expect(Object.keys(react.rules)).toEqual([
-      'react-component-file-name-match',
-      'react-hook-file-name-match',
-      'react-no-jsx-iife-in-components',
-      'react-no-jsx-local-constants-in-components',
-      'react-no-jsx-module-constants',
-      'react-no-jsx-variable-reassignment-in-components',
-      'react-no-multi-component-files',
-      'react-no-multi-hook-files',
-      'react-no-native-html',
-      'react-no-namespace',
-      'react-no-render-helper-functions-in-components',
+      'component-file-name-match',
+      'hook-file-name-match',
+      'no-jsx-iife-in-components',
+      'no-jsx-local-constants-in-components',
+      'no-jsx-module-constants',
+      'no-jsx-variable-reassignment-in-components',
+      'no-multi-component-files',
+      'no-multi-hook-files',
+      'no-native-html',
+      'no-namespace',
+      'no-render-helper-functions-in-components',
     ]);
   });
 });

@@ -18,10 +18,7 @@ import {
   type NativeButtonWithRenderOptions,
 } from '../options.ts';
 
-export const requireNativeButtonWithRenderName = bnRuleName(
-  'base-ui',
-  'require-native-button-with-render',
-);
+export const requireNativeButtonWithRenderName = bnRuleName('require-native-button-with-render');
 
 const STRING_NAME_LIST_SCHEMA = {
   type: 'array',

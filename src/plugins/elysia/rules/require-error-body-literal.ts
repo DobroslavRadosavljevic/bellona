@@ -42,7 +42,7 @@ const shouldCheckErrorBody = (
  * const string Identifier) for `code`: not templates or member access.
  * `message` may be dynamic (e.g. permission text).
  */
-export const requireErrorBodyLiteralName = bnRuleName('elysia', 'require-error-body-literal');
+export const requireErrorBodyLiteralName = bnRuleName('require-error-body-literal');
 
 export const requireErrorBodyLiteral: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

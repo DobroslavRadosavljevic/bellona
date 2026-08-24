@@ -38,7 +38,7 @@ import {
   requireValidateSearchWhenUsedName,
 } from './rules/require-validate-search-when-used.ts';
 
-const tanstackRouter = defineBellonaPlugin({
+const tanstackRouter = defineBellonaPlugin('bl-tanstack-router', {
   [createRoutePropertyOrderName]: createRoutePropertyOrder,
   [noDynamicRouterToName]: noDynamicRouterTo,
   [noGetRouteApiName]: noGetRouteApi,
