@@ -10,6 +10,7 @@ export const plugins = {
   tanstackRouter: 'bellona/tanstack-router',
   elysia: 'bellona/elysia',
   effect: 'bellona/effect',
+  tailwind: 'bellona/tailwind',
 } satisfies Record<string, `bellona/${string}`>;
 
 export type BellonaPluginSpecifier = (typeof plugins)[keyof typeof plugins];

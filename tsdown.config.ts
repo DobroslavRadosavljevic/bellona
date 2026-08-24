@@ -10,6 +10,7 @@ export default defineConfig({
     'tanstack-router': './src/plugins/tanstack-router/index.ts',
     elysia: './src/plugins/elysia/index.ts',
     effect: './src/plugins/effect/index.ts',
+    tailwind: './src/plugins/tailwind/index.ts',
   },
   format: 'esm',
   dts: true,

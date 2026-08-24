@@ -79,6 +79,7 @@ Reuse the plugin’s `shouldSkip*` instead of copying path regexes:
 | tanstack-router | `shouldSkipRouterFile` |
 | elysia | `shouldSkipElysiaFile` and path variants |
 | effect | `shouldSkipEffectFile` / `shouldSkipEffectStyleFile` / `shouldSkipNonTestEffectFile` / `shouldSkipRunPromiseFile` |
+| tailwind | `shouldSkipTailwindFile` |
 
 `matchesAllow` + `isTestFile` live in each plugin’s `filename.ts` (duplicated on purpose; keep plugins independent).
 

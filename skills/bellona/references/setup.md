@@ -24,6 +24,7 @@ export default defineConfig({
     'bellona/tanstack-router',
     'bellona/elysia',
     'bellona/effect',
+    'bellona/tailwind',
   ],
   rules: {
     'bl-js/max-classes': ['error', { max: 5 }],
@@ -34,6 +35,7 @@ export default defineConfig({
     'bl-tanstack-router/require-hook-from': 'error',
     'bl-elysia/no-context-param': 'error',
     'bl-effect/prefer-fn': 'error',
+    'bl-tailwind/no-classname-constants': 'error',
   },
 });
 ```
@@ -72,6 +74,7 @@ defineConfig({
 | `plugins.tanstackRouter` | `bellona/tanstack-router` |
 | `plugins.elysia` | `bellona/elysia` |
 | `plugins.effect` | `bellona/effect` |
+| `plugins.tailwind` | `bellona/tailwind` |
 
 ## Rule ids
 
@@ -102,6 +105,10 @@ One object at `rules` value index 1 (Oxlint options array index `0`):
 'bl-effect/no-run-promise-in-modules': [
   'error',
   { entry: ['/main.ts', '/runtime.ts'], allow: ['/scripts/'] },
+],
+'bl-tailwind/no-classname-constants': [
+  'error',
+  { minUtilities: 2, allowedCallees: ['tv', 'createTV'] },
 ],
 ```
 

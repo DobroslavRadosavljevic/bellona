@@ -19,6 +19,7 @@
 | `./tanstack-router` | `src/plugins/tanstack-router/index.ts` |
 | `./elysia` | `src/plugins/elysia/index.ts` |
 | `./effect` | `src/plugins/effect/index.ts` |
+| `./tailwind` | `src/plugins/tailwind/index.ts` |
 
 Each plugin default-export is `{ meta: { name: 'bl-<plugin>' }, rules }`. Rule keys are the slug only. Oxlint ids are `bl-<plugin>/<slug>`.
 
@@ -81,6 +82,7 @@ Most domain rules stack these checks in `before()`:
    - Effect: `effect`, `effect/…`, or `@effect/…` (`programImportsEffect`)
    - React JSX rules: filename ends with `.tsx` / `.jsx` (some React rules also run on `.ts` hook files)
    - Base UI: **no** `@base-ui/react` import required (JSX name matching)
+   - Tailwind: **no** import gate (class strings do not need a package import)
    - JS: **no** import gate
 2. **Test skip** — see [setup.md](setup.md). Not used by most `js` rules. Effect: some rules skip tests; `bl-effect/prefer-vitest` runs **only** on tests.
 3. **`allow`** — path substring / basename.
@@ -134,4 +136,5 @@ Generated: `dist/` — do not edit.
 | tanstack-router | 14 |
 | elysia | 15 |
 | effect | 25 |
-| **total** | **84** |
+| tailwind | 1 |
+| **total** | **85** |

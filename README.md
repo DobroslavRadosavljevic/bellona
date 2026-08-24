@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/npm/l/bellona.svg)](./LICENSE)
 [![skills.sh](https://skills.sh/b/DobroslavRadosavljevic/bellona)](https://skills.sh/DobroslavRadosavljevic/bellona)
 
-**Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins** for TypeScript, React, Base UI, Zod, TanStack Router, Elysia, and Effect.
+**Opt-in [Oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) JS plugins** for TypeScript, React, Base UI, Zod, TanStack Router, Elysia, Effect, and Tailwind.
 
 Load only the stacks you use. Turn rules on by id. Nothing is enabled by default.
 
@@ -17,7 +17,7 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 - 🎛️ **Fully opt-in** — no recommended preset; you pick each `bl-<plugin>/<rule>` id
 - 🛡️ TypeScript **evidence** rules (widening, `unknown`, unsafe dictionaries, mocks, assertions)
 - ⚛️ React file and JSX rules, plus Base UI `nativeButton` / `render` checks
-- 🧭 Zod, TanStack Router, Elysia, and Effect v4 style and API rules
+- 🧭 Zod, TanStack Router, Elysia, Effect v4, and Tailwind class-name rules
 
 ## Plugins
 
@@ -30,6 +30,7 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 | `bellona/tanstack-router` | TanStack Router / Start             |
 | `bellona/elysia`          | Elysia HTTP apps                    |
 | `bellona/effect`          | Effect v4 (`effect@rc`)             |
+| `bellona/tailwind`        | Tailwind class strings              |
 
 Rule ids are `bl-<plugin>/<rule>`, for example `bl-js/max-classes` and `bl-effect/prefer-fn`.
 
@@ -56,6 +57,7 @@ export default defineConfig({
     'bellona/tanstack-router',
     'bellona/elysia',
     'bellona/effect',
+    'bellona/tailwind',
   ],
   rules: {
     'bl-js/max-classes': ['error', { max: 5 }],
@@ -66,6 +68,7 @@ export default defineConfig({
     'bl-tanstack-router/require-hook-from': 'error',
     'bl-elysia/no-context-param': 'error',
     'bl-effect/prefer-fn': 'error',
+    'bl-tailwind/no-classname-constants': 'error',
   },
 });
 ```
@@ -203,6 +206,12 @@ Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some 
 - `bl-effect/no-yield-ref-handle`
 - `bl-effect/prefer-vitest` (test files only)
 - `bl-effect/schema-no-legacy-filter`
+
+### `bellona/tailwind`
+
+No import gate. Test and spec files are skipped. Prefer `tv` / `createTV` from tailwind-variants, or a reusable component.
+
+- `bl-tailwind/no-classname-constants` (`minUtilities`, default `2`; `allowedCallees`, default `tv` / `createTV`)
 
 ## Agent skill
 

@@ -2,7 +2,8 @@
 name: bellona
 description: >-
   Install, configure, and enable bellona Oxlint JS plugins (bellona/js, bellona/react,
-  bellona/base-ui, bellona/zod, bellona/tanstack-router, bellona/elysia, bellona/effect).
+  bellona/base-ui, bellona/zod, bellona/tanstack-router, bellona/elysia, bellona/effect,
+  bellona/tailwind).
   Use when adding oxlint.config.ts jsPlugins, turning on bl-* rules, debugging bellona
   lint, writing a new bellona rule with defineBellonaRule and createOnce, pinning oxlint
   for JS plugins, or when the user mentions bellona, Oxlint JS plugins, bl-js/max-classes,
@@ -23,7 +24,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
    - `oxlint` and `bellona` versions; Node `^20.19.0 || >=22.12.0`.
    - Config file: prefer `oxlint.config.ts` + `defineConfig`. Also accept `.oxlintrc.json(c)`.
    - Existing `jsPlugins`, `rules`, `ignorePatterns`, and `lint` / `lint:fix` scripts.
-   - Which stacks the app actually uses (React, Base UI, Zod, TanStack Router, Elysia, Effect). Load only those subpaths.
+   - Which stacks the app actually uses (React, Base UI, Zod, TanStack Router, Elysia, Effect, Tailwind). Load only those subpaths.
 2. Install and wire plugins using [setup.md](references/setup.md).
 3. Enable rules **explicitly**. Copy ids from the plugin catalogs below. Do not invent a `bellona/recommended` preset.
 4. Match skip behavior and options in the catalog for that plugin. Shared `allow` / test-file rules live in [how-it-works.md](references/how-it-works.md).
@@ -32,7 +33,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
 
 ## Core judgment
 
-- Subpath import = plugin load. Rule id = `bl-<plugin>/<slug>` (example: `bl-js/max-classes`). Plugin `meta.name` is unique: `bl-js`, `bl-react`, `bl-base-ui`, `bl-zod`, `bl-tanstack-router`, `bl-elysia`, `bl-effect`.
+- Subpath import = plugin load. Rule id = `bl-<plugin>/<slug>` (example: `bl-js/max-classes`). Plugin `meta.name` is unique: `bl-js`, `bl-react`, `bl-base-ui`, `bl-zod`, `bl-tanstack-router`, `bl-elysia`, `bl-effect`, `bl-tailwind`.
 - The root `bellona` entry is a **specifier catalog only** (`plugins.js`, `plugins.react`, …). Consumers put those strings in `jsPlugins`. They do not import a plugin from `bellona`.
 - Rules ship **off**. Loading a plugin does not lint until you set the rule in `rules`.
 - Prefer `schema` + `defaultOptions`. Options are a single object at index `0`.
@@ -53,6 +54,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
 | `bellona/tanstack-router` | `bl-tanstack-router` | TanStack Router / Start | [tanstack-router-rules.md](references/tanstack-router-rules.md) |
 | `bellona/elysia` | `bl-elysia` | Elysia HTTP apps | [elysia-rules.md](references/elysia-rules.md) |
 | `bellona/effect` | `bl-effect` | Effect v4 (`effect@rc`) | [effect-rules.md](references/effect-rules.md) |
+| `bellona/tailwind` | `bl-tailwind` | Tailwind class strings | [tailwind-rules.md](references/tailwind-rules.md) |
 
 Omit a subpath if that stack is not in the repo.
 
