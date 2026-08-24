@@ -7,6 +7,7 @@ import { expressionContainsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
 export const noJsxVariableReassignmentInComponentsName = bnRuleName(
+  'react',
   'no-jsx-variable-reassignment-in-components',
 );
 

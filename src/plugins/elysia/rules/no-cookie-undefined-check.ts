@@ -17,7 +17,7 @@ const isUndefinedIdentifier = (node: ReturnType<typeof unwrapExpression>): boole
  * Elysia `cookie.name` is a Proxy that is always defined: check
  * `cookie.name.value` instead of treating the jar entry as optional.
  */
-export const noCookieUndefinedCheckName = bnRuleName('no-cookie-undefined-check');
+export const noCookieUndefinedCheckName = bnRuleName('elysia', 'no-cookie-undefined-check');
 
 export const noCookieUndefinedCheck: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

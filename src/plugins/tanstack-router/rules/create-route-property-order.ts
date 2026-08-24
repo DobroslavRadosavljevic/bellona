@@ -5,7 +5,10 @@ import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { getCreateRouteOptions, sortRoutePropertiesByOrder } from '../route.ts';
 
-export const createRoutePropertyOrderName = bnRuleName('create-route-property-order');
+export const createRoutePropertyOrderName = bnRuleName(
+  'tanstack-router',
+  'create-route-property-order',
+);
 
 export const createRoutePropertyOrder: CreateOnceRule = defineBellonaRule({
   meta: {

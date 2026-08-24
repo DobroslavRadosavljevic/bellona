@@ -131,7 +131,7 @@ function hasParentAssertion(node: ESTree.Node): boolean {
 }
 
 /** Detect sound syntactic cases where a known value is explicitly widened and loses evidence. */
-export const noKnownValueWideningName = bnRuleName('no-known-value-widening');
+export const noKnownValueWideningName = bnRuleName('js', 'no-known-value-widening');
 
 export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
   meta: {

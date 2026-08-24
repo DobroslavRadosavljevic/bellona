@@ -9,6 +9,14 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-24
+
+### Changed
+
+- Rule ids are now `bellona/<plugin>-<slug>` (example: `bellona/js-max-classes`). Plugin `meta.name` is `bellona` for every subpath.
+- Slugs no longer repeat the plugin token (`bellona/zod-schema-naming`, not `bellona/zod-zod-schema-naming`).
+- Old ids such as `js/bn-max-classes` no longer match. Update `rules` and `oxlint-disable` comments.
+
 ## [0.1.0] - 2026-08-22
 
 ### Added
@@ -18,5 +26,6 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.2.0
 [0.1.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.1.0

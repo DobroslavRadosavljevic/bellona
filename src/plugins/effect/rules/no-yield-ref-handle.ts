@@ -11,7 +11,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noYieldRefHandleName = bnRuleName('no-yield-ref-handle');
+export const noYieldRefHandleName = bnRuleName('effect', 'no-yield-ref-handle');
 
 function yieldCallee(node: ESTree.YieldExpression): ESTree.CallExpression | undefined {
   const argument = unwrapExpression(node.argument);

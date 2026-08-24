@@ -16,7 +16,7 @@ const isClassBodyMethod = (node: ESTree.Node): boolean => {
  *
  * Class methods are covered by `no-controller-context-class`.
  */
-export const noContextParamName = bnRuleName('no-context-param');
+export const noContextParamName = bnRuleName('elysia', 'no-context-param');
 
 export const noContextParam: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

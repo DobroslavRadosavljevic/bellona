@@ -37,7 +37,7 @@ function isBoundRouteHookCall(node: ESTree.CallExpression): boolean {
   return object.type === 'CallExpression' && isGetRouteApiCall(object);
 }
 
-export const noGetRouteApiName = bnRuleName('no-get-route-api');
+export const noGetRouteApiName = bnRuleName('tanstack-router', 'no-get-route-api');
 
 export const noGetRouteApi: CreateOnceRule = defineBellonaRule({
   meta: {

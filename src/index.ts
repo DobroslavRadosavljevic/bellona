@@ -1,6 +1,6 @@
 /**
  * Oxlint `jsPlugins` specifiers. Each subpath is a separate plugin; rules stay
- * off until the consumer enables them by id (`<plugin-name>/<rule>`).
+ * off until the consumer enables them by id (`bellona/<plugin>-<rule>`).
  */
 export const plugins = {
   js: 'bellona/js',

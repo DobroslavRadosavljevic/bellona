@@ -9,7 +9,7 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * Disallow class methods typed with Elysia `Context`. Keep controllers
  * decoupled from HTTP context (best-practice).
  */
-export const noControllerContextClassName = bnRuleName('no-controller-context-class');
+export const noControllerContextClassName = bnRuleName('elysia', 'no-controller-context-class');
 
 export const noControllerContextClass: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

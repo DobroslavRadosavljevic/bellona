@@ -63,8 +63,8 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 ## Project rules
 
 - New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `bellona/js`.
-- `meta.name` must equal the last export segment (`js`, `react`, `base-ui`, `zod`, `tanstack-router`, `elysia`, `effect`) so ids are `<name>/bn-<slug>`
-- Register with `bnRuleName('slug')` (`bn-max-classes`, never bare `max-classes`)
+- `meta.name` is always `bellona` so ids are `bellona/<plugin>-<slug>` (example: `bellona/js-max-classes`)
+- Register with `bnRuleName('js', 'slug')` (`js-max-classes`, never `bn-max-classes` or bare `max-classes`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure
 - Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`
@@ -93,7 +93,7 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 | -------------------------- | -------------------------------------------------------------- |
 | Human setup / consumer API | `README.md`                                                    |
 | Changelog / versions       | `CHANGELOG.md`                                                 |
-| Consumer agent skill       | `skills/bellona/`                                               |
+| Consumer agent skill       | `skills/bellona/`                                              |
 | Plugin entries / publish   | `package.json`, `tsdown.config.ts`, `.npmrc`                   |
 | Lint / format              | `oxlint.config.ts`, `oxfmt.config.ts`                          |
 | Oxlint JS plugins          | https://oxc.rs/docs/guide/usage/linter/writing-js-plugins.html |

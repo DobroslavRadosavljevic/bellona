@@ -23,7 +23,7 @@ const LEGACY_DECODERS = new Map<string, string>([
 
 const TRANSFORM_DECODERS = new Set(['decode', 'encode']);
 
-export const preferDecodeUnknownEffectName = bnRuleName('prefer-decode-unknown-effect');
+export const preferDecodeUnknownEffectName = bnRuleName('effect', 'prefer-decode-unknown');
 
 export const preferDecodeUnknownEffect: CreateOnceRule = defineBellonaRule({
   meta: {

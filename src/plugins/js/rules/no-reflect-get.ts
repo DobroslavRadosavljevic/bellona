@@ -4,7 +4,7 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isGlobalReflectMethodCall } from '../shared/reflect-method.ts';
 
 /** Ban Reflect.get, which bypasses ordinary property access and useful type evidence. */
-export const noReflectGetName = bnRuleName('no-reflect-get');
+export const noReflectGetName = bnRuleName('js', 'no-reflect-get');
 
 export const noReflectGet: CreateOnceRule = defineBellonaRule({
   meta: {

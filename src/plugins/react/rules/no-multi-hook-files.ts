@@ -6,7 +6,7 @@ import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
 import { isHookFile, isHookName, matchesAllow } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 
-export const noMultiHookFilesName = bnRuleName('no-multi-hook-files');
+export const noMultiHookFilesName = bnRuleName('react', 'no-multi-hook-files');
 
 export const noMultiHookFiles: CreateOnceRule = defineBellonaRule({
   meta: {

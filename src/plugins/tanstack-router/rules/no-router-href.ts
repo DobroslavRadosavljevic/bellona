@@ -30,7 +30,7 @@ function reportIfBannedHref(
   report({ messageId: 'routerHref', node: hrefValue });
 }
 
-export const noRouterHrefName = bnRuleName('no-router-href');
+export const noRouterHrefName = bnRuleName('tanstack-router', 'no-href');
 
 export const noRouterHref: CreateOnceRule = defineBellonaRule({
   meta: {

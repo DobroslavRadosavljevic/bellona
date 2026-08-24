@@ -24,7 +24,7 @@ function referencedAliasName(type: ESTree.TSType): string | null {
 }
 
 /** Ban function contracts that return unknown instead of a parsed domain type. */
-export const noUnknownReturnsName = bnRuleName('no-unknown-returns');
+export const noUnknownReturnsName = bnRuleName('js', 'no-unknown-returns');
 
 export const noUnknownReturns: CreateOnceRule = defineBellonaRule({
   meta: {

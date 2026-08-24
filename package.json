@@ -1,6 +1,6 @@
 {
   "name": "bellona",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Opt-in Oxlint JS plugins for JS/TS, React, Base UI, Zod, TanStack Router, Elysia, and Effect.",
   "keywords": [
     "base-ui",

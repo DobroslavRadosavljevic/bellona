@@ -14,7 +14,7 @@ A new framework/domain is a new `src/plugins/<id>/` plus:
 
 TypeScript evidence rules stay on `bellona/js`. Do not start a second JS plugin.
 
-`meta.name` must equal the last export segment (`elysia`, `base-ui`, …).
+Every plugin uses `meta.name` `bellona`. Rule keys are `<id>-<slug>` so Oxlint ids are `bellona/<id>-<slug>`.
 
 Rules ship **off**. Never add a recommended config that enables them.
 
@@ -23,7 +23,7 @@ Ask before: new runtime dependencies, new plugin subpaths, oxlint major bumps, p
 ## New rule (copy this path)
 
 1. Copy `src/plugins/js/rules/max-classes.ts`.
-2. Export `bnRuleName('your-slug')` as `yourRuleName` (`bn-your-slug`, never bare `your-slug`).
+2. Export `bnRuleName('<id>', 'your-slug')` as `yourRuleName` (`js-your-slug`, never `bn-your-slug` or bare `your-slug`).
 3. Use `defineBellonaRule` + `createOnce`. Type with `defineBellonaRule`; do not annotate as `Rule` (widens).
 4. Prefer `schema` + `defaultOptions`. Read options with `objectOptionAt` / field helpers from visitors or `before`, not from the `createOnce` closure.
 5. Register in `src/plugins/<id>/index.ts`.

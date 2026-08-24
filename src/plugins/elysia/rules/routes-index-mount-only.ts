@@ -17,7 +17,7 @@ import {
  * `routes/index.ts` is a mount table only: `new Elysia` + `.use` / `.as`.
  * No route verbs or lifecycle handlers.
  */
-export const routesIndexMountOnlyName = bnRuleName('routes-index-mount-only');
+export const routesIndexMountOnlyName = bnRuleName('elysia', 'routes-index-mount-only');
 
 export const routesIndexMountOnly: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

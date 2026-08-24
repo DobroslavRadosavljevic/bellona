@@ -14,15 +14,15 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 
 - ⚡ Built for **Oxlint JS plugins** — fast lint, same config you already use
 - 🔌 **One subpath per stack** — install one package, load `bellona/react` or `bellona/effect` only when you need it
-- 🎛️ **Fully opt-in** — no recommended preset; you pick each `bn-*` rule
+- 🎛️ **Fully opt-in** — no recommended preset; you pick each `bellona/<plugin>-<rule>` id
 - 🛡️ TypeScript **evidence** rules (widening, `unknown`, unsafe dictionaries, mocks, assertions)
 - ⚛️ React file and JSX rules, plus Base UI `nativeButton` / `render` checks
 - 🧭 Zod, TanStack Router, Elysia, and Effect v4 style and API rules
 
 ## Plugins
 
-| Package subpath          | When to load                        |
-| ------------------------ | ----------------------------------- |
+| Package subpath           | When to load                        |
+| ------------------------- | ----------------------------------- |
 | `bellona/js`              | TypeScript / JavaScript evidence    |
 | `bellona/react`           | React components, hooks, JSX        |
 | `bellona/base-ui`         | Base UI `nativeButton` and `render` |
@@ -31,7 +31,7 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 | `bellona/elysia`          | Elysia HTTP apps                    |
 | `bellona/effect`          | Effect v4 (`effect@rc`)             |
 
-Rule ids are `<plugin>/<rule>`, for example `js/bn-max-classes` and `effect/bn-prefer-effect-fn`.
+Rule ids are `<plugin>/<rule>`, for example `bellona/js-max-classes` and `bellona/effect-prefer-fn`.
 
 ## Install
 
@@ -58,14 +58,14 @@ export default defineConfig({
     'bellona/effect',
   ],
   rules: {
-    'js/bn-max-classes': ['error', { max: 5 }],
-    'react/bn-no-react-namespace': 'error',
-    'base-ui/bn-require-native-button-with-render': 'error',
-    'zod/bn-zod-schema-naming': 'error',
-    'tanstack-router/bn-no-dynamic-router-to': 'error',
-    'tanstack-router/bn-require-router-hook-from': 'error',
-    'elysia/bn-no-context-param': 'error',
-    'effect/bn-prefer-effect-fn': 'error',
+    'bellona/js-max-classes': ['error', { max: 5 }],
+    'bellona/react-no-namespace': 'error',
+    'bellona/base-ui-require-native-button-with-render': 'error',
+    'bellona/zod-schema-naming': 'error',
+    'bellona/tanstack-router-no-dynamic-to': 'error',
+    'bellona/tanstack-router-require-hook-from': 'error',
+    'bellona/elysia-no-context-param': 'error',
+    'bellona/effect-prefer-fn': 'error',
   },
 });
 ```
@@ -78,30 +78,30 @@ Many domain rules skip test and spec files. Most of them also skip files that ne
 
 ### `bellona/js`
 
-- `bn-max-classes`
-- `bn-no-chained-type-assertions`
-- `bn-no-conditional-empty-object-spread`
-- `bn-no-known-value-widening`
-- `bn-no-module-mocking`
-- `bn-no-object-parameters`
-- `bn-no-reflect-apply`
-- `bn-no-reflect-get`
-- `bn-no-runtime-typeof` (`allowInTypeGuards`, default `false`)
-- `bn-no-shape-in-symbol-names` (`term`, `caseSensitive`; matching is case-insensitive by default)
-- `bn-no-unknown-parameters` (`allow`, default `["cause"]`)
-- `bn-no-unknown-returns`
-- `bn-no-unknown-type-aliases`
-- `bn-no-unsafe-dictionary-type`
-- `bn-no-widen-then-assert`
-- `bn-require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
+- `js-max-classes`
+- `js-no-chained-type-assertions`
+- `js-no-conditional-empty-object-spread`
+- `js-no-known-value-widening`
+- `js-no-module-mocking`
+- `js-no-object-parameters`
+- `js-no-reflect-apply`
+- `js-no-reflect-get`
+- `js-no-runtime-typeof` (`allowInTypeGuards`, default `false`)
+- `js-no-shape-in-symbol-names` (`term`, `caseSensitive`; matching is case-insensitive by default)
+- `js-no-unknown-parameters` (`allow`, default `["cause"]`)
+- `js-no-unknown-returns`
+- `js-no-unknown-type-aliases`
+- `js-no-unsafe-dictionary-type`
+- `js-no-widen-then-assert`
+- `js-require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
 
 ```ts
 rules: {
-  'js/bn-no-chained-type-assertions': 'error',
-  'js/bn-no-runtime-typeof': ['error', { allowInTypeGuards: false }],
-  'js/bn-no-unknown-parameters': ['error', { allow: ['cause'] }],
-  'js/bn-no-shape-in-symbol-names': ['error', { term: 'shape', caseSensitive: false }],
-  'js/bn-require-safety-comment-for-type-assertion': ['error', { marker: 'SAFETY' }],
+  'bellona/js-no-chained-type-assertions': 'error',
+  'bellona/js-no-runtime-typeof': ['error', { allowInTypeGuards: false }],
+  'bellona/js-no-unknown-parameters': ['error', { allow: ['cause'] }],
+  'bellona/js-no-shape-in-symbol-names': ['error', { term: 'shape', caseSensitive: false }],
+  'bellona/js-require-safety-comment-for-type-assertion': ['error', { marker: 'SAFETY' }],
 }
 ```
 
@@ -109,21 +109,21 @@ rules: {
 
 Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 
-- `bn-component-file-name-match`
-- `bn-hook-file-name-match`
-- `bn-no-jsx-iife-in-components`
-- `bn-no-jsx-local-constants-in-components`
-- `bn-no-jsx-module-constants`
-- `bn-no-jsx-variable-reassignment-in-components`
-- `bn-no-multi-component-files`
-- `bn-no-multi-hook-files`
-- `bn-no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
-- `bn-no-react-namespace`
-- `bn-no-render-helper-functions-in-components`
+- `react-component-file-name-match`
+- `react-hook-file-name-match`
+- `react-no-jsx-iife-in-components`
+- `react-no-jsx-local-constants-in-components`
+- `react-no-jsx-module-constants`
+- `react-no-jsx-variable-reassignment-in-components`
+- `react-no-multi-component-files`
+- `react-no-multi-hook-files`
+- `react-no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
+- `react-no-namespace`
+- `react-no-render-helper-functions-in-components`
 
 ### `bellona/base-ui`
 
-- `bn-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
+- `base-ui-require-native-button-with-render` (`components`, `nonNativeButtonComponents`, `buttonHosts`, `nonButtonHosts`, `requireExplicitWhenUnknown`)
 
 `components` and `nonNativeButtonComponents` replace the default part lists. `buttonHosts` and `nonButtonHosts` add names to the built-in `render` host lists. The rule matches JSX names (`Dialog.Trigger` or `DialogTrigger`) and does not require an `@base-ui/react` import.
 
@@ -131,77 +131,77 @@ Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 
 Test and spec files are skipped.
 
-- `bn-zod-modern-format-validators`
-- `bn-zod-schema-naming`
+- `zod-modern-format-validators`
+- `zod-schema-naming`
 
 ### `bellona/tanstack-router`
 
 Test and spec files are skipped.
 
-- `bn-create-route-property-order`
-- `bn-no-dynamic-router-to`
-- `bn-no-get-route-api`
-- `bn-no-hooks-in-route-lifecycle`
-- `bn-no-imperative-location-navigation`
-- `bn-no-relative-router-to-without-from`
-- `bn-no-router-href`
-- `bn-no-router-type-assertion`
-- `bn-no-search-in-loader`
-- `bn-require-params-with-path-tokens`
-- `bn-require-router-hook-from`
-- `bn-require-throw-not-found`
-- `bn-require-throw-redirect`
-- `bn-require-validate-search-when-used`
+- `tanstack-router-create-route-property-order`
+- `tanstack-router-no-dynamic-to`
+- `tanstack-router-no-get-route-api`
+- `tanstack-router-no-hooks-in-route-lifecycle`
+- `tanstack-router-no-imperative-location-navigation`
+- `tanstack-router-no-relative-to-without-from`
+- `tanstack-router-no-href`
+- `tanstack-router-no-type-assertion`
+- `tanstack-router-no-search-in-loader`
+- `tanstack-router-require-params-with-path-tokens`
+- `tanstack-router-require-hook-from`
+- `tanstack-router-require-throw-not-found`
+- `tanstack-router-require-throw-redirect`
+- `tanstack-router-require-validate-search-when-used`
 
 ### `bellona/elysia`
 
-Test and spec files are skipped. Files that do not import `elysia` are skipped except `bn-no-route-factory`.
+Test and spec files are skipped. Files that do not import `elysia` are skipped except `elysia-no-route-factory`.
 
-- `bn-no-context-param`
-- `bn-no-controller-context-class`
-- `bn-no-cookie-undefined-check`
-- `bn-no-functional-plugin-callback`
-- `bn-no-route-factory` (`patterns`; `modules/` or `routes/` only)
-- `bn-one-route-method-per-file` (`routes/` leaf files)
-- `bn-prefer-resolve-for-auth` (`/plugins/` paths)
-- `bn-prefer-status-helper`
-- `bn-prefer-throw-status`
-- `bn-require-error-body-literal`
-- `bn-require-plugin-name` (also skips `/main.ts`, `/server.ts`, `/index.ts`, `/app.ts`)
-- `bn-require-response-schema` (`requireAllRoutes`, default `true`)
-- `bn-require-route-export-name` (`routes/` leaf files)
-- `bn-require-route-schema` (`methods`, default `post`/`put`/`patch`)
-- `bn-routes-index-mount-only` (`routes/index` files)
+- `elysia-no-context-param`
+- `elysia-no-controller-context-class`
+- `elysia-no-cookie-undefined-check`
+- `elysia-no-functional-plugin-callback`
+- `elysia-no-route-factory` (`patterns`; `modules/` or `routes/` only)
+- `elysia-one-route-method-per-file` (`routes/` leaf files)
+- `elysia-prefer-resolve-for-auth` (`/plugins/` paths)
+- `elysia-prefer-status-helper`
+- `elysia-prefer-throw-status`
+- `elysia-require-error-body-literal`
+- `elysia-require-plugin-name` (also skips `/main.ts`, `/server.ts`, `/index.ts`, `/app.ts`)
+- `elysia-require-response-schema` (`requireAllRoutes`, default `true`)
+- `elysia-require-route-export-name` (`routes/` leaf files)
+- `elysia-require-route-schema` (`methods`, default `post`/`put`/`patch`)
+- `elysia-routes-index-mount-only` (`routes/index` files)
 
 ### `bellona/effect`
 
 Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some style rules also skip test files (marked below).
 
-- `bn-no-v3-effect-apis`
-- `bn-no-v3-imports`
-- `bn-no-v3-service-tags`
-- `bn-prefer-effect-fn`
-- `bn-require-effect-fn-name`
-- `bn-no-pipe-on-effect-fn`
-- `bn-no-try-catch-in-effect-gen`
-- `bn-no-throw-in-effect-gen`
-- `bn-require-return-yield-on-fail`
-- `bn-schema-union-array`
-- `bn-prefer-date-from-string`
-- `bn-prefer-decode-unknown-effect`
-- `bn-no-it-effect-scoped`
-- `bn-no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
-- `bn-require-service-id-path` (test files skipped)
-- `bn-require-service-static-layer` (test files skipped)
-- `bn-prefer-service-of` (test files skipped)
-- `bn-no-date-now-in-effect` (test files skipped)
-- `bn-prefer-clock-sleep` (test files skipped)
-- `bn-prefer-schema-tagged-error` (test files skipped)
-- `bn-prefer-try-promise` (test files skipped)
-- `bn-prefer-predicate` (test files skipped)
-- `bn-no-yield-ref-handle`
-- `bn-prefer-effect-vitest` (test files only)
-- `bn-schema-no-legacy-filter`
+- `effect-no-v3-apis`
+- `effect-no-v3-imports`
+- `effect-no-v3-service-tags`
+- `effect-prefer-fn`
+- `effect-require-fn-name`
+- `effect-no-pipe-on-fn`
+- `effect-no-try-catch-in-gen`
+- `effect-no-throw-in-gen`
+- `effect-require-return-yield-on-fail`
+- `effect-schema-union-array`
+- `effect-prefer-date-from-string`
+- `effect-prefer-decode-unknown`
+- `effect-no-it-scoped`
+- `effect-no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
+- `effect-require-service-id-path` (test files skipped)
+- `effect-require-service-static-layer` (test files skipped)
+- `effect-prefer-service-of` (test files skipped)
+- `effect-no-date-now` (test files skipped)
+- `effect-prefer-clock-sleep` (test files skipped)
+- `effect-prefer-schema-tagged-error` (test files skipped)
+- `effect-prefer-try-promise` (test files skipped)
+- `effect-prefer-predicate` (test files skipped)
+- `effect-no-yield-ref-handle`
+- `effect-prefer-vitest` (test files only)
+- `effect-schema-no-legacy-filter`
 
 ## Agent skill
 

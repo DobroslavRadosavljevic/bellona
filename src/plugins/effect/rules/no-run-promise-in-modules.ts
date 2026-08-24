@@ -22,7 +22,7 @@ const RUNNERS = [
   'runCallbackWith',
 ] as const;
 
-export const noRunPromiseInModulesName = bnRuleName('no-run-promise-in-modules');
+export const noRunPromiseInModulesName = bnRuleName('effect', 'no-run-promise-in-modules');
 
 export const noRunPromiseInModules: CreateOnceRule = defineBellonaRule({
   meta: {

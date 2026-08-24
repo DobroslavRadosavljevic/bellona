@@ -36,7 +36,7 @@ const STREAM_REPLACEMENTS = new Map<string, string>([['async', 'Stream.callback'
 
 const SCOPE_REPLACEMENTS = new Map<string, string>([['extend', 'Scope.provide']]);
 
-export const noV3EffectApisName = bnRuleName('no-v3-effect-apis');
+export const noV3EffectApisName = bnRuleName('effect', 'no-v3-apis');
 
 function v3ApiOf(
   node: ESTree.Node | undefined,

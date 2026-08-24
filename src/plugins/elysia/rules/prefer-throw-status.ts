@@ -11,7 +11,7 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * inside Elysia handlers / lifecycle hooks. (`throw status(...)` remains
  * valid for onError-style paths.)
  */
-export const preferThrowStatusName = bnRuleName('prefer-throw-status');
+export const preferThrowStatusName = bnRuleName('elysia', 'prefer-throw-status');
 
 export const preferThrowStatus: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

@@ -14,7 +14,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const requireServiceStaticLayerName = bnRuleName('require-service-static-layer');
+export const requireServiceStaticLayerName = bnRuleName('effect', 'require-service-static-layer');
 
 export const requireServiceStaticLayer: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -140,7 +140,7 @@ function isZodSchemaBuilderCall(init: ESTree.Expression | undefined): boolean {
   return false;
 }
 
-export const zodSchemaNamingName = bnRuleName('zod-schema-naming');
+export const zodSchemaNamingName = bnRuleName('zod', 'schema-naming');
 
 export const zodSchemaNaming: CreateOnceRule = defineBellonaRule({
   meta: {

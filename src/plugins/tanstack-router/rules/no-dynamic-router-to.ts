@@ -24,7 +24,7 @@ function reportIfDynamicTo(
   }
 }
 
-export const noDynamicRouterToName = bnRuleName('no-dynamic-router-to');
+export const noDynamicRouterToName = bnRuleName('tanstack-router', 'no-dynamic-to');
 
 export const noDynamicRouterTo: CreateOnceRule = defineBellonaRule({
   meta: {

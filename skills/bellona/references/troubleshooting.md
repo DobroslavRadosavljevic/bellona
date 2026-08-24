@@ -10,23 +10,23 @@
 
 ## Rule never reports
 
-1. Confirm the id is `<meta.name>/bn-<slug>` and severity is not `'off'`.
+1. Confirm the id is `bellona/<plugin>-<slug>` and severity is not `'off'`.
 2. Confirm that plugin is in `jsPlugins`.
 3. Import gate: Zod/Router/Elysia/Effect skip files with no matching import. Add a real import or pick another file.
 4. Test skip: most domain rules ignore `*.test.ts`, `*.spec.ts`, `*.stories.*`, and paths under `test` / `tests` / `__tests__` / `fixtures`.
 5. `allow`: a substring such as `/generated/` skips the whole file.
-6. Path gate (Elysia): `bn-one-route-method-per-file` only runs on `/routes/` leaf files, not `routes/index.ts`.
-7. Effect style rules (`shouldSkipEffectStyleFile`) skip tests; `bn-prefer-effect-vitest` runs **only** on tests.
+6. Path gate (Elysia): `elysia-one-route-method-per-file` only runs on `/routes/` leaf files, not `routes/index.ts`.
+7. Effect style rules (`shouldSkipEffectStyleFile`) skip tests; `effect-prefer-vitest` runs **only** on tests.
 8. `before()` returned `false` because an option list was empty (Base UI: both component lists empty).
 
 ## Wrong plugin prefix
 
 | You wrote | Actual |
 | --- | --- |
-| `bellona/bn-max-classes` | `js/bn-max-classes` |
-| `baseui/bn-…` | `base-ui/bn-…` |
-| `tanstack/bn-…` | `tanstack-router/bn-…` |
-| `effect/prefer-effect-fn` | `effect/bn-prefer-effect-fn` |
+| `js/bn-max-classes` | `bellona/js-max-classes` |
+| `baseui/bn-…` | `bellona/base-ui-…` |
+| `tanstack/bn-…` | `bellona/tanstack-router-…` |
+| `effect/prefer-effect-fn` | `bellona/effect-prefer-fn` |
 
 ## File looks clean but the pattern exists
 
@@ -51,7 +51,7 @@ Bellona does not format. Use Oxfmt (this repo) or the consumer’s formatter. Do
 ## Disable noise without turning the rule off
 
 ```ts
-// oxlint-disable-next-line effect/bn-no-date-now-in-effect -- clock is injected above
+// oxlint-disable-next-line bellona/effect-no-date-now -- clock is injected above
 ```
 
 Prefer a small `allow` path list for generated code over repo-wide `'off'`.

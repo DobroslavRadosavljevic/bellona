@@ -28,7 +28,7 @@ import {
   requireSafetyCommentForTypeAssertionName,
 } from './rules/require-safety-comment-for-type-assertion.ts';
 
-const js = defineBellonaPlugin('js', {
+const js = defineBellonaPlugin({
   [maxClassesName]: maxClasses,
   [noChainedTypeAssertionsName]: noChainedTypeAssertions,
   [noConditionalEmptyObjectSpreadName]: noConditionalEmptyObjectSpread,

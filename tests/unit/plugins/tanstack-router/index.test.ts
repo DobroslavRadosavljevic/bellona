@@ -3,22 +3,22 @@ import { describe, expect, it } from 'vitest';
 import tanstackRouter from '../../../../src/plugins/tanstack-router/index.ts';
 
 describe('tanstack-router plugin', () => {
-  it('registers every router rule under a bn- id', () => {
+  it('registers every router rule under a tanstack-router- id', () => {
     expect(Object.keys(tanstackRouter.rules)).toEqual([
-      'bn-create-route-property-order',
-      'bn-no-dynamic-router-to',
-      'bn-no-get-route-api',
-      'bn-no-hooks-in-route-lifecycle',
-      'bn-no-imperative-location-navigation',
-      'bn-no-relative-router-to-without-from',
-      'bn-no-router-href',
-      'bn-no-router-type-assertion',
-      'bn-no-search-in-loader',
-      'bn-require-params-with-path-tokens',
-      'bn-require-router-hook-from',
-      'bn-require-throw-not-found',
-      'bn-require-throw-redirect',
-      'bn-require-validate-search-when-used',
+      'tanstack-router-create-route-property-order',
+      'tanstack-router-no-dynamic-to',
+      'tanstack-router-no-get-route-api',
+      'tanstack-router-no-hooks-in-route-lifecycle',
+      'tanstack-router-no-imperative-location-navigation',
+      'tanstack-router-no-relative-to-without-from',
+      'tanstack-router-no-href',
+      'tanstack-router-no-type-assertion',
+      'tanstack-router-no-search-in-loader',
+      'tanstack-router-require-params-with-path-tokens',
+      'tanstack-router-require-hook-from',
+      'tanstack-router-require-throw-not-found',
+      'tanstack-router-require-throw-redirect',
+      'tanstack-router-require-validate-search-when-used',
     ]);
   });
 });

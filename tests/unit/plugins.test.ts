@@ -10,21 +10,23 @@ import tanstackRouter from '../../src/plugins/tanstack-router/index.ts';
 import zod from '../../src/plugins/zod/index.ts';
 
 describe('plugins', () => {
-  it('uses stable Oxlint plugin names matching subpath exports', () => {
-    expect(js.meta.name).toBe('js');
-    expect(react.meta.name).toBe('react');
-    expect(baseUi.meta.name).toBe('base-ui');
-    expect(zod.meta.name).toBe('zod');
-    expect(tanstackRouter.meta.name).toBe('tanstack-router');
-    expect(elysia.meta.name).toBe('elysia');
-    expect(effect.meta.name).toBe('effect');
-    expect(Object.keys(js.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(react.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(baseUi.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(zod.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(tanstackRouter.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(elysia.rules).every((name) => name.startsWith('bn-'))).toBe(true);
-    expect(Object.keys(effect.rules).every((name) => name.startsWith('bn-'))).toBe(true);
+  it('uses the bellona plugin name and plugin-prefixed rule keys', () => {
+    expect(js.meta.name).toBe('bellona');
+    expect(react.meta.name).toBe('bellona');
+    expect(baseUi.meta.name).toBe('bellona');
+    expect(zod.meta.name).toBe('bellona');
+    expect(tanstackRouter.meta.name).toBe('bellona');
+    expect(elysia.meta.name).toBe('bellona');
+    expect(effect.meta.name).toBe('bellona');
+    expect(Object.keys(js.rules).every((name) => name.startsWith('js-'))).toBe(true);
+    expect(Object.keys(react.rules).every((name) => name.startsWith('react-'))).toBe(true);
+    expect(Object.keys(baseUi.rules).every((name) => name.startsWith('base-ui-'))).toBe(true);
+    expect(Object.keys(zod.rules).every((name) => name.startsWith('zod-'))).toBe(true);
+    expect(
+      Object.keys(tanstackRouter.rules).every((name) => name.startsWith('tanstack-router-')),
+    ).toBe(true);
+    expect(Object.keys(elysia.rules).every((name) => name.startsWith('elysia-'))).toBe(true);
+    expect(Object.keys(effect.rules).every((name) => name.startsWith('effect-'))).toBe(true);
     expect(Object.keys(effect.rules)).toHaveLength(25);
     expect(plugins).toEqual({
       js: 'bellona/js',

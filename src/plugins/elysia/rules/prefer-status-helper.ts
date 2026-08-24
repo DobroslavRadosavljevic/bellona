@@ -9,7 +9,7 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * Prefer `status(code, value)` over `set.status = code` in Elysia handlers /
  * lifecycle hooks for typed responses / Eden narrowing.
  */
-export const preferStatusHelperName = bnRuleName('prefer-status-helper');
+export const preferStatusHelperName = bnRuleName('elysia', 'prefer-status-helper');
 
 export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

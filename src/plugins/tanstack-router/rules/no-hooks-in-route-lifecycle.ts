@@ -4,7 +4,10 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { isHookCall, isInsideRouteLifecycle } from '../route.ts';
 
-export const noHooksInRouteLifecycleName = bnRuleName('no-hooks-in-route-lifecycle');
+export const noHooksInRouteLifecycleName = bnRuleName(
+  'tanstack-router',
+  'no-hooks-in-route-lifecycle',
+);
 
 export const noHooksInRouteLifecycle: CreateOnceRule = defineBellonaRule({
   meta: {

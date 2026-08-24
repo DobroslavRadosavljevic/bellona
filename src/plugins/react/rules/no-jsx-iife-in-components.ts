@@ -6,7 +6,7 @@ import { isComponentName } from '../filename.ts';
 import { functionReturnsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const noJsxIifeInComponentsName = bnRuleName('no-jsx-iife-in-components');
+export const noJsxIifeInComponentsName = bnRuleName('react', 'no-jsx-iife-in-components');
 
 export const noJsxIifeInComponents: CreateOnceRule = defineBellonaRule({
   meta: {

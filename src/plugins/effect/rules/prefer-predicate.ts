@@ -23,7 +23,7 @@ const PREDICATE_NAMES = new Set([
   'isNullish',
 ]);
 
-export const preferPredicateName = bnRuleName('prefer-predicate');
+export const preferPredicateName = bnRuleName('effect', 'prefer-predicate');
 
 function declaredName(node: ESTree.Node): string | undefined {
   if (node.type === 'FunctionDeclaration' && node.id?.type === 'Identifier') {

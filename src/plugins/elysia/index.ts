@@ -36,7 +36,7 @@ import {
 import { requireRouteSchema, requireRouteSchemaName } from './rules/require-route-schema.ts';
 import { routesIndexMountOnly, routesIndexMountOnlyName } from './rules/routes-index-mount-only.ts';
 
-const elysia = defineBellonaPlugin('elysia', {
+const elysia = defineBellonaPlugin({
   [noContextParamName]: noContextParam,
   [noControllerContextClassName]: noControllerContextClass,
   [noCookieUndefinedCheckName]: noCookieUndefinedCheck,

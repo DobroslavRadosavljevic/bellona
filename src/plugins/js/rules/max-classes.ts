@@ -3,7 +3,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { DEFAULT_MAX_CLASSES, readMaxClassesOptions } from '../options.ts';
 
-export const maxClassesName = bnRuleName('max-classes');
+export const maxClassesName = bnRuleName('js', 'max-classes');
 
 export const maxClasses: CreateOnceRule = defineBellonaRule({
   meta: {

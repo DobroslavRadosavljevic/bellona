@@ -5,7 +5,7 @@ import { unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noV3ServiceTagsName = bnRuleName('no-v3-service-tags');
+export const noV3ServiceTagsName = bnRuleName('effect', 'no-v3-service-tags');
 
 export const noV3ServiceTags: CreateOnceRule = defineBellonaRule({
   meta: {

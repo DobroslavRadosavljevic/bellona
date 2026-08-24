@@ -19,7 +19,7 @@ import { shouldSkipElysiaFile } from '../options.ts';
  * Default: all routes. Also flags handlers that use `status()` / `redirect()`
  * when `requireAllRoutes` is false, and redirects missing redirect status keys.
  */
-export const requireResponseSchemaName = bnRuleName('require-response-schema');
+export const requireResponseSchemaName = bnRuleName('elysia', 'require-response-schema');
 
 export const requireResponseSchema: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

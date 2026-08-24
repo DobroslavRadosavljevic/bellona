@@ -9,7 +9,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const noTryCatchInEffectGenName = bnRuleName('no-try-catch-in-effect-gen');
+export const noTryCatchInEffectGenName = bnRuleName('effect', 'no-try-catch-in-gen');
 
 export const noTryCatchInEffectGen: CreateOnceRule = defineBellonaRule({
   meta: {

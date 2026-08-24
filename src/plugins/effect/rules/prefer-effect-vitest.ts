@@ -17,7 +17,7 @@ import {
   shouldSkipNonTestEffectFile,
 } from '../options.ts';
 
-export const preferEffectVitestName = bnRuleName('prefer-effect-vitest');
+export const preferEffectVitestName = bnRuleName('effect', 'prefer-vitest');
 
 function callbackReturnsEffect(fn: ESTree.Node, bindings: EffectBindings): boolean {
   if (!isFunctionLike(fn)) {

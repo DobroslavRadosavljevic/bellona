@@ -15,7 +15,7 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-export const preferSchemaTaggedErrorName = bnRuleName('prefer-schema-tagged-error');
+export const preferSchemaTaggedErrorName = bnRuleName('effect', 'prefer-schema-tagged-error');
 
 function calleeRoot(node: ESTree.Node | undefined): ESTree.Node | undefined {
   let current = unwrapExpression(node);

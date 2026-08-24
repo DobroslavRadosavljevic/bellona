@@ -5,7 +5,7 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const preferDateFromStringName = bnRuleName('prefer-date-from-string');
+export const preferDateFromStringName = bnRuleName('effect', 'prefer-date-from-string');
 
 function reportDateSchema(
   node: ESTree.Node | undefined,

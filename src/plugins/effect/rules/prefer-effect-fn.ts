@@ -11,7 +11,7 @@ import {
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
-export const preferEffectFnName = bnRuleName('prefer-effect-fn');
+export const preferEffectFnName = bnRuleName('effect', 'prefer-fn');
 
 function returnsEffectGen(fn: ESTree.Node, bindings: EffectBindings): boolean {
   if (!isFunctionLike(fn)) {

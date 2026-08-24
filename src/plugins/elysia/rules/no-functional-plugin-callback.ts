@@ -15,7 +15,7 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from
  * an Elysia instance (`new Elysia…` or a same-file binding thereof): not
  * unrelated helpers such as Effect `Service.use`.
  */
-export const noFunctionalPluginCallbackName = bnRuleName('no-functional-plugin-callback');
+export const noFunctionalPluginCallbackName = bnRuleName('elysia', 'no-functional-plugin-callback');
 
 export const noFunctionalPluginCallback: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

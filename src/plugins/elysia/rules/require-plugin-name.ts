@@ -32,7 +32,7 @@ const isExportedElysiaInstance = (node: ESTree.Node): boolean => {
  * Require `{ name: "…" }` on **exported** `new Elysia(...)` plugins so
  * lifecycle deduplication works. Skips `.listen(...)` chains and entry paths.
  */
-export const requirePluginNameName = bnRuleName('require-plugin-name');
+export const requirePluginNameName = bnRuleName('elysia', 'require-plugin-name');
 
 export const requirePluginName: CreateOnceRule = defineBellonaRule({
   createOnce(context) {

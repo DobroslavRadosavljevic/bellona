@@ -14,7 +14,7 @@ function referencedAliasName(type: ESTree.TSType): string | null {
 }
 
 /** Ban named aliases that merely conceal TypeScript's unknown top type. */
-export const noUnknownTypeAliasesName = bnRuleName('no-unknown-type-aliases');
+export const noUnknownTypeAliasesName = bnRuleName('js', 'no-unknown-type-aliases');
 
 export const noUnknownTypeAliases: CreateOnceRule = defineBellonaRule({
   meta: {

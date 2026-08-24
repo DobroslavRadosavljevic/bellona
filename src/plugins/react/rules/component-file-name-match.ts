@@ -6,7 +6,7 @@ import { getExportedExpressionName, unwrapComponentInit } from '../ast.ts';
 import { basenameWithoutExtension, isPrimaryComponentName, kebabToPascal } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
-export const componentFileNameMatchName = bnRuleName('component-file-name-match');
+export const componentFileNameMatchName = bnRuleName('react', 'component-file-name-match');
 
 export const componentFileNameMatch: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -8,7 +8,7 @@ import { matchesAllow } from '../filename.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, readAllowList } from '../options.ts';
 import { v3ImportReplacement } from '../v3-imports.ts';
 
-export const noV3ImportsName = bnRuleName('no-v3-imports');
+export const noV3ImportsName = bnRuleName('effect', 'no-v3-imports');
 
 function reportMoved(context: Context, sourceNode: ESTree.Node, source: string): void {
   const replacement = v3ImportReplacement(source);

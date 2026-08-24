@@ -1,12 +1,12 @@
 # bellona/js rules
 
-Plugin name: `js`. Ids: `js/bn-<slug>`. **No import gate. No test skip.** These run on every linted JS/TS file once enabled.
+Plugin name: `bellona`. Ids: `bellona/js-<slug>`. **No import gate. No test skip.** These run on every linted JS/TS file once enabled.
 
 Evidence rules are syntactic (file-local aliases). They do not need `--type-aware`.
 
 Shared intent: keep known types, parse `unknown` at I/O boundaries, avoid `Reflect` and module mocks.
 
-## `js/bn-max-classes`
+## `bellona/js-max-classes`
 
 Disallow more than `max` **class declarations** in one file. Class expressions do not count.
 
@@ -19,45 +19,45 @@ Disallow more than `max` **class declarations** in one file. Class expressions d
 // good: split files, or { max: 10 }
 ```
 
-## `js/bn-no-chained-type-assertions`
+## `bellona/js-no-chained-type-assertions`
 
 Disallow chained `as` / angle-bracket assertions, including parenthesized chains (`(x as A) as B`).
 
 Prefer: keep the original type, or parse once at the boundary.
 
-## `js/bn-no-conditional-empty-object-spread`
+## `bellona/js-no-conditional-empty-object-spread`
 
 Disallow `{ ...cond && {} }` / `{ ...(cond ? extra : {}) }` style spreads that hide omission behind an empty object.
 
 Prefer: build the object in statements; add the property only when present.
 
-## `js/bn-no-known-value-widening`
+## `bellona/js-no-known-value-widening`
 
 Disallow annotating a syntactically known value with a broad/anonymous type (`unknown`, `object`, open dictionaries, empty object types, generic containers) that discards evidence.
 
 Prefer: inference, `satisfies`, or a named owner type.
 
-## `js/bn-no-module-mocking`
+## `bellona/js-no-module-mocking`
 
 Disallow Vitest/Jest module mocks: `vi.mock`, `vi.doMock`, `vi.unstable_mockModule`, and the same on `jest` (global or imported from `vitest` / `@jest/globals`).
 
 Prefer: inject a real interface, service, or test double.
 
-## `js/bn-no-object-parameters`
+## `bellona/js-no-object-parameters`
 
 Disallow parameters typed as `object`.
 
 Prefer: a named owner type; parse external input before the call.
 
-## `js/bn-no-reflect-apply`
+## `bellona/js-no-reflect-apply`
 
 Disallow `Reflect.apply`. Call the function, or put dynamic dispatch behind an interface.
 
-## `js/bn-no-reflect-get`
+## `bellona/js-no-reflect-get`
 
 Disallow `Reflect.get`. Use typed property access, or parse dynamic input first.
 
-## `js/bn-no-runtime-typeof`
+## `bellona/js-no-runtime-typeof`
 
 Disallow runtime `typeof` checks. They narrow a representation without a contract.
 
@@ -69,7 +69,7 @@ When `allowInTypeGuards: true`, `typeof` inside a function with a `is X` type-pr
 
 Prefer: decode at the I/O boundary (Zod, Effect Schema, …), then branch on the domain value.
 
-## `js/bn-no-shape-in-symbol-names`
+## `bellona/js-no-shape-in-symbol-names`
 
 Disallow a substring in JS/TS/private/JSX symbol names.
 
@@ -80,7 +80,7 @@ Disallow a substring in JS/TS/private/JSX symbol names.
 
 Rename `UserShape` → `User`, `ParsedUser`, or an owner name. The word “shape” is treated as structure, not ownership.
 
-## `js/bn-no-unknown-parameters`
+## `bellona/js-no-unknown-parameters`
 
 Disallow parameters typed `unknown`.
 
@@ -90,29 +90,29 @@ Disallow parameters typed `unknown`.
 
 `cause` is allowed for error enrichment. Parse at the boundary; pass a named type inward.
 
-## `js/bn-no-unknown-returns`
+## `bellona/js-no-unknown-returns`
 
 Disallow explicit return types `unknown` or `Promise<unknown>` (including signatures).
 
 Prefer: a named domain type after parsing.
 
-## `js/bn-no-unknown-type-aliases`
+## `bellona/js-no-unknown-type-aliases`
 
 Disallow `type Foo = unknown` (and aliases that resolve to `unknown` in-file). Keep `unknown` visible at the parsing boundary.
 
-## `js/bn-no-unsafe-dictionary-type`
+## `bellona/js-no-unsafe-dictionary-type`
 
 Disallow dictionaries whose value type is `unknown`, `any`, `object`, `{}`, or a union/alias containing those.
 
 Prefer: `Record<string, User>` (or schema-derived values). Parse payloads before insert.
 
-## `js/bn-no-widen-then-assert`
+## `bellona/js-no-widen-then-assert`
 
 Disallow `const x: unknown = value; … x as User` in the same function: widen, then assert back.
 
 Prefer: keep the precise type from init, or parse once.
 
-## `js/bn-require-safety-comment-for-type-assertion`
+## `bellona/js-require-safety-comment-for-type-assertion`
 
 Every `as T` / `<T>x` except `as const` needs a nearby comment containing `MARKER:`.
 

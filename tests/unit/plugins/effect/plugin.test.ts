@@ -13,9 +13,10 @@ import {
 } from '../../../../src/plugins/effect/v3-imports.ts';
 
 describe('effect plugin', () => {
-  it('registers 25 rules under meta.name effect', () => {
-    expect(effect.meta.name).toBe('effect');
+  it('registers 25 rules under meta.name bellona', () => {
+    expect(effect.meta.name).toBe('bellona');
     expect(Object.keys(effect.rules)).toHaveLength(25);
+    expect(Object.keys(effect.rules).every((name) => name.startsWith('effect-'))).toBe(true);
   });
 });
 

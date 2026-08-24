@@ -314,7 +314,7 @@ function assertionIsNarrower(
 }
 
 /** Detect immutable local bindings that erase a known type and are later asserted back to a narrower type. */
-export const noWidenThenAssertName = bnRuleName('no-widen-then-assert');
+export const noWidenThenAssertName = bnRuleName('js', 'no-widen-then-assert');
 
 export const noWidenThenAssert: CreateOnceRule = defineBellonaRule({
   meta: {

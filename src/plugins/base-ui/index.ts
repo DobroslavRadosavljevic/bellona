@@ -4,7 +4,7 @@ import {
   requireNativeButtonWithRenderName,
 } from './rules/require-native-button-with-render.ts';
 
-const baseUi = defineBellonaPlugin('base-ui', {
+const baseUi = defineBellonaPlugin({
   [requireNativeButtonWithRenderName]: requireNativeButtonWithRender,
 });
 

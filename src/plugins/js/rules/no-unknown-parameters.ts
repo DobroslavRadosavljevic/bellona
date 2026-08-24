@@ -43,7 +43,7 @@ function parameterName(parameter: Parameter, sourceText: string): string {
 }
 
 /** Disallow unknown inputs except explicitly named error-cause enrichment. */
-export const noUnknownParametersName = bnRuleName('no-unknown-parameters');
+export const noUnknownParametersName = bnRuleName('js', 'no-unknown-parameters');
 
 export const noUnknownParameters: CreateOnceRule = defineBellonaRule({
   meta: {

@@ -74,7 +74,7 @@ function formatReplacement(method: string): string | undefined {
   }
 }
 
-export const zodModernFormatValidatorsName = bnRuleName('zod-modern-format-validators');
+export const zodModernFormatValidatorsName = bnRuleName('zod', 'modern-format-validators');
 
 export const zodModernFormatValidators: CreateOnceRule = defineBellonaRule({
   meta: {

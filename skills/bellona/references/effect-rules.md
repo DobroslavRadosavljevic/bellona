@@ -1,18 +1,18 @@
 # bellona/effect rules
 
-Plugin name: `effect`. Ids: `effect/bn-<slug>`. Target **Effect v4** (`effect@rc`). Do not mix v3 APIs.
+Plugin name: `bellona`. Ids: `bellona/effect-<slug>`. Target **Effect v4** (`effect@rc`). Do not mix v3 APIs.
 
 **Skip (all):** files that do not import `effect`, `effect/…`, or `@effect/…`, and `allow` matches.
 
 **Also skip tests** (style rules): marked **tests skipped** below.
 
-**Tests only:** `bn-prefer-effect-vitest`.
+**Tests only:** `effect-prefer-vitest`.
 
 Bindings follow namespace and named imports (`Effect.fn` and `import { fn } from 'effect/Effect'`). See [how-it-works.md](how-it-works.md).
 
 ## v3 → v4
 
-### `effect/bn-no-v3-imports`
+### `bellona/effect-no-v3-imports`
 
 Disallow moved v3 specifiers. Exact map (partial):
 
@@ -39,7 +39,7 @@ Disallow moved v3 specifiers. Exact map (partial):
 
 Current v4 packages are **not** flagged: `effect`, `effect/…`, `@effect/vitest`, `@effect/platform-*`, `@effect/sql-*`, `@effect/ai-*`, `@effect/atom-*`, `@effect/opentelemetry` (SDK, not the old Otlp helpers).
 
-### `effect/bn-no-v3-effect-apis`
+### `bellona/effect-no-v3-apis`
 
 | Old | New |
 | --- | --- |
@@ -61,11 +61,11 @@ Current v4 packages are **not** flagged: `effect`, `effect/…`, `@effect/vitest
 | `Stream.async` | `Stream.callback` |
 | `Scope.extend` | `Scope.provide` |
 
-### `effect/bn-no-v3-service-tags`
+### `bellona/effect-no-v3-service-tags`
 
 Disallow `Context.Tag`, `GenericTag`, `Effect.Tag`, `Effect.Service`. Use `Context.Service`.
 
-### `effect/bn-prefer-decode-unknown-effect`
+### `bellona/effect-prefer-decode-unknown`
 
 | Old | New |
 | --- | --- |
@@ -82,7 +82,7 @@ Object-form `Schema.decode({ … })` transforms are not flagged.
 
 ## Effect.fn / gen
 
-### `effect/bn-prefer-effect-fn`
+### `bellona/effect-prefer-fn`
 
 Prefer `Effect.fn("name")` over a function that **returns** `Effect.gen`. Do not wrap `Effect.gen` in a plain function. Vitest `it.effect` callbacks are excluded.
 
@@ -93,33 +93,33 @@ export const loadUser = Effect.fn('loadUser')(function* (id: string) {
 })
 ```
 
-### `effect/bn-require-effect-fn-name`
+### `bellona/effect-require-fn-name`
 
 `Effect.fn` must take a string span name. It should match the binding (`loadUser` or `users.loadUser`).
 
-### `effect/bn-no-pipe-on-effect-fn`
+### `bellona/effect-no-pipe-on-fn`
 
 Do not `.pipe` the result of `Effect.fn(...)(...)`. Pass extra combinators as extra arguments to `Effect.fn`.
 
-### `effect/bn-no-try-catch-in-effect-gen`
+### `bellona/effect-no-try-catch-in-gen`
 
 Disallow `try/catch` inside `Effect.gen` / `Effect.fn` generators. Use Effect error combinators.
 
-### `effect/bn-no-throw-in-effect-gen`
+### `bellona/effect-no-throw-in-gen`
 
 Disallow `throw` inside those generators. Use `return yield* Effect.fail(...)` or `Schema.TaggedError`.
 
-### `effect/bn-require-return-yield-on-fail`
+### `bellona/effect-require-return-yield-on-fail`
 
 Fail with `return yield*` so TypeScript narrows the rest of the generator (`yield* Effect.fail` without `return` is flagged).
 
-### `effect/bn-no-yield-ref-handle`
+### `bellona/effect-no-yield-ref-handle`
 
 Do not `yield*` a `Ref` / `Fiber` / `Deferred` **handle**. Use `Ref.get`, `Fiber.join`, `Deferred.await`.
 
 ## Schema / errors / time
 
-### `effect/bn-schema-union-array`
+### `bellona/effect-schema-union-array`
 
 `Schema.Union`, `Tuple`, `TemplateLiteral` take an **array**. Multi `Schema.Literal` → `Schema.Literals([...])`.
 
@@ -128,51 +128,51 @@ Schema.Union([A, B])
 Schema.Literals(['a', 'b'])
 ```
 
-### `effect/bn-schema-no-legacy-filter`
+### `bellona/effect-schema-no-legacy-filter`
 
 Disallow v3 Schema methods: `filter`, `optionalWith`, `positive`, `negative`, `nonNegative`, `nonPositive`, `pattern`, plus exports `nonEmptyString`.
 
 Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.String.check(Schema.isNonEmpty())`.
 
-### `effect/bn-prefer-date-from-string`
+### `bellona/effect-prefer-date-from-string`
 
 `Schema.Date` is `Date` instances in v4. ISO strings → `Schema.DateFromString`. `Schema.DateFromNumber` → `Schema.DateFromMillis`.
 
-### `effect/bn-prefer-schema-tagged-error`
+### `bellona/effect-prefer-schema-tagged-error`
 
 **Tests skipped.** Prefer `Schema.TaggedError` over `class X extends Error`, `Data.TaggedError`, and `Effect.fail(new Error(...))`.
 
-### `effect/bn-prefer-predicate`
+### `bellona/effect-prefer-predicate`
 
 **Tests skipped.** Do not write local `isString` / `isObject` / `isNumber` / `isBoolean` / `isUndefined` / `isNull` / `isFunction` / `isDate` / `isPromise` / `isError` / `isNullish` / `isRecord` helpers. Use `Predicate.*`.
 
-### `effect/bn-no-date-now-in-effect`
+### `bellona/effect-no-date-now`
 
 **Tests skipped.** No `Date.now()` or `new Date()` for “now”. Use `Clock.currentTimeMillis` / `DateTime.now`.
 
-### `effect/bn-prefer-clock-sleep`
+### `bellona/effect-prefer-clock-sleep`
 
 **Tests skipped.** Inside generators, prefer `Effect.sleep` over `setTimeout` / `setInterval` so `TestClock` can control time.
 
-### `effect/bn-prefer-try-promise`
+### `bellona/effect-prefer-try-promise`
 
 **Tests skipped.** Prefer `Effect.tryPromise({ try, catch })`. `Effect.promise` maps rejection to a defect.
 
 ## Services / runtime
 
-### `effect/bn-require-service-id-path`
+### `bellona/effect-require-service-id-path`
 
 **Tests skipped.** `Context.Service` ids must look like `pkg/dir/Name` (two or more non-empty `/` segments). Not `"Database"`.
 
-### `effect/bn-require-service-static-layer`
+### `bellona/effect-require-service-static-layer`
 
 **Tests skipped.** `Context.Service` classes need `static readonly layer` (or `options.make`). v4 has no `.Default`.
 
-### `effect/bn-prefer-service-of`
+### `bellona/effect-prefer-service-of`
 
 **Tests skipped.** Return `Database.of({ ... })`, not a plain object, when implementing a `Context.Service`.
 
-### `effect/bn-no-run-promise-in-modules`
+### `bellona/effect-no-run-promise-in-modules`
 
 **Tests skipped.** Keep `Effect.runPromise` / `runSync` / `runFork` / `runCallback` (and `*With` / `*Exit` variants) at process entry files.
 
@@ -185,10 +185,10 @@ Prefer `NodeRuntime.runMain` / `BunRuntime.runMain` / `Layer.launch` / `ManagedR
 
 ## Tests
 
-### `effect/bn-no-it-effect-scoped`
+### `bellona/effect-no-it-scoped`
 
 Do not wrap `it.effect` / `it.live` in `Effect.scoped` (already scoped). `it.scopedLive` is removed → `it.live`.
 
-### `effect/bn-prefer-effect-vitest`
+### `bellona/effect-prefer-vitest`
 
 **Test files only.** If a bare `it` / `test` callback returns an Effect, use `it.effect` from `@effect/vitest`.

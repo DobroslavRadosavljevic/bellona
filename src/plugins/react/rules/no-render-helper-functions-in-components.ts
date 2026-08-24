@@ -8,6 +8,7 @@ import { functionReturnsJsx } from '../jsx.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipJsxFile } from '../options.ts';
 
 export const noRenderHelperFunctionsInComponentsName = bnRuleName(
+  'react',
   'no-render-helper-functions-in-components',
 );
 

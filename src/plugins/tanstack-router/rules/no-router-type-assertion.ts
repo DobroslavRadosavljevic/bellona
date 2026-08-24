@@ -25,7 +25,7 @@ function reportIfAsserted(
   }
 }
 
-export const noRouterTypeAssertionName = bnRuleName('no-router-type-assertion');
+export const noRouterTypeAssertionName = bnRuleName('tanstack-router', 'no-type-assertion');
 
 export const noRouterTypeAssertion: CreateOnceRule = defineBellonaRule({
   meta: {

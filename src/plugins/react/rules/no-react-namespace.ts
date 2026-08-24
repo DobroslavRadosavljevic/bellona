@@ -3,7 +3,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipReactFile } from '../options.ts';
 
-export const noReactNamespaceName = bnRuleName('no-react-namespace');
+export const noReactNamespaceName = bnRuleName('react', 'no-namespace');
 
 export const noReactNamespace: CreateOnceRule = defineBellonaRule({
   meta: {
