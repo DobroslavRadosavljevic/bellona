@@ -15,6 +15,7 @@ Load only the stacks you use. Turn rules on by id. Nothing is enabled by default
 - ⚡ Built for **Oxlint JS plugins** — fast lint, same config you already use
 - 🔌 **One subpath per stack** — install one package, load `bellona/react` or `bellona/effect` only when you need it
 - 🎛️ **Fully opt-in** — no recommended preset; you pick each `bl-<plugin>/<rule>` id
+- 🤖 **Agent-ready reports** — each diagnostic has Problem, Why, Fix, and Avoid
 - 🛡️ TypeScript **evidence** rules (widening, `unknown`, unsafe dictionaries, mocks, assertions)
 - ⚛️ React file and JSX rules, plus Base UI `nativeButton` / `render` checks
 - 🧭 Zod, TanStack Router, Elysia, Effect v4, and Tailwind class-name rules
@@ -84,6 +85,7 @@ Many domain rules skip test and spec files. Most of them also skip files that ne
 - `bl-js/max-classes`
 - `bl-js/no-chained-type-assertions`
 - `bl-js/no-conditional-empty-object-spread`
+- `bl-js/no-inline-import-type`
 - `bl-js/no-known-value-widening`
 - `bl-js/no-module-mocking`
 - `bl-js/no-object-parameters`
@@ -95,6 +97,7 @@ Many domain rules skip test and spec files. Most of them also skip files that ne
 - `bl-js/no-unknown-returns`
 - `bl-js/no-unknown-type-aliases`
 - `bl-js/no-unsafe-dictionary-type`
+- `bl-js/no-useless-reexport` (`allow`, `allowRenames`; renames in mixed files are allowed by default)
 - `bl-js/no-widen-then-assert`
 - `bl-js/require-safety-comment-for-type-assertion` (`marker`, default `SAFETY`)
 

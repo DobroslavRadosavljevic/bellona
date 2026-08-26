@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, walkFunctionBody } from '../ast.ts';
 import {
@@ -49,7 +50,14 @@ export const preferEffectFn: CreateOnceRule = defineBellonaRule({
       description: 'Prefer Effect.fn("name") over functions that return Effect.gen',
     },
     messages: {
-      wrap: 'Use Effect.fn("{{name}}") instead of a function that returns Effect.gen.',
+      wrap: agentDiagnostic({
+        problem:
+          'This function returns `Effect.gen(...)`. Wrap it with `Effect.fn("{{name}}")` instead. `it.effect` callbacks are excluded.',
+        why: '`Effect.fn` is the v4 named, traceable function. A plain function that returns `gen` hides the span name and the extra-combinator slot.',
+        fix: 'Write `export const {{name}} = Effect.fn("{{name}}")(function* (id: string) { return yield* find(id) })`. Pass extra combinators as extra arguments to `Effect.fn`, not `.pipe` on the result.',
+        avoid:
+          'Do not keep a wrapper `function {{name}}() { return Effect.gen(...) }`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

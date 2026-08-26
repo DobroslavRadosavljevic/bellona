@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, pipeRoot, unwrapExpression } from '../ast.ts';
 import {
@@ -68,9 +69,19 @@ export const noItEffectScoped: CreateOnceRule = defineBellonaRule({
         'Do not wrap it.effect / it.live tests in Effect.scoped; those runners already scope',
     },
     messages: {
-      scoped:
-        'it.effect and it.live already provide a Scope. Do not wrap the test in Effect.scoped.',
-      scopedLive: 'it.scopedLive is removed. Use it.live.',
+      scoped: agentDiagnostic({
+        problem:
+          'This `it.effect` / `it.live` test wraps the body in `Effect.scoped`. Those runners already provide a `Scope`.',
+        why: 'A second `Effect.scoped` is redundant and can close resources at the wrong time.',
+        fix: 'Remove `Effect.scoped`. Keep `it.effect("name", () => Effect.gen(function* () { … }))`.',
+        avoid: 'Do not switch to `it.scopedLive` (removed). Do not disable the rule.',
+      }),
+      scopedLive: agentDiagnostic({
+        problem: '`it.scopedLive` was removed from `@effect/vitest`.',
+        why: 'v4 uses `it.live`, which already has a scope.',
+        fix: 'Replace `it.scopedLive` with `it.live`.',
+        avoid: 'Do not wrap `it.live` in `Effect.scoped`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

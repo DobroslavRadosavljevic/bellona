@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getParamTypeName, isContextTypeName } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
@@ -54,8 +55,13 @@ export const noControllerContextClass: CreateOnceRule = defineBellonaRule({
       description: 'Disallow class methods that take Elysia Context; keep controllers decoupled',
     },
     messages: {
-      contextClass:
-        'Do not type class methods with `Context`. Keep controllers decoupled and destructure handler fields at the Elysia route instead.',
+      contextClass: agentDiagnostic({
+        problem:
+          'A class method is typed with Elysia `Context`. Controllers then depend on the HTTP layer.',
+        why: 'Domain classes should not know about Elysia request objects. That makes reuse and tests depend on the framework.',
+        fix: 'Keep the class free of `Context`. Destructure `{ body, params, status }` at the Elysia route and pass named values into the class.',
+        avoid: 'Do not store `Context` on `this`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

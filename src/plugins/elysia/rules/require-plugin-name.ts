@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { chainIncludesListen, elysiaOptionsHasName, isNewElysiaExpression } from '../elysia.ts';
 import {
@@ -65,8 +66,13 @@ export const requirePluginName: CreateOnceRule = defineBellonaRule({
       description: 'Require name on exported new Elysia() plugin instances for deduplication',
     },
     messages: {
-      missingName:
-        'Provide `{ name: "…" }` on exported `new Elysia(...)` plugins so lifecycle can be deduplicated when reused.',
+      missingName: agentDiagnostic({
+        problem:
+          'This exported `new Elysia(...)` plugin has no `{ name: "…" }`. Entry files (`main` / `server` / `index` / `app`) and `.listen()` apps are skipped.',
+        why: 'Unnamed plugins cannot be deduplicated when `.use`d twice. Lifecycle hooks then run twice.',
+        fix: 'Pass `{ name: "feature-plugin" }` (stable string) as the first argument: `new Elysia({ name: "FEATURE" })`.',
+        avoid: 'Do not use a computed name. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

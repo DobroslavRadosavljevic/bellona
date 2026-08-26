@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { pathHasParamToken } from '../route.ts';
@@ -39,8 +40,12 @@ export const requireParamsWithPathTokens: CreateOnceRule = defineBellonaRule({
         'Require `params` when `to` includes a `$` token and `from` is not set to inherit params',
     },
     messages: {
-      missingParams:
-        'Pass a `params` object for `$` tokens in `to` (e.g. `to: "/posts/$postId", params: { postId }`). Do not interpolate the value into `to`.',
+      missingParams: agentDiagnostic({
+        problem: '`to` contains `$` path tokens but this call has no `params` object.',
+        why: 'Tokens such as `$postId` are not filled by interpolating into `to`. Without `params`, the URL is incomplete and types are wrong.',
+        fix: 'Keep the literal path and pass params: `navigate({ to: "/posts/$postId", params: { postId } })` or the same `params` object on `<Link to="/posts/$postId" />`.',
+        avoid: 'Do not write `to: `/posts/${id}``. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

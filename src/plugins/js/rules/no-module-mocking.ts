@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, Scope, SourceCode, Variable } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 const moduleMockMethods = new Set(['doMock', 'mock', 'unstable_mockModule']);
@@ -79,8 +80,14 @@ export const noModuleMocking: CreateOnceRule = defineBellonaRule({
         'Disallow Vitest and Jest module mocking; tests must replace dependencies through real interfaces.',
     },
     messages: {
-      moduleMock:
-        'Replace module mocking with dependency injection through a real interface, service layer, or faithful test implementation.',
+      moduleMock: agentDiagnostic({
+        problem:
+          'This is a Vitest or Jest module mock (`vi.mock`, `vi.doMock`, `vi.unstable_mockModule`, or the same methods on `jest`, global or imported from `vitest` / `@jest/globals`).',
+        why: 'Module mocks replace a real module graph with a fake. Tests then pass without proving the production seam. Refactors of the mocked module do not fail the test.',
+        fix: 'Inject a real interface, service, or test double through parameters or a small adapter. Construct the collaborator in the test and pass it in. Keep the production import graph intact.',
+        avoid:
+          'Do not switch `vi.mock` to `jest.mock` or `unstable_mockModule`. Do not wrap the mock in a helper to hide it. Do not disable the rule in tests — this rule is meant to run on test files.',
+      }),
     },
   },
   createOnce(context) {

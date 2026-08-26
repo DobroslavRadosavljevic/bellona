@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isModuleLevelDeclaration, unwrapComponentInit } from '../ast.ts';
 import { isPrimaryComponentName } from '../filename.ts';
@@ -15,7 +16,14 @@ export const noMultiComponentFiles: CreateOnceRule = defineBellonaRule({
       description: 'Disallow multiple primary React components in one file',
     },
     messages: {
-      multiple: 'Keep one primary React component per file.',
+      multiple: agentDiagnostic({
+        problem:
+          'This file declares more than one primary React component (PascalCase, not ending in `Impl` / `Provider` / `Context`).',
+        why: 'One primary component per file keeps ownership and file names aligned. Extra primaries become hidden siblings.',
+        fix: 'Move each extra primary component into its own file. You may keep `*Impl` / `*Provider` / `*Context` helpers in this file; they are not primary.',
+        avoid:
+          'Do not rename extras to `FooImpl` just to dodge the rule if they are real screens. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

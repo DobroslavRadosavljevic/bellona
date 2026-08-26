@@ -8,6 +8,7 @@ import {
   noConditionalEmptyObjectSpread,
   noConditionalEmptyObjectSpreadName,
 } from './rules/no-conditional-empty-object-spread.ts';
+import { noInlineImportType, noInlineImportTypeName } from './rules/no-inline-import-type.ts';
 import { noKnownValueWidening, noKnownValueWideningName } from './rules/no-known-value-widening.ts';
 import { noModuleMocking, noModuleMockingName } from './rules/no-module-mocking.ts';
 import { noObjectParameters, noObjectParametersName } from './rules/no-object-parameters.ts';
@@ -22,6 +23,7 @@ import {
   noUnsafeDictionaryType,
   noUnsafeDictionaryTypeName,
 } from './rules/no-unsafe-dictionary-type.ts';
+import { noUselessReexport, noUselessReexportName } from './rules/no-useless-reexport.ts';
 import { noWidenThenAssert, noWidenThenAssertName } from './rules/no-widen-then-assert.ts';
 import {
   requireSafetyCommentForTypeAssertion,
@@ -32,6 +34,7 @@ const js = defineBellonaPlugin('bl-js', {
   [maxClassesName]: maxClasses,
   [noChainedTypeAssertionsName]: noChainedTypeAssertions,
   [noConditionalEmptyObjectSpreadName]: noConditionalEmptyObjectSpread,
+  [noInlineImportTypeName]: noInlineImportType,
   [noKnownValueWideningName]: noKnownValueWidening,
   [noModuleMockingName]: noModuleMocking,
   [noObjectParametersName]: noObjectParameters,
@@ -43,6 +46,7 @@ const js = defineBellonaPlugin('bl-js', {
   [noUnknownReturnsName]: noUnknownReturns,
   [noUnknownTypeAliasesName]: noUnknownTypeAliases,
   [noUnsafeDictionaryTypeName]: noUnsafeDictionaryType,
+  [noUselessReexportName]: noUselessReexport,
   [noWidenThenAssertName]: noWidenThenAssert,
   [requireSafetyCommentForTypeAssertionName]: requireSafetyCommentForTypeAssertion,
 });
@@ -55,6 +59,8 @@ export {
   noChainedTypeAssertionsName,
   noConditionalEmptyObjectSpread,
   noConditionalEmptyObjectSpreadName,
+  noInlineImportType,
+  noInlineImportTypeName,
   noKnownValueWidening,
   noKnownValueWideningName,
   noModuleMocking,
@@ -77,6 +83,8 @@ export {
   noUnknownTypeAliasesName,
   noUnsafeDictionaryType,
   noUnsafeDictionaryTypeName,
+  noUselessReexport,
+  noUselessReexportName,
   noWidenThenAssert,
   noWidenThenAssertName,
   requireSafetyCommentForTypeAssertion,

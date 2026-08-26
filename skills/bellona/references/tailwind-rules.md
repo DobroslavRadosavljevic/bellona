@@ -4,6 +4,8 @@ Plugin name: `bl-tailwind`. Ids: `bl-tailwind/<slug>`.
 
 **Skip:** test/spec/stories files and `allow` matches. There is **no** import gate. Tailwind class strings do not need a `tailwindcss` import.
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## `bl-tailwind/no-classname-constants`
 
 Do not store Tailwind class names in `const` / `let` / `var` bindings or class fields.

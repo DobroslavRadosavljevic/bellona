@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type TypeAssertionExpression = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
@@ -63,8 +64,14 @@ export const noChainedTypeAssertions: CreateOnceRule = defineBellonaRule({
         'Disallow chained TypeScript as and angle-bracket assertions, including parenthesized chains.',
     },
     messages: {
-      chained:
-        'This assertion chain discards type evidence. Keep the original precise type, or parse untrusted input at its boundary before narrowing it.',
+      chained: agentDiagnostic({
+        problem:
+          'This is a chained type assertion (`value as A as B` or `(value as A) as B`, including angle-bracket `<T>x`). A chain of only `as const` is allowed.',
+        why: 'Each extra assertion discards the type TypeScript already proved and invents a new one. Callers then trust a type that was never parsed.',
+        fix: 'Keep the original precise type. If the value is untrusted (JSON, network, unknown), parse it once at the I/O boundary with a schema (Zod, Effect Schema) into a named type. Then use that named type with no assertion.',
+        avoid:
+          'Do not add more assertions, wrap the chain in parentheses, switch `as` to angle-bracket form, or disable the rule. Do not use `as unknown as T` as a substitute.',
+      }),
     },
   },
   createOnce(context) {

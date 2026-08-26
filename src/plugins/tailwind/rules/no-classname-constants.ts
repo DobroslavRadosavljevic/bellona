@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { bindingName } from '../ast.ts';
 import { isClassNameBinding, looksLikeClassNameList } from '../class-name.ts';
@@ -25,8 +26,14 @@ export const noClassnameConstants: CreateOnceRule = defineBellonaRule({
         'Disallow storing Tailwind class names in constants. Use tailwind-variants or a reusable component.',
     },
     messages: {
-      storedClassNames:
-        'Do not store class names in "{{name}}". Use tailwind-variants or a reusable component.',
+      storedClassNames: agentDiagnostic({
+        problem:
+          'Tailwind class names are stored in "{{name}}" (`const` / `let` / `var` or a class field). Strings inside `tv(...)` / `createTV(...)` (or `allowedCallees`) are not this rule.',
+        why: 'A class-name constant is a second styling API. Variants, `cn()`, and copy-paste then drift from the component.',
+        fix: 'Put the classes in a `tv` / `createTV` recipe (`const control = tv({ base: "…" })`) or inline `className` on a reusable component. Add other recipe helpers via `{ allowedCallees: ["tv", "createTV", "cva"] }`.',
+        avoid:
+          'Do not move the string into a function that still returns the same constant. Do not prefix the name to dodge detection. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_TAILWIND_OPTIONS,

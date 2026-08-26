@@ -13,11 +13,24 @@
 1. Confirm the id is `bl-<plugin>/<slug>` and severity is not `'off'`.
 2. Confirm that plugin is in `jsPlugins`.
 3. Import gate: Zod/Router/Elysia/Effect skip files with no matching import. Add a real import or pick another file.
-4. Test skip: most domain rules ignore `*.test.ts`, `*.spec.ts`, `*.stories.*`, and paths under `test` / `tests` / `__tests__` / `fixtures`.
+4. Test skip: most domain rules ignore `*.test.ts`, `*.spec.ts`, `*.stories.*`, and paths under `test` / `tests` / `__tests__` / `fixtures`. `bellona/js` does **not** skip tests.
 5. `allow`: a substring such as `/generated/` skips the whole file.
 6. Path gate (Elysia): `bl-elysia/one-route-method-per-file` only runs on `/routes/` leaf files, not `routes/index.ts`.
 7. Effect style rules (`shouldSkipEffectStyleFile`) skip tests; `bl-effect/prefer-vitest` runs **only** on tests.
-8. `before()` returned `false` because an option list was empty (Base UI: both component lists empty).
+8. `before()` returned `false` because an option list was empty (Base UI: both component lists empty; `bl-react/no-native-html` with `tags: []`).
+
+## How to apply a report
+
+Reports look like:
+
+```
+Problem: …
+Why: …
+Fix: …
+Avoid: …
+```
+
+Do the **Fix**. Do not add `oxlint-disable`, a dummy local use, or a second banned API. Open `references/*-rules.md` only if **Fix** is incomplete.
 
 ## Wrong plugin prefix
 

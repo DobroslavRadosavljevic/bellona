@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, SourceCode } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
 
@@ -44,8 +45,14 @@ export const noObjectParameters: CreateOnceRule = defineBellonaRule({
         'Disallow object function parameters; inputs must use an owner-provided type and be parsed at their boundary.',
     },
     messages: {
-      objectParameter:
-        'Parameter `{{parameter}}` uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.',
+      objectParameter: agentDiagnostic({
+        problem:
+          'Parameter `{{parameter}}` is typed as `object`. That type only means “not a primitive”. It has no fields and no owner.',
+        why: 'Callers can pass any non-primitive. The function cannot name the contract, so every property access is a guess or an assertion.',
+        fix: 'Give the parameter a named owner type (`User`, `LoadUserInput`, …). If the value is external, parse it at the I/O boundary with a schema, then pass the parsed type into this function.',
+        avoid:
+          'Do not replace `object` with `Record<string, unknown>`, `{}`, `any`, or `unknown`. Do not add `as Owner` inside the function. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

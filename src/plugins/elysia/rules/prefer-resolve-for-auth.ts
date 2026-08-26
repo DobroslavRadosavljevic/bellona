@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getElysiaDeriveCallback, isAuthRelatedDeriveCallback } from '../elysia.ts';
 import {
@@ -36,8 +37,13 @@ export const preferResolveForAuth: CreateOnceRule = defineBellonaRule({
       description: 'Prefer .resolve / macros over .derive for auth/session in plugins',
     },
     messages: {
-      preferResolve:
-        'Prefer `.resolve` or a macro for auth/session context: avoid `.derive` for cookie / Authorization / user/session.',
+      preferResolve: agentDiagnostic({
+        problem:
+          'This `/plugins/` Elysia plugin uses `.derive` for cookie / `Authorization` / user / session. Auth context belongs on `.resolve` (or a macro).',
+        why: '`.derive` runs more often and is the wrong slot for request auth. `.resolve` is the documented place for derived request context such as the user.',
+        fix: 'Move the auth/session logic to `.resolve(({ cookie, headers }) => ({ user }))` or a macro. Stop using `.derive` for those fields.',
+        avoid: 'Do not keep `.derive` and also add `.resolve`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

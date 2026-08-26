@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
@@ -115,18 +116,44 @@ export const requireRouteSchema: CreateOnceRule = defineBellonaRule({
         'Require body/query/params schemas on mutating Elysia routes, path params, and destructured handler props',
     },
     messages: {
-      missingSchema:
-        'Elysia `.{{method}}()` should declare a request schema (`body`, `query`, `params`, `headers`, or `cookie`).',
-      missingParams:
-        'Elysia `.{{method}}()` should declare a `params` schema (path has `:param` and/or handler destructures `params`).',
-      missingQuery:
-        'Elysia `.{{method}}()` should declare a `query` schema (handler destructures `query`).',
-      missingHeaders:
-        'Elysia `.{{method}}()` should declare a `headers` schema (handler destructures `headers`).',
-      missingCookie:
-        'Elysia `.{{method}}()` should declare a `cookie` schema (handler destructures `cookie`).',
-      missingBody:
-        'Elysia `.{{method}}()` should declare a `body` schema (handler destructures `body`).',
+      missingSchema: agentDiagnostic({
+        problem:
+          'Elysia `.{{method}}()` has no request schema (`body`, `query`, `params`, `headers`, or `cookie`).',
+        why: 'Without a request schema, input is untyped and unparsed. Handlers then read raw HTTP bags.',
+        fix: 'Add a schema object on `.{{method}}("/path", { body: …, query: …, params: … }, handler)` for every field the handler reads.',
+        avoid: 'Do not type the handler argument as `Context`. Do not disable the rule.',
+      }),
+      missingParams: agentDiagnostic({
+        problem:
+          'Elysia `.{{method}}()` needs a `params` schema (the path has `:param` and/or the handler destructures `params`).',
+        why: 'Path params are strings until you schema them. Missing `params` leaves them unparsed.',
+        fix: 'Add `params: t.Object({ id: t.String() })` (or your schema) matching each `:token`.',
+        avoid: 'Do not parse `params` by hand inside the handler. Do not disable the rule.',
+      }),
+      missingQuery: agentDiagnostic({
+        problem: 'Elysia `.{{method}}()` destructures `query` but has no `query` schema.',
+        why: 'Query strings are untrusted text until parsed.',
+        fix: 'Add `query: t.Object({ … })` (or your schema) for every query field the handler reads.',
+        avoid: 'Do not use `typeof` on query values. Do not disable the rule.',
+      }),
+      missingHeaders: agentDiagnostic({
+        problem: 'Elysia `.{{method}}()` destructures `headers` but has no `headers` schema.',
+        why: 'Headers are untrusted strings until parsed.',
+        fix: 'Add `headers: t.Object({ authorization: t.String() })` (or your schema) for the headers you read.',
+        avoid: 'Do not read `headers` as `Context`. Do not disable the rule.',
+      }),
+      missingCookie: agentDiagnostic({
+        problem: 'Elysia `.{{method}}()` destructures `cookie` but has no `cookie` schema.',
+        why: 'Cookies are untrusted until parsed. Also check `.value`, not the Proxy object.',
+        fix: 'Add `cookie: t.Cookie({ … })` / the project cookie schema for each cookie the handler reads.',
+        avoid: 'Do not `if (cookie.sid)`. Do not disable the rule.',
+      }),
+      missingBody: agentDiagnostic({
+        problem: 'Elysia `.{{method}}()` destructures `body` but has no `body` schema.',
+        why: 'Request bodies are untrusted until parsed.',
+        fix: 'Add `body: t.Object({ … })` (or Zod/Effect Schema via the Elysia adapter) matching the handler fields.',
+        avoid: 'Do not type `body` as `unknown`/`object`. Do not disable the rule.',
+      }),
     },
     schema: [
       {

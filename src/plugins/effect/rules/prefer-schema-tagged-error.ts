@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isInsideSuperClass, unwrapExpression } from '../ast.ts';
 import {
@@ -43,9 +44,27 @@ export const preferSchemaTaggedError: CreateOnceRule = defineBellonaRule({
       description: 'Prefer Schema.TaggedError over Error subclasses and Data.TaggedError',
     },
     messages: {
-      errorClass: 'Define domain errors with Schema.TaggedError.',
-      dataTagged: 'Use Schema.TaggedError instead of Data.TaggedError.',
-      failError: 'Fail with Schema.TaggedError instead of new Error(...).',
+      errorClass: agentDiagnostic({
+        problem:
+          'This domain error is a plain `class X extends Error` (or similar) instead of `Schema.TaggedError`.',
+        why: 'Effect v4 typed errors need a `_tag` and a schema. A raw `Error` subclass is not channel `E`.',
+        fix: 'Define `export class Boom extends Schema.TaggedError<Boom>()("Boom", { message: Schema.String }) {}` and `yield*` / `Effect.fail` that class.',
+        avoid: 'Do not keep `extends Error` and add a `_tag` by hand. Do not disable the rule.',
+      }),
+      dataTagged: agentDiagnostic({
+        problem:
+          'This uses `Data.TaggedError`. Effect v4 domain errors should be `Schema.TaggedError`.',
+        why: '`Data.TaggedError` is the older data-class style. Schema-tagged errors decode and type as Schema.',
+        fix: 'Replace with `class Boom extends Schema.TaggedError<Boom>()("Boom", { … }) {}`.',
+        avoid:
+          'Do not mix `Data.TaggedError` and `Schema.TaggedError` for the same error. Do not disable the rule.',
+      }),
+      failError: agentDiagnostic({
+        problem: 'This fails with `new Error(...)` instead of a `Schema.TaggedError`.',
+        why: '`Error` is a defect-shaped value, not a typed `E` in the Effect channel.',
+        fix: 'Construct your `Schema.TaggedError` and `return yield* new Boom({ message })` or `Effect.fail(new Boom({ … }))`.',
+        avoid: 'Do not `Effect.die` to hide it. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

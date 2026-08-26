@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallName, getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
@@ -59,10 +60,19 @@ export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
         'Prefer status(code, value) over set.status or deprecated error() in Elysia handlers',
     },
     messages: {
-      preferStatus:
-        'Prefer `status(code, value)` over `set.status`. It preserves response typing and Eden narrowing.',
-      preferStatusOverError:
-        'Prefer `status(code, value)` over deprecated `error()`. Elysia 1.3+ renamed context `error` to `status`.',
+      preferStatus: agentDiagnostic({
+        problem: 'This handler sets the status with `set.status` instead of `status(code, value)`.',
+        why: '`set.status` does not preserve Eden / response typing the way `status()` does. Clients then miss status unions.',
+        fix: 'Return `status(code, body)` (import `status` from `elysia`). Example: `return status(404, { code: "not_found" })`.',
+        avoid: 'Do not assign `set.status` and return a body separately. Do not disable the rule.',
+      }),
+      preferStatusOverError: agentDiagnostic({
+        problem:
+          'This handler uses deprecated context `error()`. Elysia 1.3+ renamed it to `status`.',
+        why: '`error()` is the old name. Typed responses and Eden expect `status(code, value)`.',
+        fix: 'Replace `error(code, body)` with `return status(code, body)`.',
+        avoid: 'Do not keep `error()` under an alias. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

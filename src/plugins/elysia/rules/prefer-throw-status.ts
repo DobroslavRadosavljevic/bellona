@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
@@ -54,8 +55,19 @@ export const preferThrowStatus: CreateOnceRule = defineBellonaRule({
       description: 'Prefer return status() over throw new Error/string in Elysia handlers',
     },
     messages: {
-      throwError: 'Prefer `return status(code, value)` over `throw new Error(...)`.',
-      throwLiteral: 'Prefer `return status(code, value)` over throwing a string.',
+      throwError: agentDiagnostic({
+        problem:
+          'This handler throws `new Error(...)` instead of returning `status(code, value)`. `throw status(...)` is allowed for onError-style paths.',
+        why: 'Thrown `Error` is untyped HTTP. Eden and `response` schemas cannot see the status or body.',
+        fix: 'Return `status(code, { code: "…", message: "…" })` with a literal error `code`. Use `throw status(...)` only when you must enter `onError`.',
+        avoid: 'Do not throw a string. Do not disable the rule.',
+      }),
+      throwLiteral: agentDiagnostic({
+        problem: 'This handler throws a string. That is not a typed Elysia response.',
+        why: 'String throws skip `status()` and response schemas. Clients cannot narrow the error.',
+        fix: 'Return `status(code, { code: "literal_code", message: "…" })` instead of `throw "…"`.',
+        avoid: 'Do not throw `new Error(string)` as a substitute. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

@@ -9,10 +9,19 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-26
+
 ### Added
 
+- `bl-js/no-inline-import-type`: do not write `import("…").Type` in a type position; use a top-level type import.
+- `bl-js/no-useless-reexport`: do not add re-export-only files or unchanged re-exports; import from the source module.
 - `bellona/tailwind` plugin with `bl-tailwind/no-classname-constants`: do not store Tailwind class names in constants; use `tv` / `createTV` or a reusable component.
 - `bl-react/component-props-type`: each primary component must use a non-empty `{Name}Props` type declared in the same file.
+
+### Changed
+
+- All rule diagnostics now use a four-part agent message: **Problem**, **Why**, **Fix**, **Avoid**. Placeholders (`{{name}}`, …) are unchanged.
+- Consumer skill (`skills/bellona/`): 0.4.0 snapshot, diagnostic workflow, full enable-many paste, `bl-*` OpenAI prompt.
 
 ## [0.3.0] - 2026-08-24
 
@@ -39,7 +48,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.0
 [0.3.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.3.0
 [0.2.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.2.0
 [0.1.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.1.0

@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
 import {
@@ -21,7 +22,13 @@ export const hookFileNameMatch: CreateOnceRule = defineBellonaRule({
       description: 'Require hook declarations in use-*.ts(x) files to match the basename',
     },
     messages: {
-      mismatch: 'Hook file basename should match the hook name: {{expected}}.',
+      mismatch: agentDiagnostic({
+        problem:
+          'This `use-*.ts(x)` file declares a hook whose name does not match the basename. Expected `{{expected}}` (`use-local-storage.ts` → `useLocalStorage`).',
+        why: 'Hook file names are the public lookup key. A mismatch makes imports and the file tree disagree.',
+        fix: 'Rename the hook to `{{expected}}`, or rename the file to the kebab-case form of the hook (`useLocalStorage` → `use-local-storage.ts`). Keep one hook per `use-*` file.',
+        avoid: 'Do not add a second hook that matches the basename. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

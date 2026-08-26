@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import {
@@ -69,7 +70,13 @@ export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
       description: 'Disallow Schema v3 filter / optionalWith / positive helpers; use .check in v4',
     },
     messages: {
-      legacy: 'Use {{replacement}} instead of Schema.{{name}}.',
+      legacy: agentDiagnostic({
+        problem:
+          'This uses v3 Schema API `Schema.{{name}}`. The v4 replacement is `{{replacement}}`.',
+        why: '`filter` / `optionalWith` / `positive` / `pattern` / `nonEmptyString` and friends were replaced by `Schema.check` / `Schema.refine` / `Schema.optionalKey`.',
+        fix: 'Replace `Schema.{{name}}` with `{{replacement}}` (example: `Schema.String.check(Schema.isNonEmpty())` instead of `nonEmptyString`).',
+        avoid: 'Do not keep the v3 method on a renamed import. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

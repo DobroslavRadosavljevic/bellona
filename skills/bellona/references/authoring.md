@@ -25,14 +25,15 @@ Ask before: new runtime dependencies, new plugin subpaths, oxlint major bumps, p
 1. Copy `src/plugins/js/rules/max-classes.ts`.
 2. Export `bnRuleName('your-slug')` as `yourRuleName`. Register the plugin with `defineBellonaPlugin('bl-<id>', …)`.
 3. Use `defineBellonaRule` + `createOnce`. Type with `defineBellonaRule`; do not annotate as `Rule` (widens).
-4. Prefer `schema` + `defaultOptions`. Read options with `objectOptionAt` / field helpers from visitors or `before`, not from the `createOnce` closure.
-5. Register in `src/plugins/<id>/index.ts`.
-6. Add `tests/unit/plugins/<id>/<rule>.test.ts` with `valid` / `invalid` `RuleTester` cases:
+4. Write `meta.messages` with `agentDiagnostic` from `src/lib/lint-message.ts` (Problem / Why / Fix / Avoid). Keep `{{placeholders}}` that `context.report` fills. Do not put JSX `params={{ x }}` in the text — Oxlint treats that as a placeholder.
+5. Prefer `schema` + `defaultOptions`. Read options with `objectOptionAt` / field helpers from visitors or `before`, not from the `createOnce` closure.
+6. Register in `src/plugins/<id>/index.ts`.
+7. Add `tests/unit/plugins/<id>/<rule>.test.ts` with `valid` / `invalid` `RuleTester` cases:
    - default behavior
    - option variants (`allow`, `max`, …)
    - no-import skip (domain plugins)
    - test-file skip when the production rule skips tests
-7. Run focused Vitest, then `bun run check`.
+8. Run focused Vitest, then `bun run check`.
 
 ```sh
 bunx vitest run tests/unit/plugins/js/max-classes.test.ts

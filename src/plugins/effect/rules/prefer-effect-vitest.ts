@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, pipeRoot, unwrapExpression } from '../ast.ts';
 import {
@@ -59,8 +60,13 @@ export const preferEffectVitest: CreateOnceRule = defineBellonaRule({
       description: 'Use it.effect from @effect/vitest when a test returns an Effect',
     },
     messages: {
-      itEffect:
-        'Import it from "@effect/vitest" and use it.effect instead of a bare it/test callback that returns an Effect.',
+      itEffect: agentDiagnostic({
+        problem:
+          'This test file uses bare `it` / `test` whose callback returns an Effect. `@effect/vitest` needs `it.effect`.',
+        why: 'A returned Effect is not run by Vitest. The test passes without executing the program.',
+        fix: 'Import `{ it } from "@effect/vitest"` and write `it.effect("name", () => Effect.gen(function* () { … }))` (or return the Effect from `it.effect`).',
+        avoid: 'Do not `void Effect.runPromise` inside `it`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

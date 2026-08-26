@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
@@ -15,7 +16,13 @@ export const noV3ServiceTags: CreateOnceRule = defineBellonaRule({
         'Disallow Context.Tag, GenericTag, Effect.Tag, and Effect.Service; use Context.Service',
     },
     messages: {
-      tag: 'Use Context.Service instead of {{api}}.',
+      tag: agentDiagnostic({
+        problem:
+          'This uses `{{api}}` (`Context.Tag`, `GenericTag`, `Effect.Tag`, or `Effect.Service`). Effect v4 services are `Context.Service`.',
+        why: 'The old Tag/Service APIs are v3. Layers, `.of`, and `static readonly layer` are the v4 shape.',
+        fix: 'Define `class Database extends Context.Service<Database, { … }>()("myapp/db/Database", { … })` with `static readonly layer` and `Database.of({ … })`.',
+        avoid: 'Do not keep `Effect.Service` / `.Default`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

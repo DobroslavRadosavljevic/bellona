@@ -2,6 +2,7 @@ import type { Context, CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { matchesAllow } from '../filename.ts';
@@ -37,7 +38,13 @@ export const noV3Imports: CreateOnceRule = defineBellonaRule({
       description: 'Disallow Effect v3 module specifiers that moved in Effect v4',
     },
     messages: {
-      moved: 'Import {{replacement}} instead of "{{source}}".',
+      moved: agentDiagnostic({
+        problem:
+          'This import specifier `"{{source}}"` moved in Effect v4. Import `{{replacement}}` instead.',
+        why: 'v3 module paths (`effect/Either`, `@effect/platform/HttpClient`, `effect/TestClock`, …) do not match v4 (`effect/Result`, `effect/unstable/http`, `effect/testing/TestClock`, …).',
+        fix: 'Change the import to `{{replacement}}` and update the named bindings (e.g. `Either` → `Result`, `TRef` → `TxRef`). See bellona `effect-rules.md` for the map.',
+        avoid: 'Do not re-export the old path. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

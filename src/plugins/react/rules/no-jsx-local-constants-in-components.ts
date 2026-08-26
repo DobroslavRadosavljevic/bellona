@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName, isAtModuleScope, isFunctionLike } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
@@ -17,8 +18,13 @@ export const noJsxLocalConstantsInComponents: CreateOnceRule = defineBellonaRule
       description: 'Disallow JSX assigned to local const inside React components',
     },
     messages: {
-      localConst:
-        'Do not assign JSX to local const variables inside React components. Render it inline or extract a component.',
+      localConst: agentDiagnostic({
+        problem: 'This React component assigns JSX to a local `const` (`const node = <div />`).',
+        why: 'JSX stored in a variable is not a component. It skips the usual composition boundary and makes lists/conditionals harder to type and extract.',
+        fix: 'Render the JSX inline in the return, or extract a child component file (`function Title() { return <h1 /> }`) and render `<Title />`.',
+        avoid:
+          'Do not switch `const` to `let` (reassignment is also banned). Do not wrap JSX in a render helper inside the component. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

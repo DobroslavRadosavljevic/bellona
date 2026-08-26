@@ -6,6 +6,8 @@ Plugin name: `bl-elysia`. Ids: `bl-elysia/<slug>`.
 
 **Exception:** `bl-elysia/no-route-factory` is gated to `/modules/` or `/routes/` only (no import required).
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 Path helpers (slash-normalized):
 
 | Gate | True when |

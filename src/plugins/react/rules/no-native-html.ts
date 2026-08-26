@@ -2,6 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { readNativeHtmlReplacements } from '../options.ts';
@@ -128,9 +129,22 @@ export const noNativeHtml: CreateOnceRule = defineBellonaRule({
         'Disallow high-confidence native HTML tags so callers use design-system components',
     },
     messages: {
-      forbidden: 'Native HTML `<{{tag}}>` is not allowed. Use `<{{component}}>` instead.',
-      forbiddenFrom:
-        'Native HTML `<{{tag}}>` is not allowed. Use `<{{component}}>` from "{{from}}" instead.',
+      forbidden: agentDiagnostic({
+        problem:
+          'Native HTML `<{{tag}}>` is not allowed by `bl-react/no-native-html`. Use the design-system component `<{{component}}>` instead. Tags inside `Typeset` or an ancestor with `data-slot="typeset"` / class `typeset` are allowed (prose).',
+        why: 'Native tags skip the shared visual and a11y contract. The app then has two button/input implementations.',
+        fix: 'Replace `<{{tag}}>` with `<{{component}}>` and map props to that component’s API. Configure `{ replacements: { {{tag}}: { component: "…", from: "…" } } }` so the import path is known.',
+        avoid:
+          'Do not wrap the native tag in a local component with the same native tag inside. Do not disable the rule for convenience. Empty `tags: []` turns the rule off for that override — only do that when the file set is not UI.',
+      }),
+      forbiddenFrom: agentDiagnostic({
+        problem:
+          'Native HTML `<{{tag}}>` is not allowed. Use `<{{component}}>` from "{{from}}" instead. Typeset/prose exceptions still apply.',
+        why: 'The project named a replacement component and import path. Native `<{{tag}}>` bypasses it.',
+        fix: 'Import `{ {{component}} }` from "{{from}}" and render `<{{component}} …>` with the design-system props. Remove the native `<{{tag}}>`.',
+        avoid:
+          'Do not keep `<{{tag}}>` next to the design-system component. Do not invent a second wrapper. Do not disable the rule.',
+      }),
     },
     schema: [
       {

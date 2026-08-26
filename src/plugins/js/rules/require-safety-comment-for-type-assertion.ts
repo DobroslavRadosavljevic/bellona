@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, SourceCode } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { objectOptionAt, stringField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
@@ -51,8 +52,14 @@ export const requireSafetyCommentForTypeAssertion: CreateOnceRule = defineBellon
         'Require a nearby SAFETY comment for every TypeScript type assertion except const assertions.',
     },
     messages: {
-      missingSafetyComment:
-        'This type assertion has no `{{marker}}:` justification. State the checked invariant immediately before the assertion or its containing statement.',
+      missingSafetyComment: agentDiagnostic({
+        problem:
+          'This type assertion (`as T` or `<T>x`) has no nearby comment that contains `{{marker}}:` (default marker `SAFETY`). `as const` does not need a comment.',
+        why: 'An assertion forges a type TypeScript could not prove. Without a stated invariant, later readers cannot tell what was checked.',
+        fix: 'Prefer removing the assertion and parsing instead. If the assertion must stay, put a comment on the assertion or its containing statement (`ExpressionStatement`, `VariableDeclaration`, `ReturnStatement`, `ThrowStatement`, `PropertyDefinition`) like `// {{marker}}: UserSchema.parse already validated this JSON`.',
+        avoid:
+          'Do not add an empty `{{marker}}:` comment. Do not move the comment to an unrelated line. Do not switch to a chained assertion. Do not disable the rule.',
+      }),
     },
     schema: [
       {

@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { booleanField, objectOptionAt, stringField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
@@ -24,8 +25,14 @@ export const forbiddenTermInNames: CreateOnceRule = defineBellonaRule({
         'Disallow a configurable substring in JavaScript, TypeScript, private, and JSX symbol names.',
     },
     messages: {
-      forbiddenSymbolName:
-        'Rename symbol "{{name}}"; "{{term}}" describes structure rather than ownership.',
+      forbiddenSymbolName: agentDiagnostic({
+        problem:
+          'Symbol "{{name}}" contains "{{term}}". The default term is `shape` (case-insensitive unless `{ caseSensitive: true }`). This includes JS/TS names, private fields, and JSX names.',
+        why: 'The word describes structure, not ownership. Names like `UserShape` do not say who owns the type, so later code treats the structure as the domain.',
+        fix: 'Rename to an owner name: `UserShape` → `User` or `ParsedUser`. Remove "{{term}}" from the identifier.',
+        avoid:
+          'Do not hide the term with a typo (`shap`, `ShapeImpl` still matches by default). Do not disable the rule. Change the identifier.',
+      }),
     },
     schema: [
       {

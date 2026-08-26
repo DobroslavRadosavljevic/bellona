@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isAtModuleScope, isFunctionLike } from '../ast.ts';
 import { expressionContainsJsx } from '../jsx.ts';
@@ -14,8 +15,13 @@ export const noJsxModuleConstants: CreateOnceRule = defineBellonaRule({
       description: 'Disallow JSX assigned to module-level const; extract a component instead',
     },
     messages: {
-      moduleConst:
-        'Do not assign JSX to module-level const variables. Extract a component file and render it with JSX instead.',
+      moduleConst: agentDiagnostic({
+        problem: 'This module assigns JSX to a module-level `const` (`const icon = <Svg />`).',
+        why: 'Module-level JSX is created once and reused as an element, not as a component. It cannot take props cleanly and is easy to share by accident.',
+        fix: 'Move the JSX into a component file (PascalCase). Export that component and render `<Icon />` (pass props as needed).',
+        avoid:
+          'Do not wrap the element in a function that is not a component (`function getIcon()`). Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

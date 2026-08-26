@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression, walkFunctionBody } from '../ast.ts';
 import {
@@ -36,7 +37,13 @@ export const noYieldRefHandle: CreateOnceRule = defineBellonaRule({
         'Do not yield Ref, Fiber, or Deferred handles; use Ref.get, Fiber.join, Deferred.await',
     },
     messages: {
-      handle: 'Do not yield* a {{kind}} handle. Use {{replacement}}.',
+      handle: agentDiagnostic({
+        problem:
+          'This generator `yield*`s a `{{kind}}` handle. Handles are not Effects. Use `{{replacement}}`.',
+        why: '`Ref` / `Fiber` / `Deferred` values are handles. `yield*` on them does not get/join/await.',
+        fix: 'Call `{{replacement}}` (examples: `yield* Ref.get(ref)`, `yield* Fiber.join(fiber)`, `yield* Deferred.await(deferred)`).',
+        avoid: 'Do not `yield* ref` after wrapping. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

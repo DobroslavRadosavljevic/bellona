@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
@@ -34,8 +35,14 @@ export const noDynamicRouterTo: CreateOnceRule = defineBellonaRule({
         'Require static string-literal `to` on TanStack Router Link/navigate/redirect APIs',
     },
     messages: {
-      dynamicTo:
-        'Use a string-literal route path for `to` (e.g. `"/posts/$postId"`) with `params`/`search`, or pass a typed `linkOptions(...)` object. Do not interpolate, concatenate, or pass a variable.',
+      dynamicTo: agentDiagnostic({
+        problem:
+          '`to` is not a string-literal route path (interpolation, concatenation, or a variable). This applies to `Link` / `Navigate` / `navigate` / `redirect` / `linkOptions` / `buildLocation` / `preloadRoute`.',
+        why: 'The router infers `params` and `search` from a literal path such as `"/posts/$postId"`. A dynamic string is just `string`, so types and mismatches disappear.',
+        fix: 'Write `to: "/posts/$postId"` (or `to="/posts/$postId"`) and pass values in `params` / `search`. Or pass a typed `linkOptions({ to: "/…", params })` object. Do not interpolate ids into `to`.',
+        avoid:
+          'Do not assert `to as "/posts/$postId"`. Do not use `href` instead. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

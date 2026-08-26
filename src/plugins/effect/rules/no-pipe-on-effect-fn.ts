@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isEffectFnAppliedCall, type EffectBindings } from '../bindings.ts';
@@ -14,7 +15,13 @@ export const noPipeOnEffectFn: CreateOnceRule = defineBellonaRule({
       description: 'Do not call .pipe on Effect.fn(...)(...); pass combinators as extra arguments',
     },
     messages: {
-      pipe: 'Pass extra combinators as arguments to Effect.fn, not .pipe.',
+      pipe: agentDiagnostic({
+        problem:
+          'This pipes the result of `Effect.fn(...)(...)` with `.pipe`. Extra combinators belong on `Effect.fn` itself.',
+        why: '`.pipe` after `fn` is a second composition path. `Effect.fn("name")(gen, combinator, …)` is the v4 slot.',
+        fix: 'Pass combinators as extra arguments: `Effect.fn("loadUser")(function* () { … }, Effect.catchTag("Boom", …))`. Remove `.pipe`.',
+        avoid: 'Do not assign to a temp and pipe. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

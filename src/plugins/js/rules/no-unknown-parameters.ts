@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
@@ -53,8 +54,14 @@ export const noUnknownParameters: CreateOnceRule = defineBellonaRule({
         'Disallow explicitly unknown function parameters except `cause`; decode unknown input at its I/O boundary instead.',
     },
     messages: {
-      unknownParameter:
-        'Parameter `{{parameter}}` leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.',
+      unknownParameter: agentDiagnostic({
+        problem:
+          'Parameter `{{parameter}}` is typed as `unknown`. The default allowlist is `cause` for error enrichment. This name is not on that list (or `{ allow }` does not include it).',
+        why: '`unknown` means “not parsed yet”. If this function accepts it, every caller can dump raw I/O inward and the parse never happens.',
+        fix: 'Parse at the I/O boundary (schema/decoder), then pass a named domain type into this function. If this parameter is an error `cause`, name it `cause` or add the name to `{ allow: ["cause", "…"] }` on `bl-js/no-unknown-parameters`.',
+        avoid:
+          'Do not replace `unknown` with `any`, `object`, or `Record<string, unknown>`. Do not assert `as T` inside the function. Do not disable the rule.',
+      }),
     },
     schema: [
       {

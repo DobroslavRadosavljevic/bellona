@@ -6,6 +6,8 @@ Plugin name: `bl-react`. Ids: `bl-react/<slug>`.
 
 Primary component = PascalCase name that does **not** end in `Impl` / `Provider` / `Context`. Hook = `use` + PascalCase.
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## `bl-react/component-file-name-match`
 
 The primary exported component name must match the file basename converted to PascalCase (`user-card.tsx` → `UserCard`).

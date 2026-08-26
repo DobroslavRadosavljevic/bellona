@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import {
@@ -97,14 +98,34 @@ export const requireRouteExportName: CreateOnceRule = defineBellonaRule({
         'Require camelCase …Route(s) exports; Elysia name option must be SCREAMING_SNAKE equivalent',
     },
     messages: {
-      badName:
-        'Exported Elysia route plugins must be named like `featureActionRoute` (camelCase ending in `Route` or `Routes`). Found `{{name}}`.',
-      missingNameOption:
-        'Pass `{ name: "{{name}}" }` on `new Elysia(...)` (SCREAMING_SNAKE matching the camelCase export).',
-      nameMismatch:
-        '`new Elysia({ name: "{{optionName}}" })` must be `{{expectedName}}` for export `{{name}}`.',
-      defaultExport:
-        'Do not default-export Elysia route plugins. Use a named `featureActionRoute` export.',
+      badName: agentDiagnostic({
+        problem:
+          'Exported Elysia route plugin `{{name}}` is not camelCase ending in `Route` or `Routes` (example: `featureActionRoute`).',
+        why: 'The export name is how `routes/index` and tests find the plugin. Other names hide the file’s job.',
+        fix: 'Rename the export to `featureActionRoute` (or `featureRoutes` for an index). Update the Elysia `{ name }` option to SCREAMING_SNAKE of that export.',
+        avoid: 'Do not default-export. Do not disable the rule.',
+      }),
+      missingNameOption: agentDiagnostic({
+        problem:
+          '`new Elysia(...)` for this route export is missing `{ name: "{{name}}" }` (SCREAMING_SNAKE matching the camelCase export).',
+        why: 'The instance name is used for lifecycle dedup and must match the export.',
+        fix: 'Write `new Elysia({ name: "{{name}}" })` then chain `.get` / `.post`.',
+        avoid: 'Do not invent a different string. Do not disable the rule.',
+      }),
+      nameMismatch: agentDiagnostic({
+        problem:
+          '`new Elysia({ name: "{{optionName}}" })` does not match export `{{name}}`. Expected `{{expectedName}}`.',
+        why: 'A mismatched name breaks the 1:1 map between export and plugin id.',
+        fix: 'Set `{ name: "{{expectedName}}" }` to the SCREAMING_SNAKE form of `{{name}}`.',
+        avoid:
+          'Do not change only the export or only the option. Keep them paired. Do not disable the rule.',
+      }),
+      defaultExport: agentDiagnostic({
+        problem: 'This Elysia route plugin is a default export.',
+        why: 'Default exports hide the `featureActionRoute` name that indexes and tests rely on.',
+        fix: 'Use a named export: `export const featureActionRoute = new Elysia({ name: "FEATURE_ACTION_ROUTE" })`.',
+        avoid: 'Do not add `export default` plus a named export. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { isSchemaName } from '../filename.ts';
@@ -149,7 +150,14 @@ export const zodSchemaNaming: CreateOnceRule = defineBellonaRule({
       description: 'Require exported Zod schemas to use PascalCase names ending in Schema',
     },
     messages: {
-      naming: 'Exported Zod schemas must use PascalCase names ending in `Schema`.',
+      naming: agentDiagnostic({
+        problem:
+          'This exported Zod schema binding is not PascalCase ending in `Schema` (`/^[A-Z][A-Za-z0-9]*Schema$/`). Detected because the initializer is a `z.*` / schema builder call.',
+        why: 'Schema names are the public parse contract. `user` or `user_schema` does not read as an owner type next to `User`.',
+        fix: 'Rename the export to `SomethingSchema` (example: `export const UserSchema = z.object({ id: z.string() })`). Update all imports.',
+        avoid:
+          'Do not keep a short alias export. Do not drop `export` to hide it. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

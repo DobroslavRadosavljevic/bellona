@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction, getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import {
@@ -42,7 +43,13 @@ export const preferClockSleep: CreateOnceRule = defineBellonaRule({
       description: 'Prefer Effect.sleep over setTimeout / setInterval inside Effect generators',
     },
     messages: {
-      sleep: 'Use Effect.sleep so TestClock can control time.',
+      sleep: agentDiagnostic({
+        problem:
+          'This generator uses `setTimeout` / `setInterval` (or similar) instead of `Effect.sleep`.',
+        why: 'Timers that hit the real clock cannot be driven by `TestClock`. Tests become slow or flaky.',
+        fix: 'Use `yield* Effect.sleep(Duration.seconds(1))` (or `Duration.millis`). Advance time with `TestClock` in tests.',
+        avoid: 'Do not wrap `setTimeout` in `Effect.promise`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

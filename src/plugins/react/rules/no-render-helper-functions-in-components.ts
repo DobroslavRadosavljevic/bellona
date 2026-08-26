@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName, getStaticPropertyName, isFunctionLike } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
@@ -18,10 +19,21 @@ export const noRenderHelperFunctionsInComponents: CreateOnceRule = defineBellona
       description: 'Disallow JSX-returning helper functions inside React components',
     },
     messages: {
-      insideComponent:
-        'Do not define JSX-returning functions inside React components. Split conditional UI into named subcomponent files.',
-      nonComponent:
-        'Only React components may return JSX. Rename this JSX-returning function as a component or extract a component file.',
+      insideComponent: agentDiagnostic({
+        problem:
+          'This React component defines an inner function that returns JSX (a render helper such as `const renderTitle = () => <h1 />`).',
+        why: 'Inner render helpers hide component boundaries. They are easy to use with hooks incorrectly and they block extraction.',
+        fix: 'Move the JSX into a named child component in its own file (or a PascalCase component in a file that allows it). Render `<Child />` from the parent.',
+        avoid:
+          'Do not rename the helper to PascalCase while it stays nested inside the parent. Nested components still remount. Extract a file. Do not disable the rule.',
+      }),
+      nonComponent: agentDiagnostic({
+        problem:
+          'This function returns JSX but is not a React component (it is not PascalCase). Only components may return JSX.',
+        why: 'A camelCase function that returns JSX is a hidden component. File naming and the rules of hooks will not apply.',
+        fix: 'Rename it to PascalCase and treat it as a component in its own file, or inline the JSX in a real component.',
+        avoid: 'Do not return JSX from utils/helpers. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

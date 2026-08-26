@@ -4,7 +4,9 @@ Plugin name: `bl-js`. Ids: `bl-js/<slug>`. **No import gate. No test skip.** The
 
 Evidence rules are syntactic (file-local aliases). They do not need `--type-aware`.
 
-Shared intent: keep known types, parse `unknown` at I/O boundaries, avoid `Reflect` and module mocks.
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
+Shared intent: keep known types, parse `unknown` at I/O boundaries, avoid `Reflect`, module mocks, and pass-through re-exports.
 
 ## `bl-js/max-classes`
 
@@ -30,6 +32,24 @@ Prefer: keep the original type, or parse once at the boundary.
 Disallow `{ ...cond && {} }` / `{ ...(cond ? extra : {}) }` style spreads that hide omission behind an empty object.
 
 Prefer: build the object in statements; add the property only when present.
+
+## `bl-js/no-inline-import-type`
+
+Disallow TypeScript `import("…")` types, including `import("./mod").Name` and `typeof import("./mod")`.
+
+Prefer a top-level type import:
+
+```ts
+// bad
+useRef<import("./lightbox-context").LightboxTravel | null>(null)
+
+// good
+import type { LightboxTravel } from './lightbox-context'
+
+useRef<LightboxTravel | null>(null)
+```
+
+Runtime `import("./mod")` (a dynamic import expression) is allowed.
 
 ## `bl-js/no-known-value-widening`
 
@@ -105,6 +125,47 @@ Disallow `type Foo = unknown` (and aliases that resolve to `unknown` in-file). K
 Disallow dictionaries whose value type is `unknown`, `any`, `object`, `{}`, or a union/alias containing those.
 
 Prefer: `Record<string, User>` (or schema-derived values). Parse payloads before insert.
+
+## `bl-js/no-useless-reexport`
+
+Disallow files that only re-export, and unchanged re-exports in mixed files.
+
+A **re-export** is `export … from`, `export *`, or an import that is exported and never used in the file.
+
+| Option | Default |
+| --- | --- |
+| `allow` | `[]` (path substring / basename skip) |
+| `allowRenames` | `true` |
+
+Prefer: import from the source module at the use site.
+
+```ts
+// bad — file only re-exports
+export { User } from './user'
+export * from './models'
+
+// bad — mixed file, unchanged re-export
+export function loadUser() {}
+export { User } from './user'
+
+// good — the file owns the code
+export function loadUser() {
+  return { id: '1' }
+}
+
+// good — mixed file, the name change is the public API
+export function loadUser() {}
+export { InternalUser as User } from './internal'
+
+// good — import is used here, then also exported
+import { foo, fooName } from './foo'
+const plugin = { [fooName]: foo }
+export { foo, fooName }
+```
+
+A rename-only file is still a re-export file. Put a public alias in `allow`, or import the source name at the use site.
+
+This rule does **not** skip tests. `allow` skips matching files.
 
 ## `bl-js/no-widen-then-assert`
 

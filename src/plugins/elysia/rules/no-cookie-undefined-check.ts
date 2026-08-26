@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { isCookieJarMember } from '../elysia.ts';
@@ -92,8 +93,13 @@ export const noCookieUndefinedCheck: CreateOnceRule = defineBellonaRule({
       description: 'Do not treat Elysia cookie jar entries as undefined; check .value instead',
     },
     messages: {
-      cookieCheck:
-        'Elysia `cookie.<name>` is always defined (Proxy). Check `cookie.<name>.value` instead.',
+      cookieCheck: agentDiagnostic({
+        problem:
+          'This code checks Elysia `cookie.<name>` for null/undefined (`cookie.sid == null`, `!cookie.sid`, and similar). `cookie.<name>` is a Proxy that always exists.',
+        why: 'The check is always false/true in the wrong way. Missing cookies show up on `.value`, not on the cookie object.',
+        fix: 'Read `cookie.<name>.value` (and schema-parse it). Guard `if (cookie.sid.value === undefined)` or use the typed cookie schema on the route.',
+        avoid: 'Do not keep `if (cookie.sid)`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

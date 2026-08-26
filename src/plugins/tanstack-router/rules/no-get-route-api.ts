@@ -2,6 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -46,10 +47,20 @@ export const noGetRouteApi: CreateOnceRule = defineBellonaRule({
       description: 'Disallow getRouteApi and Route.useX() / routeApi.useX(); use hooks with `from`',
     },
     messages: {
-      getRouteApi:
-        'Do not use `getRouteApi`. Call the hook with a route id: `useLoaderData({ from: "/posts/$postId" })`.',
-      boundHook:
-        'Do not use `Route.useX()` or `routeApi.useX()`. Call the hook with a route id: `useLoaderData({ from: "/posts/$postId" })`.',
+      getRouteApi: agentDiagnostic({
+        problem:
+          'This code calls `getRouteApi`. That helper binds hooks to a route behind a runtime id.',
+        why: 'Bound APIs hide the `from` literal. Shared components then lose typed `params` / loader data, or they couple to one route.',
+        fix: 'Call the hook with a route id: `useLoaderData({ from: "/posts/$postId" })` (same for `useParams` / `useSearch` / `useRouteContext`). For shared UI, pass `{ strict: false }` or pass data as props.',
+        avoid:
+          'Do not wrap `getRouteApi` in a local helper. Do not switch to `Route.useLoaderData()` (also banned). Do not disable the rule.',
+      }),
+      boundHook: agentDiagnostic({
+        problem: 'This code uses a bound route hook (`Route.useX()` or `routeApi.useX()`).',
+        why: 'Bound hooks skip an explicit `from` literal, so inference and reuse suffer the same way as `getRouteApi`.',
+        fix: 'Call the exported hook with `from`: `useLoaderData({ from: "/posts/$postId" })`. For shared components use `{ strict: false }` or props.',
+        avoid: 'Do not assign `const useData = Route.useLoaderData`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

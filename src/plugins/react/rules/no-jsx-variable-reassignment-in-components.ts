@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
@@ -17,8 +18,14 @@ export const noJsxVariableReassignmentInComponents: CreateOnceRule = defineBello
       description: 'Disallow building JSX by reassigning local variables in React components',
     },
     messages: {
-      reassign:
-        'Do not build JSX by reassigning local variables inside React components. Render the conditional UI inline or extract a component.',
+      reassign: agentDiagnostic({
+        problem:
+          'This React component builds JSX by reassigning a local variable (`let ui = …; ui = <Other />`).',
+        why: 'Reassignment is a mutable pipeline. The render tree is no longer a single expression, so conditionals and types get lost.',
+        fix: 'Return inline conditional JSX (`condition ? <A /> : <B />`) or extract child components and compose them in one return.',
+        avoid:
+          'Do not replace reassignment with `const ui = condition ? …` if that stores JSX in a local const (also banned). Extract a component or inline it. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

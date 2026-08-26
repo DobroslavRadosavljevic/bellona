@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument, hasStaticClassMember, objectHasMakeOption } from '../ast.ts';
 import {
@@ -24,8 +25,19 @@ export const requireServiceStaticLayer: CreateOnceRule = defineBellonaRule({
         'Require Context.Service classes to declare static readonly layer (or options.make)',
     },
     messages: {
-      layer: 'Attach static readonly layer on this Context.Service class.',
-      defaultMember: 'Effect v4 does not use .Default. Attach static readonly layer instead.',
+      layer: agentDiagnostic({
+        problem:
+          'This `Context.Service` class has no `static readonly layer` (and no `options.make` that provides one).',
+        why: 'v4 services are provided through a static layer, not `.Default`. Without it, the app cannot `Layer.provide` the service.',
+        fix: 'Add `static readonly layer = Layer.effect(this, …)` (or the documented `make` options) on the class.',
+        avoid: 'Do not add `.Default`. Do not disable the rule.',
+      }),
+      defaultMember: agentDiagnostic({
+        problem: 'This code uses `.Default` on a service. Effect v4 removed that member.',
+        why: '`.Default` is v3 `Effect.Service` sugar. v4 uses `static readonly layer`.',
+        fix: 'Delete `.Default`. Provide `Service.layer` (or `Layer.provide(Service.layer)`).',
+        avoid: 'Do not alias `.Default`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

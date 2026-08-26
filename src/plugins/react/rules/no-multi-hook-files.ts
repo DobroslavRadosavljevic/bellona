@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, isModuleLevelDeclaration } from '../ast.ts';
 import { isHookFile, isHookName, matchesAllow } from '../filename.ts';
@@ -15,7 +16,13 @@ export const noMultiHookFiles: CreateOnceRule = defineBellonaRule({
       description: 'Disallow multiple React hooks in one use-*.ts(x) file',
     },
     messages: {
-      multiple: 'Keep one React hook per use-*.ts or use-*.tsx file.',
+      multiple: agentDiagnostic({
+        problem:
+          'This `use-*.ts` or `use-*.tsx` file declares more than one React hook (`use` + PascalCase).',
+        why: 'Hook files are one hook per basename. Extra hooks hide under the wrong file name.',
+        fix: 'Move each extra hook into its own `use-*.ts(x)` file whose basename matches the hook.',
+        avoid: 'Do not nest extra hooks as inner functions to hide them. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

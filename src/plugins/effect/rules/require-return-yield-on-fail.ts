@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction, isReturnedNode, unwrapExpression } from '../ast.ts';
 import {
@@ -20,8 +21,13 @@ export const requireReturnYieldOnFail: CreateOnceRule = defineBellonaRule({
       description: 'Require return yield* when failing inside Effect.gen so TypeScript can narrow',
     },
     messages: {
-      returnYield:
-        'Use return yield* when failing so TypeScript can narrow the rest of the generator.',
+      returnYield: agentDiagnostic({
+        problem:
+          'This generator fails with `yield* Effect.fail(...)` (or a TaggedError) without `return`. TypeScript will not narrow the rest of the function.',
+        why: 'Without `return`, the generator continues in types as if the fail were recoverable in-place.',
+        fix: 'Write `return yield* Effect.fail(...)` or `return yield* new Boom({ … })`.',
+        avoid: 'Do not add `throw` after yield. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

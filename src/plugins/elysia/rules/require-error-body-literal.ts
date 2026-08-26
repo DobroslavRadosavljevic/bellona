@@ -2,6 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsNumber } from '../../../lib/js-kind.ts';
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import {
@@ -90,8 +91,14 @@ export const requireErrorBodyLiteral: CreateOnceRule = defineBellonaRule({
         'Require status(4xx|5xx, { code }) values to be string literals or const strings',
     },
     messages: {
-      nonLiteralCode:
-        '`status(..., { code })` must use a string literal or a same-file const string, not templates or member access.',
+      nonLiteralCode: agentDiagnostic({
+        problem:
+          '`status(4xx|5xx, { code })` uses a `code` that is not a string literal or a same-file `const` string (templates and member access are banned).',
+        why: 'Error `code` is part of the public API. A dynamic code cannot be listed in `response` or documented as a closed set.',
+        fix: 'Write `code: "not_found"` or `const NOT_FOUND = "not_found"` in this file and use that const. Keep `message` as you like.',
+        avoid:
+          'Do not use `errors.notFound`, `Codes.X`, or `` `not_${x}` ``. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

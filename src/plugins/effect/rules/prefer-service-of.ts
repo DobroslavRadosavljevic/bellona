@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { classNameOf, enclosingClass, getCallArgument, unwrapExpression } from '../ast.ts';
 import {
@@ -24,7 +25,14 @@ export const preferServiceOf: CreateOnceRule = defineBellonaRule({
       description: 'Prefer Service.of({ ... }) when returning a Context.Service implementation',
     },
     messages: {
-      of: 'Return {{name}}.of({ ... }) instead of a plain object.',
+      of: agentDiagnostic({
+        problem:
+          'This `Context.Service` implementation returns a plain object instead of `{{name}}.of({ … })`.',
+        why: '`.of` is the v4 constructor that brands the service. A plain object is not a typed Service instance.',
+        fix: 'Return `{{name}}.of({ method() { … } })` (or the equivalent members) from `make` / the layer.',
+        avoid:
+          'Do not `as {{name}}` on a plain object. Do not use `.Default`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

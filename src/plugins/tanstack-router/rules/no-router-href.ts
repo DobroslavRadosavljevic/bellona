@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import {
@@ -40,8 +41,13 @@ export const noRouterHref: CreateOnceRule = defineBellonaRule({
         'Disallow `href` on TanStack Router navigation APIs except external URL literals',
     },
     messages: {
-      routerHref:
-        'Do not use `href` for in-app navigation. Prefer typed `to` with `params`/`search`. External links may use a literal `http(s):` / `mailto:` / `tel:` / `//` href.',
+      routerHref: agentDiagnostic({
+        problem:
+          'This in-app link uses `href`. Typed app routes must use `to` with `params` / `search`. Literal external `href` is allowed only when it starts with `http:`, `https:`, `mailto:`, `tel:`, or `//`.',
+        why: '`href` is an untyped URL string. The router will not check params or search.',
+        fix: 'Replace with `<Link to="/posts/$postId" />` plus a `params` object `{ postId }` (or `navigate({ to, params })`). Keep `href` only for real external URLs with those prefixes.',
+        avoid: 'Do not put an in-app path in `href` (`href="/posts"`). Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument, isArrayExpressionArgument } from '../ast.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
@@ -27,7 +28,13 @@ export const schemaUnionArray: CreateOnceRule = defineBellonaRule({
         'Require Schema.Union, Tuple, TemplateLiteral, and multi Literal to take an array',
     },
     messages: {
-      array: 'Use {{replacement}} instead of a variadic Schema.{{name}}(...) call.',
+      array: agentDiagnostic({
+        problem:
+          'This calls `Schema.{{name}}(...)` with variadic members. v4 takes a single array. Use `{{replacement}}`.',
+        why: '`Schema.Union(A, B)` is v3. v4 is `Schema.Union([A, B])`. Multi `Schema.Literal` became `Schema.Literals([...])`.',
+        fix: 'Replace with `{{replacement}}` (example: `Schema.Union([A, B])`, `Schema.Literals(["a", "b"])`, array form for Tuple / TemplateLiteral).',
+        avoid: 'Do not keep rest arguments. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

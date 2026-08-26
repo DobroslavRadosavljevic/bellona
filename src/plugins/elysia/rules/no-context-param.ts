@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getParamTypeName, isContextTypeName } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
@@ -60,8 +61,13 @@ export const noContextParam: CreateOnceRule = defineBellonaRule({
       description: 'Disallow typing parameters as Elysia Context; destructure needed fields',
     },
     messages: {
-      contextParam:
-        'Do not type parameters as `Context`. Destructure the fields you need from the handler argument instead.',
+      contextParam: agentDiagnostic({
+        problem:
+          'A handler (or similar) parameter is typed as Elysia `Context`. That type is the whole request bag.',
+        why: 'Typing `Context` couples the function to HTTP and hides which fields it actually reads. Tests then need a fake full context.',
+        fix: 'Destructure the fields you use from the handler argument: `({ body, params, status }) => { … }`. Type those fields, not `Context`.',
+        avoid: 'Do not alias `Context` as `Ctx`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

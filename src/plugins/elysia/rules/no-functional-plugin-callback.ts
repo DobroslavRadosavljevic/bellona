@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isFunctionLike, unwrapExpression } from '../ast.ts';
 import {
@@ -62,8 +63,13 @@ export const noFunctionalPluginCallback: CreateOnceRule = defineBellonaRule({
       description: 'Disallow functional .use((app) => …) plugins; prefer new Elysia() instances',
     },
     messages: {
-      functionalPlugin:
-        'Prefer `new Elysia({ name: "…" })` plugin instances over `.use((app) => …)` callbacks.',
+      functionalPlugin: agentDiagnostic({
+        problem:
+          'This uses `.use((app) => …)` — a callback plugin. Effect `Service.use` is not this rule.',
+        why: 'Callback plugins have no stable `name`, so lifecycle hooks duplicate when the plugin is reused. Instances with `{ name }` can be deduplicated.',
+        fix: 'Create `new Elysia({ name: "feature" }).get(…).…` and `.use(thatInstance)` instead of `.use((app) => app.get(…))`.',
+        avoid: 'Do not nest another callback `.use`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

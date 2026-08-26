@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, Variable } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type BroadTypeKind = 'top' | 'object' | 'record';
@@ -324,8 +325,14 @@ export const noWidenThenAssert: CreateOnceRule = defineBellonaRule({
         'Disallow local const flows that explicitly widen a known value before asserting the widened binding to a narrower type.',
     },
     messages: {
-      widenThenAssert:
-        'Binding "{{name}}" discards type evidence and later recreates it with an assertion. Keep the precise type from initialization through use; parse boundary input once.',
+      widenThenAssert: agentDiagnostic({
+        problem:
+          'Binding "{{name}}" is given a broad type (`unknown` / similar) and later asserted back to a precise type in the same function (`const x: unknown = value; … x as User`).',
+        why: 'The widen-then-assert loop discards evidence and then forges it. Nothing parsed the value in between.',
+        fix: 'Keep the precise type from initialization through use. If the value is untrusted, parse it once at the boundary into `User` (schema), then use `User` with no assertion.',
+        avoid:
+          'Do not split the assert into another function to hide the pair. Do not use `as unknown as User`. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

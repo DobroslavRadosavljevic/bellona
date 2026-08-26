@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   isComponentWrapperCall,
@@ -138,11 +139,43 @@ export const componentPropsType: CreateOnceRule = defineBellonaRule({
       description: 'Require each primary component to use a non-empty same-file `{Name}Props` type',
     },
     messages: {
-      missing: 'Primary component `{{name}}` must take props typed as `{{expected}}`.',
-      wrongName: 'Primary component `{{name}}` must use the props type `{{expected}}`.',
-      missingLocal: 'Declare `{{expected}}` in this file. Do not import the component props type.',
-      empty: 'Props type `{{expected}}` must declare at least one member.',
-      extraType: 'A component file may declare only the component and its `*Props` type.',
+      missing: agentDiagnostic({
+        problem:
+          'Primary component `{{name}}` has no props parameter typed as `{{expected}}` (`{Component}Props` in the same file).',
+        why: 'Props types must be named after the component and live next to it so the contract is local and searchable.',
+        fix: 'Declare `type {{expected}} = { … }` in this file with at least one member. Give `{{name}}` a parameter typed `{{expected}}` (or a single props object of that type).',
+        avoid:
+          'Do not import `{{expected}}` from another file. Do not use an inline object type on the parameter. Do not use `{}` or an empty interface. Do not disable the rule.',
+      }),
+      wrongName: agentDiagnostic({
+        problem: 'Primary component `{{name}}` uses a props type that is not named `{{expected}}`.',
+        why: 'A different props name breaks the `{Component}Props` convention. Search and refactors then miss the contract.',
+        fix: 'Rename the props type to `{{expected}}` in this file and use that name on the component parameter.',
+        avoid:
+          'Do not keep two props types. Do not import a renamed alias. Do not disable the rule.',
+      }),
+      missingLocal: agentDiagnostic({
+        problem:
+          '`{{expected}}` is not declared in this file. The component props type must be local, not imported.',
+        why: 'An imported props type splits the component from its contract and often becomes a shared bag of fields.',
+        fix: 'Declare `type {{expected}} = { … }` in this same file (non-empty). Point the component parameter at that type. Remove the imported props type if it is unused.',
+        avoid:
+          'Do not re-export the imported type under the expected name. Do not disable the rule.',
+      }),
+      empty: agentDiagnostic({
+        problem: 'Props type `{{expected}}` is empty (`{}` or an interface with no members).',
+        why: 'An empty props type is not a contract. Either the component needs no props (then it should not claim a props type with no fields) or fields are missing.',
+        fix: 'Add the real props fields to `{{expected}}`. If the component has no props, this rule still requires a non-empty `{Name}Props` for primary components — give it the fields the UI actually reads, or split a no-props leaf only if it is not a primary component (`*Impl` / `*Provider` / `*Context`).',
+        avoid: 'Do not add a dummy `_unused: never` field. Do not disable the rule.',
+      }),
+      extraType: agentDiagnostic({
+        problem:
+          'This component file declares an extra type or interface besides the primary component and its `*Props` type.',
+        why: 'Extra aliases in a component file become a dumping ground. Domain types belong in their own modules.',
+        fix: 'Keep only the component and `{Name}Props` here. Move other types to a dedicated file and import values (not the props type) as needed.',
+        avoid:
+          'Do not hide extra types inside the props type as unused fields. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

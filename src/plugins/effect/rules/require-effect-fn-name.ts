@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   getBindingNameForInitializer,
@@ -39,8 +40,21 @@ export const requireEffectFnName: CreateOnceRule = defineBellonaRule({
       description: 'Require Effect.fn to take a span name that matches the function binding',
     },
     messages: {
-      missing: 'Pass a string name to Effect.fn("name").',
-      mismatch: 'Effect.fn name "{{spanName}}" should match binding "{{binding}}".',
+      missing: agentDiagnostic({
+        problem:
+          '`Effect.fn` is called without a string span name (`Effect.fn(function* () { … })`).',
+        why: 'The name is the trace span and the identifier in logs. Unnamed `fn` cannot be matched to a binding.',
+        fix: 'Write `Effect.fn("loadUser")(function* (…) { … })` using the same name as the binding.',
+        avoid: 'Do not pass a non-string expression as the name. Do not disable the rule.',
+      }),
+      mismatch: agentDiagnostic({
+        problem:
+          '`Effect.fn` span name `"{{spanName}}"` does not match binding `"{{binding}}"` (or `object.{{binding}}`).',
+        why: 'Traces then show a different name than the export, so search and logs disagree.',
+        fix: 'Set the string to `"{{binding}}"` (or `"{{binding}}"` after the object prefix). Rename either the binding or the span so they match.',
+        avoid:
+          'Do not pick a “pretty” span that differs from the function. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

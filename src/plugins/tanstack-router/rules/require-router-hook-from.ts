@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
 import { hasFromOrStrictFalse, isBareRouterHookCall } from '../router.ts';
@@ -13,8 +14,13 @@ export const requireRouterHookFrom: CreateOnceRule = defineBellonaRule({
       description: 'Require `from` or `strict: false` on bare TanStack Router hooks',
     },
     messages: {
-      missingFrom:
-        'Pass `from` (e.g. `useLoaderData({ from: "/posts/$postId" })`) to narrow types, or `strict: false` for shared components. Do not use `getRouteApi` or `Route.useX()`.',
+      missingFrom: agentDiagnostic({
+        problem:
+          'This router hook (`useNavigate` / `useParams` / `useSearch` / `useLoaderData` / `useRouteContext`) has no `{ from }` and no `{ strict: false }`.',
+        why: 'Without `from`, the hook cannot narrow to a route’s params, search, or loader data.',
+        fix: 'Pass a literal route id: `useLoaderData({ from: "/posts/$postId" })`. For shared components, pass `{ strict: false }` or take the data as props. Do not use `getRouteApi` or `Route.useX()`.',
+        avoid: 'Do not assert the hook result. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

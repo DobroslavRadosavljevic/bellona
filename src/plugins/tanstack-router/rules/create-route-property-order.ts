@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -15,8 +16,14 @@ export const createRoutePropertyOrder: CreateOnceRule = defineBellonaRule({
         'Require inference-sensitive `createRoute` / `createFileRoute` option keys in documented order',
     },
     messages: {
-      invalidOrder:
-        'Put inference-sensitive route options in order: `params` / `validateSearch`, then `search`, `loaderDeps`, `context`, `beforeLoad`, `loader`, then lifecycle fields. `{{functionName}}` is out of order.',
+      invalidOrder: agentDiagnostic({
+        problem:
+          '`{{functionName}}` route options are out of inference order. Required order: `params` / `validateSearch`, then `search`, then `loaderDeps` / `ssr`, then `context`, then `beforeLoad`, then `loader`, then lifecycle (`onEnter`, `onStay`, `onLeave`, `head`, `scripts`, `headers`, `remountDeps`).',
+        why: 'TanStack Router infers types from earlier keys. A later key placed first makes `loader` / `search` see the wrong type.',
+        fix: 'Reorder the object keys on this `{{functionName}}` call to match the list above. Do not change behavior, only key order.',
+        avoid:
+          'Do not add type assertions on `to` / loader results to “fix” inference. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

@@ -4,6 +4,8 @@ Plugin name: `bl-base-ui`. Ids: `bl-base-ui/<slug>`.
 
 **No** `@base-ui/react` import required. Matching is by JSX name. `Dialog.Trigger` and `DialogTrigger` are the same canonical name (dots stripped).
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## `bl-base-ui/require-native-button-with-render`
 
 Align Base UI `nativeButton` with whether `render` mounts a real `<button>`. Base UI warns when they disagree.

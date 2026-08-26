@@ -62,6 +62,7 @@ createOnce(context) {
 | `defineBellonaRule(rule)` | `src/lib/rule.ts` | preserves `createOnce` typing (do not annotate as `Rule`) |
 | `bnRuleName('slug')` | `src/lib/rule.ts` | returns `slug` |
 | `objectOptionAt` / `integerField` / `stringField` / `stringListField` / `booleanField` / `namedImportHintMap` | `src/lib/options.ts` | typed option readers |
+| `agentDiagnostic` | `src/lib/lint-message.ts` | Problem / Why / Fix / Avoid lint text |
 
 Do not use `as` / `any` to hide option or AST types. Narrow in `src/lib/`.
 
@@ -129,7 +130,7 @@ Generated: `dist/` — do not edit.
 
 | Plugin | Rules |
 | --- | --- |
-| js | 16 |
+| js | 18 |
 | react | 11 |
 | base-ui | 1 |
 | zod | 2 |
@@ -137,4 +138,4 @@ Generated: `dist/` — do not edit.
 | elysia | 15 |
 | effect | 25 |
 | tailwind | 1 |
-| **total** | **85** |
+| **total** | **87** |

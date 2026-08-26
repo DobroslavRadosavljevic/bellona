@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree, Scope, SourceCode, Variable } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   classifyWideningTarget,
@@ -141,8 +142,14 @@ export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
         'Disallow syntactically established values from flowing into explicitly broad or anonymous target types that discard useful evidence.',
     },
     messages: {
-      widening:
-        'The explicit {{target}} type on {{subject}} discards known type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.',
+      widening: agentDiagnostic({
+        problem:
+          'The explicit {{target}} type on {{subject}} widens a value whose type is already known from the expression (literal, constructor, or other evidence in this file).',
+        why: 'A broad or anonymous annotation (`unknown`, `object`, `{}`, open dictionaries, generic containers) throws away that evidence. Later code must guess or assert.',
+        fix: 'Remove the annotation and keep inference, or write `const x = value satisfies NamedType`, or annotate with a named owner type that matches the value. Parse untrusted input at the boundary into that named type.',
+        avoid:
+          'Do not assert `as NamedType` after widening. Do not replace the annotation with `any`. Do not wrap the value in a redundant cast. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

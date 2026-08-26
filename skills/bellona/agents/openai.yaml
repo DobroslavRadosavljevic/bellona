@@ -1,4 +1,4 @@
 interface:
   display_name: "Bellona"
   short_description: "Configure opt-in Oxlint JS plugins from bellona"
-  default_prompt: "Use $bellona to install, configure, enable, or debug bellona Oxlint JS plugins and bn-* rules."
+  default_prompt: "Use $bellona to install, configure, enable, or debug bellona Oxlint JS plugins and bl-* rules. Follow each report's Problem, Why, Fix, and Avoid lines."

@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getEnclosingFunctionName, isFunctionLike, unwrapExpression } from '../ast.ts';
 import { isComponentName } from '../filename.ts';
@@ -15,7 +16,14 @@ export const noJsxIifeInComponents: CreateOnceRule = defineBellonaRule({
       description: 'Disallow JSX-returning IIFEs inside React components',
     },
     messages: {
-      iife: 'Do not hide JSX in immediately invoked functions inside React components. Render the conditional UI inline or extract a component.',
+      iife: agentDiagnostic({
+        problem:
+          'This React component hides JSX inside an immediately invoked function (`(() => <div />)()` or similar).',
+        why: 'An IIFE is a fake block scope. Conditional UI then lives in a nested function instead of in the render tree, which hides hooks rules and makes extraction harder.',
+        fix: 'Render the JSX inline with `&&` / ternaries, or extract a named child component file and render `<Child />`.',
+        avoid:
+          'Do not wrap the IIFE in `useMemo`. Do not assign it to a local const (that is also banned). Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

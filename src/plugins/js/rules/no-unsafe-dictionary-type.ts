@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   classifyUnsafeDictionary,
@@ -95,8 +96,14 @@ export const noUnsafeDictionaryType: CreateOnceRule = defineBellonaRule({
         'Disallow object-dictionary contracts whose direct value type is unknown, any, object, {}, or a union/alias containing one of those escape hatches.',
     },
     messages: {
-      unsafeDictionary:
-        "This dictionary's {{value}} value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+      unsafeDictionary: agentDiagnostic({
+        problem:
+          'This dictionary uses an unsafe {{value}} value type (`unknown`, `any`, `object`, `{}`, or a union/alias that contains those).',
+        why: 'A map whose values have no owner type cannot be read safely. Every lookup becomes a guess or an assertion.',
+        fix: 'Use `Record<string, NamedType>` (or a schema-derived value type). Parse each payload before insert. If keys are not free-form, use a named object type instead of a dictionary.',
+        avoid:
+          'Do not switch `unknown` to `any` or `object`. Do not add `as NamedType` at each read. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

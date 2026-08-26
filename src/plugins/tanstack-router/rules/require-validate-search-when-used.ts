@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -50,8 +51,13 @@ export const requireValidateSearchWhenUsed: CreateOnceRule = defineBellonaRule({
         'Require `validateSearch` when this route reads search via `loaderDeps`, `beforeLoad`, or `useSearch`',
     },
     messages: {
-      missingValidateSearch:
-        'Add `validateSearch` on this route. Search params are raw URL text until the route parses them.',
+      missingValidateSearch: agentDiagnostic({
+        problem:
+          'This route uses search params but has no `validateSearch`. Search is raw URL text until the route parses it.',
+        why: 'Without `validateSearch`, `search` is untyped and unparsed. Loaders and components then guess.',
+        fix: 'Add `validateSearch` (Zod / Effect Schema / a parse function) on this `createFileRoute` / `createRoute` options object. Then map fields through `loaderDeps` if the loader needs them.',
+        avoid: 'Do not type-assert `search`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

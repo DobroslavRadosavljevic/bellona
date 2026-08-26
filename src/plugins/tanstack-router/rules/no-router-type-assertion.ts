@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -34,10 +35,19 @@ export const noRouterTypeAssertion: CreateOnceRule = defineBellonaRule({
       description: 'Disallow type assertions and annotations that bypass TanStack Router inference',
     },
     messages: {
-      assertedToFrom:
-        'Do not type-assert `to` / `from`. Use a string-literal route path or typed `linkOptions`.',
-      assertedHook:
-        'Do not annotate or cast TanStack Router hook results. Let inference flow from `from` / the route API.',
+      assertedToFrom: agentDiagnostic({
+        problem: '`to` or `from` is type-asserted (`as "/posts"`, angle-bracket, or similar).',
+        why: 'An assertion forges a route id. The compiler no longer checks that the path exists or that params match.',
+        fix: 'Write a string-literal path (`to: "/posts/$postId"`) or build a typed `linkOptions({ to: "/…", params })` object and pass that. Remove the assertion.',
+        avoid: 'Do not assert `as any` / `as never`. Do not disable the rule.',
+      }),
+      assertedHook: agentDiagnostic({
+        problem:
+          'A TanStack Router hook result is annotated or cast (`const x: T = useLoaderData(...)` or `as T`).',
+        why: 'Hook types must flow from `from` / the route API. A cast hides a missing `from` or a wrong route id.',
+        fix: 'Pass `{ from: "/literal/path" }` (or `{ strict: false }` for shared UI) and let inference work. Remove the annotation/cast.',
+        avoid: 'Do not add `getRouteApi` to recover types. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

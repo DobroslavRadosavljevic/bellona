@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -35,8 +36,14 @@ export const noRelativeRouterToWithoutFrom: CreateOnceRule = defineBellonaRule({
       description: 'Require `from` when TanStack Router `to` is a relative path',
     },
     messages: {
-      missingFrom:
-        'Relative `to` requires `from` (e.g. `from={Route.fullPath}` or `useNavigate({ from })`) so resolution and types stay correct.',
+      missingFrom: agentDiagnostic({
+        problem:
+          '`to` is relative (`./`, `../`, or empty) and there is no `from`. Relative targets need an origin route.',
+        why: 'Without `from`, the router cannot resolve the path or infer types for relative navigation.',
+        fix: 'Add `from={Route.fullPath}` on the `Link` / options, or `useNavigate({ from: "/posts" })` / `navigate({ from, to: "./edit" })`. Prefer a full literal `to: "/posts/$postId"` when you can.',
+        avoid:
+          'Do not convert the relative path to a guessed absolute string. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

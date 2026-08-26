@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { enclosingFunction } from '../ast.ts';
 import {
@@ -18,7 +19,13 @@ export const noThrowInEffectGen: CreateOnceRule = defineBellonaRule({
       description: 'Disallow throw inside Effect.gen and Effect.fn generators',
     },
     messages: {
-      throwStmt: 'Use return yield* Effect.fail(...) or a Schema.TaggedError instead of throw.',
+      throwStmt: agentDiagnostic({
+        problem:
+          'This `Effect.gen` / `Effect.fn` generator uses `throw`. Failures belong in the Effect error channel.',
+        why: '`throw` becomes a defect, not typed `E`. Callers cannot `catchTag`.',
+        fix: 'Write `return yield* Effect.fail(...)` or `return yield* new Schema.TaggedError(...)`. Use `return yield*` so TypeScript narrows the rest of the generator.',
+        avoid: 'Do not wrap `throw` in `try/catch` (also banned). Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

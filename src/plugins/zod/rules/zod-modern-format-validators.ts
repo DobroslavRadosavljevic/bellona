@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, isZStringSchemaExpression, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipZodFile } from '../options.ts';
@@ -84,7 +85,14 @@ export const zodModernFormatValidators: CreateOnceRule = defineBellonaRule({
         'Prefer Zod 4 top-level format factories over deprecated z.string() format methods',
     },
     messages: {
-      preferTopLevel: 'Use {{replacement}} instead of z.string().{{method}}().',
+      preferTopLevel: agentDiagnostic({
+        problem:
+          'This uses deprecated Zod 3 string format chaining: `z.string().{{method}}()`. Zod 4 exposes top-level factories.',
+        why: 'The chained methods are deprecated. Top-level factories (`z.email()`, `z.iso.datetime()`, …) are the v4 contract.',
+        fix: 'Replace `z.string().{{method}}()` with `{{replacement}}`. Keep other refinements on the result if needed.',
+        avoid:
+          'Do not keep `z.string()` and add `.{{method}}()` again. Do not wrap in `z.string().pipe(...)`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

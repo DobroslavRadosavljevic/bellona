@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 function referencedAliasName(type: ESTree.TSType): string | null {
@@ -24,8 +25,14 @@ export const noUnknownTypeAliases: CreateOnceRule = defineBellonaRule({
         'Disallow type aliases whose resolved type is unknown; unknown must remain visible at an allowed boundary.',
     },
     messages: {
-      unknownAlias:
-        'Type alias `{{alias}}` hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.',
+      unknownAlias: agentDiagnostic({
+        problem:
+          'Type alias `{{alias}}` is `unknown`, or it resolves to `unknown` through other aliases in this file (`type Foo = unknown` or `type Foo = Bar` where `Bar` is unknown).',
+        why: 'The alias hides that the value is still unparsed. Callers treat `{{alias}}` as a domain type when it is still the top type.',
+        fix: 'Keep `unknown` visible only at the parse boundary (the function that decodes I/O). After parse, use the named owner type. `cause` on errors may stay `unknown`.',
+        avoid:
+          'Do not rename `unknown` to `Json`, `Payload`, or `Data` without a schema. Do not use `any`. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

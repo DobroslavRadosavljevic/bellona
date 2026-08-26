@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
 import {
@@ -32,7 +33,14 @@ export const noRunPromiseInModules: CreateOnceRule = defineBellonaRule({
         'Keep Effect.runPromise / runSync / runFork at process entry files, not in library modules',
     },
     messages: {
-      run: 'Run effects at the process edge (NodeRuntime.runMain, BunRuntime.runMain, Layer.launch, or ManagedRuntime).',
+      run: agentDiagnostic({
+        problem:
+          'This module calls `Effect.runPromise` / `runSync` / `runFork` / `runCallback` (or `*With` / `*Exit` variants). That is a process edge, not a feature module.',
+        why: 'Running inside a module hides the runtime and makes tests and layers optional. Effects should return `Effect` until `main`.',
+        fix: 'Return the `Effect` from this function. Run it only in an entry file (`main.ts` / `runtime.ts` by default) with `NodeRuntime.runMain`, `BunRuntime.runMain`, `Layer.launch`, or `ManagedRuntime`. Add a path to `{ entry }` or `{ allow }` if this file is a true edge.',
+        avoid:
+          'Do not wrap `runPromise` in a helper named `run`. Do not disable the rule to “just execute it”.',
+      }),
     },
     schema: [ENTRY_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ENTRY_OPTIONS,

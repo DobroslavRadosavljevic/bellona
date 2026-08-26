@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   collectEffectBindings,
@@ -24,7 +25,13 @@ export const requireServiceIdPath: CreateOnceRule = defineBellonaRule({
       description: 'Require Context.Service identifiers to look like pkg/dir/Name',
     },
     messages: {
-      path: 'Use a service id like "myapp/db/Database", not "{{id}}".',
+      path: agentDiagnostic({
+        problem:
+          'This `Context.Service` id is `"{{id}}"`. It must look like `"pkg/dir/Name"` (two or more non-empty `/` segments), not a single token like `"Database"`.',
+        why: 'Service ids are unique keys in the context. A short name collides across packages.',
+        fix: 'Use a path id: `Context.Service<Database, { … }>()("myapp/db/Database", { … })`.',
+        avoid: 'Do not use `"Database"` or a UUID. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

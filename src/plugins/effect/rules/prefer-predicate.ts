@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import {
   ALLOW_OPTION_SCHEMA,
@@ -47,7 +48,13 @@ export const preferPredicate: CreateOnceRule = defineBellonaRule({
         'Use Predicate.isString / isObject / isNumber instead of local type-guard helpers',
     },
     messages: {
-      predicate: 'Use Predicate.{{name}} instead of a local {{name}} helper.',
+      predicate: agentDiagnostic({
+        problem:
+          'This file defines a local `{{name}}` helper (`isString` / `isObject` / `isNullish` / …). Effect already exports `Predicate.{{name}}`.',
+        why: 'Local type guards duplicate `effect/Predicate` and often use `typeof` (also banned).',
+        fix: 'Import `{ Predicate }` from `effect/Predicate` (or the namespace you already use) and call `Predicate.{{name}}`. Delete the local helper.',
+        avoid: 'Do not rename the helper to `checkString`. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
 
@@ -34,8 +35,14 @@ export const noUnknownReturns: CreateOnceRule = defineBellonaRule({
         'Disallow functions whose explicit return contract is unknown or Promise<unknown>.',
     },
     messages: {
-      unknownReturn:
-        'This function exposes `unknown` to its caller. Parse the value at its boundary and return a named domain type.',
+      unknownReturn: agentDiagnostic({
+        problem:
+          'This function (or signature) declares a return type of `unknown` or `Promise<unknown>`.',
+        why: 'The caller then receives unparsed data and must guess or assert. The parse belongs at the boundary that produced the value, not in every consumer.',
+        fix: 'Parse before returning, then declare a named domain type (`User`, `LoadResult`, …). For async work, return `Promise<NamedType>` after parse.',
+        avoid:
+          'Do not return `any`, `object`, or `Record<string, unknown>` as a substitute. Do not keep `unknown` and add `as NamedType` at each call site. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

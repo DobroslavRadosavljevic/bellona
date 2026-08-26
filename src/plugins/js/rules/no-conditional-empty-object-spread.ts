@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 function unwrapParentheses(node: ESTree.Expression): ESTree.Expression {
@@ -35,8 +36,14 @@ export const noConditionalEmptyObjectSpread: CreateOnceRule = defineBellonaRule(
         'Disallow object spreads that conditionally spread an empty object to omit fields.',
     },
     messages: {
-      avoid:
-        'This conditional spread hides property omission behind an empty object. Build the object in separate statements and add the property only when present.',
+      avoid: agentDiagnostic({
+        problem:
+          'This object spread uses a condition that yields `{}` (`{ ...cond && {} }` or `{ ...(cond ? extra : {}) }`). An empty object is spread only to omit fields.',
+        why: 'The empty object hides whether a property exists. Readers and types cannot see the real object shape.',
+        fix: 'Build the object with statements. Start with the required fields, then assign extra fields only when the condition is true. Example: `const out = { a }; if (cond) out.b = value; return out`.',
+        avoid:
+          'Do not replace `{}` with `Object.create(null)`, a dummy property, or `as const`. Do not keep the spread and add a comment. Do not disable the rule.',
+      }),
     },
   },
   createOnce(context) {

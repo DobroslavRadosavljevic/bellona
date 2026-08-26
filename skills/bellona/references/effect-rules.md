@@ -10,6 +10,8 @@ Plugin name: `bl-effect`. Ids: `bl-effect/<slug>`. Target **Effect v4** (`effect
 
 Bindings follow namespace and named imports (`Effect.fn` and `import { fn } from 'effect/Effect'`). See [how-it-works.md](how-it-works.md).
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## v3 → v4
 
 ### `bl-effect/no-v3-imports`

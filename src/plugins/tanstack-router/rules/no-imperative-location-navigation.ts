@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapAssignmentTarget, unwrapExpression } from '../ast.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
@@ -45,8 +46,13 @@ export const noImperativeLocationNavigation: CreateOnceRule = defineBellonaRule(
       description: 'Disallow imperative location/history navigation when using TanStack Router',
     },
     messages: {
-      imperative:
-        'Do not use `location` / `history` for in-app navigation. Prefer `Link`, `navigate`, `redirect`, or `router.navigate({ to, params })`.',
+      imperative: agentDiagnostic({
+        problem:
+          'This in-app navigation uses `location` / `history` (`assign`, `replace`, `push`, and similar) while the file imports TanStack Router.',
+        why: 'Imperative browser APIs skip typed `to` / `params` / `search` and can drop router state.',
+        fix: 'Use `<Link to="…" params={…} />`, `navigate({ to, params })`, `throw redirect({ to })`, or `router.navigate({ to, params })` with literal paths.',
+        avoid: 'Do not use `window.location.href = …` as a substitute. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

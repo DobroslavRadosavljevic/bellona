@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isElysiaRouteMethodCall } from '../elysia.ts';
 import {
@@ -44,8 +45,13 @@ export const oneRouteMethodPerFile: CreateOnceRule = defineBellonaRule({
       description: 'Allow at most one Elysia route method (.get/.post/…) per routes leaf file',
     },
     messages: {
-      extraRoute:
-        'Routes leaf files may declare only one Elysia route method. Split extra verbs into separate files, or mount them from `routes/index.ts`.',
+      extraRoute: agentDiagnostic({
+        problem:
+          'This routes leaf file (path contains `/routes/` and is not `index.*`) declares more than one Elysia route method (`.get` / `.post` / …).',
+        why: 'Leaf files are one verb each so schemas, names, and tests stay 1:1 with a route.',
+        fix: 'Move extra verbs into their own leaf files. Mount all of them from `routes/index.ts` with `.use` / `.as` only.',
+        avoid: 'Do not chain `.get().post()` in one leaf. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

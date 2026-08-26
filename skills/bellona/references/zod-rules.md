@@ -4,6 +4,8 @@ Plugin name: `bl-zod`. Ids: `bl-zod/<slug>`.
 
 **Skip:** files that do not import `zod` or `zod/…`, test/spec/stories files, and `allow` matches.
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## `bl-zod/modern-format-validators`
 
 Prefer Zod 4 **top-level** format factories over deprecated `z.string().email()` (and friends).

@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { objectOptionAt, stringListField } from '../../../lib/options.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { isExportedNode } from '../elysia.ts';
@@ -105,8 +106,14 @@ export const noRouteFactory: CreateOnceRule = defineBellonaRule({
         'Disallow exported make/create Route/Handler/Http factory helpers in modules/routes',
     },
     messages: {
-      factory:
-        'Do not export route/HTTP factory `{{name}}`. Declare one Elysia route plugin per file instead of shared factories or HTTP mappers.',
+      factory: agentDiagnostic({
+        problem:
+          'This file under `/modules/` or `/routes/` exports a route/HTTP factory named `{{name}}` (default patterns: `make*Route` / `create*Handler` / `RouteFactory` / `HttpMapper`).',
+        why: 'Factories hide the one-route-per-file layout. Callers then compose HTTP in the wrong layer.',
+        fix: 'Replace the factory with one Elysia route plugin file (`export const featureActionRoute = new Elysia({ name: "FEATURE_ACTION_ROUTE" }).get(…)`). Mount it from `routes/index.ts` with `.use`.',
+        avoid:
+          'Do not rename the factory to dodge the regex. Do not disable the rule. Tune `{ patterns }` only for true exceptions.',
+      }),
     },
     schema: [
       {

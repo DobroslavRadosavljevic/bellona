@@ -1,5 +1,6 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallArgument } from '../ast.ts';
 import {
@@ -33,7 +34,13 @@ export const preferDecodeUnknownEffect: CreateOnceRule = defineBellonaRule({
         'Use Schema.decodeUnknownEffect / decodeEffect instead of v3 Effect decoder names',
     },
     messages: {
-      decoder: 'Use {{replacement}} instead of Schema.{{name}}.',
+      decoder: agentDiagnostic({
+        problem:
+          'This calls `Schema.{{name}}`. Effect v4 renamed decode/encode helpers to `*Effect` / `*Exit`.',
+        why: 'The old names are v3. The v4 names make the Effect/Exit channel obvious.',
+        fix: 'Replace `Schema.{{name}}` with `{{replacement}}`. Object-form `Schema.decode({ … })` transforms are not this rule.',
+        avoid: 'Do not keep the old name behind an alias. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

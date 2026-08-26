@@ -6,6 +6,8 @@ Plugin name: `bl-tanstack-router`. Ids: `bl-tanstack-router/<slug>`.
 
 Shared intent: keep `to` / `from` / `params` / `search` as string literals so the router can infer types. Do not bypass inference with assertions, `getRouteApi`, or `Route.useX()`.
 
+Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
+
 ## `bl-tanstack-router/create-route-property-order`
 
 `createRoute` / `createRootRoute` / `createFileRoute` / `createRootRouteWithContext` option keys must follow inference order:

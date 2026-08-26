@@ -1,18 +1,20 @@
 ---
 name: bellona
 description: >-
-  Install, configure, and enable bellona Oxlint JS plugins (bellona/js, bellona/react,
+  Install, configure, and enable bellona 0.4.0 Oxlint JS plugins (bellona/js, bellona/react,
   bellona/base-ui, bellona/zod, bellona/tanstack-router, bellona/elysia, bellona/effect,
-  bellona/tailwind).
-  Use when adding oxlint.config.ts jsPlugins, turning on bl-* rules, debugging bellona
-  lint, writing a new bellona rule with defineBellonaRule and createOnce, pinning oxlint
+  bellona/tailwind). Follow Problem / Why / Fix / Avoid diagnostics. Use when adding
+  oxlint.config.ts jsPlugins, turning on bl-* rules, debugging bellona lint, writing a
+  new bellona rule with defineBellonaRule, createOnce, and agentDiagnostic, pinning oxlint
   for JS plugins, or when the user mentions bellona, Oxlint JS plugins, bl-js/max-classes,
-  bl-effect/prefer-fn, bl-react/no-native-html, or opt-in Oxlint plugins.
+  bl-js/no-useless-reexport, bl-js/no-inline-import-type, bl-react/component-props-type,
+  bl-effect/prefer-fn, bl-react/no-native-html, bl-tailwind/no-classname-constants, or
+  opt-in Oxlint plugins.
 ---
 
 # Bellona
 
-Bellona is a set of **opt-in Oxlint JS plugins**. Install the package, load only the subpaths you need, then turn rules on by id. **Nothing is enabled by default.** There is no recommended config.
+Bellona is a set of **opt-in Oxlint JS plugins** (this skill matches **bellona 0.4.0**: 8 plugins, 87 rules). Install the package, load only the subpaths you need, then turn rules on by id. **Nothing is enabled by default.** There is no recommended config.
 
 JS plugins are **alpha** in Oxlint (outside semver). Pin `oxlint` in the consuming app to the same minor as bellona’s peer (`oxlint` ^1.78).
 
@@ -28,7 +30,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
 2. Install and wire plugins using [setup.md](references/setup.md).
 3. Enable rules **explicitly**. Copy ids from the plugin catalogs below. Do not invent a `bellona/recommended` preset.
 4. Match skip behavior and options in the catalog for that plugin. Shared `allow` / test-file rules live in [how-it-works.md](references/how-it-works.md).
-5. For a diagnostic: read the rule entry, apply the “prefer” snippet, then re-run the narrowest `oxlint` path.
+5. For a diagnostic: read the four lines (**Problem**, **Why**, **Fix**, **Avoid**). Apply **Fix**. Obey **Avoid**. Then re-run the narrowest `oxlint` path. Use the catalog only if the report is incomplete.
 6. When changing the bellona **package** (new plugin or rule), follow [authoring.md](references/authoring.md). Do not treat that path as consumer work.
 
 ## Core judgment
@@ -36,6 +38,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
 - Subpath import = plugin load. Rule id = `bl-<plugin>/<slug>` (example: `bl-js/max-classes`). Plugin `meta.name` is unique: `bl-js`, `bl-react`, `bl-base-ui`, `bl-zod`, `bl-tanstack-router`, `bl-elysia`, `bl-effect`, `bl-tailwind`.
 - The root `bellona` entry is a **specifier catalog only** (`plugins.js`, `plugins.react`, …). Consumers put those strings in `jsPlugins`. They do not import a plugin from `bellona`.
 - Rules ship **off**. Loading a plugin does not lint until you set the rule in `rules`.
+- Each report is four lines: **Problem**, **Why**, **Fix**, **Avoid**. Do the **Fix**. Do not add `oxlint-disable` unless the file is generated or listed in `allow`.
 - Prefer `schema` + `defaultOptions`. Options are a single object at index `0`.
 - `allow` is a list of path substrings (and basename matches when the entry contains `.`). It skips the file. It is not a per-symbol allowlist.
 - Domain plugins (react / zod / tanstack-router / elysia / most effect style rules) also skip test/spec/stories files. See each catalog.
@@ -47,7 +50,7 @@ Use this skill when the work is: install/config, enable/tune `bl-<plugin>/*` rul
 
 | Subpath | `meta.name` | Enable when the app uses | Catalog |
 | --- | --- | --- | --- |
-| `bellona/js` | `bl-js` | TS/JS evidence, mocks, class count | [js-rules.md](references/js-rules.md) |
+| `bellona/js` | `bl-js` | TS/JS evidence, mocks, re-exports, class count | [js-rules.md](references/js-rules.md) |
 | `bellona/react` | `bl-react` | React components/hooks/JSX | [react-rules.md](references/react-rules.md) |
 | `bellona/base-ui` | `bl-base-ui` | Base UI `nativeButton` + `render` | [base-ui-rules.md](references/base-ui-rules.md) |
 | `bellona/zod` | `bl-zod` | Zod 4 schemas | [zod-rules.md](references/zod-rules.md) |
@@ -73,6 +76,10 @@ export default defineConfig({
 ```
 
 Full install, `allow` examples, disable comments, and an “enable many rules” paste: [setup.md](references/setup.md).
+
+## Diagnostics
+
+Each lint report has four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**. Obey **Avoid**. Do not disable the rule for convenience. Details: [setup.md](references/setup.md#diagnostics).
 
 ## How it works (short)
 

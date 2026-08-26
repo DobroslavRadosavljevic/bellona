@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getExportedExpressionName, unwrapComponentInit } from '../ast.ts';
 import { basenameWithoutExtension, isPrimaryComponentName, kebabToPascal } from '../filename.ts';
@@ -15,7 +16,14 @@ export const componentFileNameMatch: CreateOnceRule = defineBellonaRule({
       description: 'Require the primary exported component name to match the file basename',
     },
     messages: {
-      mismatch: 'Primary component export should match the file basename: {{expected}}.',
+      mismatch: agentDiagnostic({
+        problem:
+          'The primary exported React component name does not match this file basename. Expected `{{expected}}` (basename converted to PascalCase, e.g. `user-card.tsx` → `UserCard`). Helpers named `*Impl` / `*Provider` / `*Context` are not primary.',
+        why: 'A mismatched name hides the component. Imports and file search then disagree.',
+        fix: 'Rename the primary component to `{{expected}}`, or rename the file so its basename (kebab-case) maps to the component name. Keep one primary component in this file.',
+        avoid:
+          'Do not add a re-export alias in another file as the only fix. Do not rename only the default export while leaving a different named export. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,

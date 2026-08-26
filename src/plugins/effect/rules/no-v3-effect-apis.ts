@@ -1,6 +1,7 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
+import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import { collectEffectBindings, isModuleMember, type EffectBindings } from '../bindings.ts';
@@ -77,7 +78,13 @@ export const noV3EffectApis: CreateOnceRule = defineBellonaRule({
       description: 'Disallow Effect v3 combinators that were renamed or removed in Effect v4',
     },
     messages: {
-      renamed: 'Use {{replacement}} instead of {{api}}.',
+      renamed: agentDiagnostic({
+        problem:
+          '`{{api}}` is an Effect v3 API. The v4 replacement is `{{replacement}}` (`removed` means the API is gone).',
+        why: 'v3 names do not exist or mean something else on Effect v4 (`effect@rc`). Mixing them breaks types and runtime.',
+        fix: 'Replace `{{api}}` with `{{replacement}}`. If replacement is `removed` / `removed (typed defects only)`, delete the call and use typed `Effect.fail` / `catch` / `forkChild` as documented in bellona Effect rules.',
+        avoid: 'Do not keep the v3 name behind a local alias. Do not disable the rule.',
+      }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
     defaultOptions: DEFAULT_ALLOW_OPTIONS,
