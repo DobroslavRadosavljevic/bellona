@@ -106,6 +106,18 @@ function propsTypeNameFromWrapper(call: ESTree.CallExpression): string | undefin
   return second === undefined ? undefined : typeReferenceName(second);
 }
 
+function hasWrapperPropsTypeArgument(init: ESTree.Expression | undefined): boolean {
+  let current = unwrapExpression(init);
+  while (current?.type === 'CallExpression' && isComponentWrapperCall(current)) {
+    if (current.typeArguments?.params[1] !== undefined) {
+      return true;
+    }
+    const nextArgument = current.arguments.find((argument) => argument.type !== 'SpreadElement');
+    current = nextArgument === undefined ? undefined : unwrapExpression(nextArgument);
+  }
+  return false;
+}
+
 function propsTypeNameFromInit(init: ESTree.Expression | undefined): string | undefined {
   let current = unwrapExpression(init);
   while (current?.type === 'CallExpression' && isComponentWrapperCall(current)) {
@@ -117,6 +129,22 @@ function propsTypeNameFromInit(init: ESTree.Expression | undefined): string | un
     current = nextArgument === undefined ? undefined : unwrapExpression(nextArgument);
   }
   return undefined;
+}
+
+function hasPropsTypeAttempt(
+  fn: ESTree.Function | ESTree.ArrowFunctionExpression,
+  init: ESTree.Expression | undefined,
+  variableAnnotation: ESTree.TSType | undefined,
+): boolean {
+  if (variableAnnotation !== undefined) {
+    return true;
+  }
+  const [first] = fn.params;
+  const annotation = first === undefined ? undefined : parameterAnnotation(first);
+  if (annotation !== undefined && annotation !== null) {
+    return true;
+  }
+  return hasWrapperPropsTypeArgument(init);
 }
 
 function isEmptyType(type: ESTree.TSType): boolean {
@@ -136,14 +164,15 @@ export const componentPropsType: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Require each primary component to use a non-empty same-file `{Name}Props` type',
+      description:
+        'When a primary component types its props, require a non-empty same-file `{Name}Props` type',
     },
     messages: {
       missing: agentDiagnostic({
         problem:
-          'Primary component `{{name}}` has no props parameter typed as `{{expected}}` (`{Component}Props` in the same file).',
-        why: 'Props types must be named after the component and live next to it so the contract is local and searchable.',
-        fix: 'Declare `type {{expected}} = { … }` in this file with at least one member. Give `{{name}}` a parameter typed `{{expected}}` (or a single props object of that type).',
+          'Primary component `{{name}}` types its props, but the type is not `{{expected}}` (`{Component}Props` in the same file).',
+        why: 'When a component has a props type, that type must be named after the component and live next to it so the contract is local and searchable.',
+        fix: 'Declare `type {{expected}} = { … }` in this file with at least one member. Give `{{name}}` a parameter typed `{{expected}}` (or a single props object of that type). If the component has no props, omit the parameter and any props type.',
         avoid:
           'Do not import `{{expected}}` from another file. Do not use an inline object type on the parameter. Do not use `{}` or an empty interface. Do not disable the rule.',
       }),
@@ -165,7 +194,7 @@ export const componentPropsType: CreateOnceRule = defineBellonaRule({
       empty: agentDiagnostic({
         problem: 'Props type `{{expected}}` is empty (`{}` or an interface with no members).',
         why: 'An empty props type is not a contract. Either the component needs no props (then it should not claim a props type with no fields) or fields are missing.',
-        fix: 'Add the real props fields to `{{expected}}`. If the component has no props, this rule still requires a non-empty `{Name}Props` for primary components — give it the fields the UI actually reads, or split a no-props leaf only if it is not a primary component (`*Impl` / `*Provider` / `*Context`).',
+        fix: 'Add the real props fields to `{{expected}}`. If the component has no props, remove the empty type and the props parameter.',
         avoid: 'Do not add a dummy `_unused: never` field. Do not disable the rule.',
       }),
       extraType: agentDiagnostic({
@@ -201,6 +230,9 @@ export const componentPropsType: CreateOnceRule = defineBellonaRule({
       variableAnnotation: ESTree.TSType | undefined,
     ) => {
       if (name === undefined || !isPrimaryComponentName(name)) {
+        return;
+      }
+      if (!hasPropsTypeAttempt(fn, init, variableAnnotation)) {
         return;
       }
       primaryNames.add(name);

@@ -16,11 +16,13 @@ Skip: tests, `allow`, non-JSX files.
 
 ## `bl-react/component-props-type`
 
-Each primary component must take a props type named `{Component}Props` (example: `MetricCard` → `MetricCardProps`).
+When a primary component types its props, that type must be named `{Component}Props` (example: `MetricCard` → `MetricCardProps`).
+
+Skip components with no props parameter and no props type (they do not need `{Name}Props`).
 
 The type must live in the same file. Do not import it. The type must not be empty (`{}` or an empty interface).
 
-The file may declare only that `*Props` type besides the component. Extra aliases and interfaces fail.
+The file may declare only that `*Props` type besides the component. Extra aliases and interfaces fail when the component types its props.
 
 Skip: tests, `allow`, non-`.tsx` files. Helpers named `*Impl` / `*Provider` / `*Context` are not primary.
 

@@ -44,6 +44,13 @@ runReactRule(componentPropsTypeName, {
       'type MetricCardProps = { title: string };\nfunction MetricCard(props: MetricCardProps) { return null; }\nfunction MetricCardProvider() { return null; }',
       { filename: 'metric-card.tsx' },
     ),
+    validWith('function MetricCard() { return null; }', { filename: 'metric-card.tsx' }),
+    validWith('const MetricCard = () => null;', { filename: 'metric-card.tsx' }),
+    validWith('const MetricCard = memo(() => null);', { filename: 'metric-card.tsx' }),
+    validWith('function MetricCard(props) { return null; }', { filename: 'metric-card.tsx' }),
+    validWith('type Title = string;\nfunction MetricCard() { return null; }', {
+      filename: 'metric-card.tsx',
+    }),
     validWith('function MetricCard() { return null; }', { filename: 'metric-card.jsx' }),
     validWith('function MetricCard() { return null; }', { filename: 'metric-card.test.tsx' }),
     validWith('function MetricCard() { return null; }', {
@@ -55,7 +62,7 @@ runReactRule(componentPropsTypeName, {
   invalid: [
     invalidWith({
       filename: 'metric-card.tsx',
-      code: 'function MetricCard() { return null; }',
+      code: 'const MetricCard: FC = () => null;',
       errors: [error('missing')],
     }),
     invalidWith({
@@ -90,7 +97,7 @@ runReactRule(componentPropsTypeName, {
     }),
     invalidWith({
       filename: 'metric-card.tsx',
-      code: 'const MetricCard = () => null;',
+      code: 'const MetricCard = (props: { title: string }) => null;',
       errors: [error('missing')],
     }),
   ],
