@@ -53,10 +53,15 @@ export function isComponentName(name: string | undefined): boolean {
   return name !== undefined && isPascalCaseName(name);
 }
 
-const COMPONENT_HELPER_SUFFIX_PATTERN = /(?:Impl|Provider|Context)$/u;
+const COMPONENT_HELPER_SUFFIX_PATTERN = /(?:Provider|Context)$/u;
+const IMPL_COMPONENT_SEGMENT_PATTERN = /Impl(?:[A-Z]|$)/u;
 
 export function isPrimaryComponentName(name: string | undefined): boolean {
   return name !== undefined && isComponentName(name) && !COMPONENT_HELPER_SUFFIX_PATTERN.test(name);
+}
+
+export function isImplComponentName(name: string | undefined): boolean {
+  return name !== undefined && isComponentName(name) && IMPL_COMPONENT_SEGMENT_PATTERN.test(name);
 }
 
 export function isHookName(name: string | undefined): boolean {

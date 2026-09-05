@@ -18,7 +18,7 @@ export const componentFileNameMatch: CreateOnceRule = defineBellonaRule({
     messages: {
       mismatch: agentDiagnostic({
         problem:
-          'The primary exported React component name does not match this file basename. Expected `{{expected}}` (basename converted to PascalCase, e.g. `user-card.tsx` → `UserCard`). Helpers named `*Impl` / `*Provider` / `*Context` are not primary.',
+          'The primary exported React component name does not match this file basename. Expected `{{expected}}` (basename converted to PascalCase, e.g. `user-card.tsx` → `UserCard`). Helpers named `*Provider` / `*Context` are not primary. Names that end in `Impl` are primary and are also banned.',
         why: 'A mismatched name hides the component. Imports and file search then disagree.',
         fix: 'Rename the primary component to `{{expected}}`, or rename the file so its basename (kebab-case) maps to the component name. Keep one primary component in this file.',
         avoid:

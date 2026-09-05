@@ -8,6 +8,7 @@ describe('react plugin', () => {
       'component-file-name-match',
       'component-props-type',
       'hook-file-name-match',
+      'no-impl-component-suffix',
       'no-jsx-iife-in-components',
       'no-jsx-local-constants-in-components',
       'no-jsx-module-constants',

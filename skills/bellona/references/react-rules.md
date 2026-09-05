@@ -4,7 +4,7 @@ Plugin name: `bl-react`. Ids: `bl-react/<slug>`.
 
 **Skip:** test/spec/stories files and `allow` matches. JSX-only rules also require `.tsx` / `.jsx`. `component-props-type` requires `.tsx`. Hook filename rules run on `use-*.ts(x)`.
 
-Primary component = PascalCase name that does **not** end in `Impl` / `Provider` / `Context`. Hook = `use` + PascalCase.
+Primary component = PascalCase name that does **not** end in `Provider` / `Context`. Names that end in `Impl` are primary and are banned. Hook = `use` + PascalCase.
 
 Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
 
@@ -24,7 +24,7 @@ The type must live in the same file. Do not import it. The type must not be empt
 
 The file may declare only that `*Props` type besides the component. Extra aliases and interfaces fail when the component types its props.
 
-Skip: tests, `allow`, non-`.tsx` files. Helpers named `*Impl` / `*Provider` / `*Context` are not primary.
+Skip: tests, `allow`, non-`.tsx` files. Helpers named `*Provider` / `*Context` are not primary. `*Impl` is not a helper.
 
 ```tsx
 type MetricCardProps = {
@@ -39,6 +39,12 @@ function MetricCard(props: MetricCardProps) {
 ## `bl-react/hook-file-name-match`
 
 In `use-*.ts(x)` files, the hook declaration must match the basename (`use-local-storage.ts` → `useLocalStorage`).
+
+## `bl-react/no-impl-component-suffix`
+
+Disallow PascalCase component names that contain an `Impl` name segment (`FooImpl`, `FooImplRow`, `FooImplProvider`). `Implementation` does not match.
+
+Prefer: a real name and a file per component.
 
 ## `bl-react/no-jsx-iife-in-components`
 
@@ -66,7 +72,7 @@ Prefer: inline conditionals or a child component.
 
 ## `bl-react/no-multi-component-files`
 
-One **primary** React component per file. Helpers named `*Impl` / `*Provider` / `*Context` are not “primary”.
+One **primary** React component per file. Helpers named `*Provider` / `*Context` are not “primary”. `*Impl` is primary and is also banned by `bl-react/no-impl-component-suffix`.
 
 ## `bl-react/no-multi-hook-files`
 

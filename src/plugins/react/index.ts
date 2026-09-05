@@ -6,6 +6,10 @@ import {
 import { componentPropsType, componentPropsTypeName } from './rules/component-props-type.ts';
 import { hookFileNameMatch, hookFileNameMatchName } from './rules/hook-file-name-match.ts';
 import {
+  noImplComponentSuffix,
+  noImplComponentSuffixName,
+} from './rules/no-impl-component-suffix.ts';
+import {
   noJsxIifeInComponents,
   noJsxIifeInComponentsName,
 } from './rules/no-jsx-iife-in-components.ts';
@@ -34,6 +38,7 @@ const react = defineBellonaPlugin('bl-react', {
   [componentFileNameMatchName]: componentFileNameMatch,
   [componentPropsTypeName]: componentPropsType,
   [hookFileNameMatchName]: hookFileNameMatch,
+  [noImplComponentSuffixName]: noImplComponentSuffix,
   [noJsxIifeInComponentsName]: noJsxIifeInComponents,
   [noJsxLocalConstantsInComponentsName]: noJsxLocalConstantsInComponents,
   [noJsxModuleConstantsName]: noJsxModuleConstants,
@@ -53,6 +58,8 @@ export {
   componentPropsTypeName,
   hookFileNameMatch,
   hookFileNameMatchName,
+  noImplComponentSuffix,
+  noImplComponentSuffixName,
   noJsxIifeInComponents,
   noJsxIifeInComponentsName,
   noJsxLocalConstantsInComponents,

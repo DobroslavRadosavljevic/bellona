@@ -18,11 +18,11 @@ export const noMultiComponentFiles: CreateOnceRule = defineBellonaRule({
     messages: {
       multiple: agentDiagnostic({
         problem:
-          'This file declares more than one primary React component (PascalCase, not ending in `Impl` / `Provider` / `Context`).',
+          'This file declares more than one primary React component (PascalCase, not ending in `Provider` / `Context`).',
         why: 'One primary component per file keeps ownership and file names aligned. Extra primaries become hidden siblings.',
-        fix: 'Move each extra primary component into its own file. You may keep `*Impl` / `*Provider` / `*Context` helpers in this file; they are not primary.',
+        fix: 'Move each extra primary component into its own file. You may keep `*Provider` / `*Context` helpers in this file; they are not primary.',
         avoid:
-          'Do not rename extras to `FooImpl` just to dodge the rule if they are real screens. Do not disable the rule.',
+          'Do not rename extras to `FooImpl` or any other suffix to hide a second component. `Impl` still counts as primary. Do not disable the rule.',
       }),
     },
     schema: [ALLOW_OPTION_SCHEMA],

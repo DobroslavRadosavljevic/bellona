@@ -6,6 +6,7 @@ import {
   isComponentName,
   isHookFile,
   isHookName,
+  isImplComponentName,
   isJsxFilename,
   isTsxFilename,
   isPrimaryComponentName,
@@ -19,10 +20,16 @@ describe('react filename helpers', () => {
     expect(kebabToPascal('user-card')).toBe('UserCard');
   });
 
-  it('treats Impl/Provider/Context as helper components', () => {
+  it('treats Provider/Context as helper components and Impl as banned primary', () => {
     expect(isComponentName('UserCard')).toBe(true);
     expect(isPrimaryComponentName('UserCard')).toBe(true);
+    expect(isPrimaryComponentName('UserCardImpl')).toBe(true);
     expect(isPrimaryComponentName('UserCardProvider')).toBe(false);
+    expect(isPrimaryComponentName('UserCardContext')).toBe(false);
+    expect(isImplComponentName('UserCardImpl')).toBe(true);
+    expect(isImplComponentName('UserCardImplProvider')).toBe(true);
+    expect(isImplComponentName('Implementation')).toBe(false);
+    expect(isImplComponentName('UserCard')).toBe(false);
   });
 
   it('detects hook modules', () => {

@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.1**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.4.2**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 
@@ -208,6 +208,7 @@ rules: {
   'bl-react/component-file-name-match': 'error',
   'bl-react/component-props-type': 'error',
   'bl-react/hook-file-name-match': 'error',
+  'bl-react/no-impl-component-suffix': 'error',
   'bl-react/no-jsx-iife-in-components': 'error',
   'bl-react/no-jsx-local-constants-in-components': 'error',
   'bl-react/no-jsx-module-constants': 'error',

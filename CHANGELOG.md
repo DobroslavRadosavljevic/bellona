@@ -9,6 +9,16 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-05
+
+### Added
+
+- `bl-react/no-impl-component-suffix`: ban PascalCase component names that contain an `Impl` name segment (including nested helpers and `*ImplProvider`).
+
+### Changed
+
+- `bl-react/no-multi-component-files`: `*Impl` counts as a primary component. Only `*Provider` / `*Context` stay as helpers.
+
 ## [0.4.1] - 2026-08-26
 
 ### Changed
@@ -54,7 +64,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.2
 [0.4.1]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.1
 [0.4.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.0
 [0.3.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.3.0
