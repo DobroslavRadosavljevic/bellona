@@ -147,16 +147,21 @@ Test and spec files are skipped.
 Test and spec files are skipped.
 
 - `bl-tanstack-router/create-route-property-order`
+- `bl-tanstack-router/no-control-flow-outside-edge`
 - `bl-tanstack-router/no-dynamic-to`
 - `bl-tanstack-router/no-get-route-api`
 - `bl-tanstack-router/no-hooks-in-route-lifecycle`
 - `bl-tanstack-router/no-imperative-location-navigation`
+- `bl-tanstack-router/no-loader-data-in-not-found`
+- `bl-tanstack-router/no-not-found-in-component`
+- `bl-tanstack-router/no-not-found-route`
 - `bl-tanstack-router/no-relative-to-without-from`
 - `bl-tanstack-router/no-href`
 - `bl-tanstack-router/no-type-assertion`
 - `bl-tanstack-router/no-search-in-loader`
 - `bl-tanstack-router/require-params-with-path-tokens`
 - `bl-tanstack-router/require-hook-from`
+- `bl-tanstack-router/require-inline-route-options`
 - `bl-tanstack-router/require-throw-not-found`
 - `bl-tanstack-router/require-throw-redirect`
 - `bl-tanstack-router/require-validate-search-when-used`

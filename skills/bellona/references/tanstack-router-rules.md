@@ -8,6 +8,22 @@ Shared intent: keep `to` / `from` / `params` / `search` as string literals so th
 
 Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
 
+## `bl-tanstack-router/no-control-flow-outside-edge`
+
+`notFound()` and `redirect()` belong in a route module (`createFileRoute` / `createRoute` / `createRootRoute*`) or a `createServerFn` handler. Do not throw them from `lib/` helpers.
+
+## `bl-tanstack-router/no-not-found-in-component`
+
+Do not call `notFound()` inside `component`, `pendingComponent`, `errorComponent`, or `notFoundComponent`. Throw it in `loader` or `beforeLoad`.
+
+## `bl-tanstack-router/no-loader-data-in-not-found`
+
+Do not call `useLoaderData` (or `Route.useLoaderData()`) inside `notFoundComponent`. Use `useParams` / `useSearch` / `useRouteContext`, or `notFound({ data })`.
+
+## `bl-tanstack-router/no-not-found-route`
+
+Do not use deprecated `NotFoundRoute` or `createRouter({ notFoundRoute })`. Use `notFoundComponent` on the root route, or `defaultNotFoundComponent` on `createRouter`.
+
 ## `bl-tanstack-router/create-route-property-order`
 
 `createRoute` / `createRootRoute` / `createFileRoute` / `createRootRouteWithContext` option keys must follow inference order:
@@ -60,6 +76,16 @@ Prefer: string-literal paths or `linkOptions(...)`; let inference flow.
 ## `bl-tanstack-router/no-search-in-loader`
 
 Do not read `search` inside `loader`. Declare `validateSearch`, map fields in `loaderDeps`, read `deps` in the loader.
+
+## `bl-tanstack-router/require-inline-route-options`
+
+`createFileRoute` / `createRoute` / `createRootRoute` / `createLazyFileRoute` / `createLazyRoute` must take an inline options object. Do not pass a helper (`legalRoute("…")`), a shared variable, or `{ ...helper() }`.
+
+```tsx
+export const Route = createFileRoute('/{-$locale}/accessibility/')({
+  component: AccessibilityPage,
+})
+```
 
 ## `bl-tanstack-router/require-params-with-path-tokens`
 

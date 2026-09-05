@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.2**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.4.3**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 
@@ -225,16 +225,21 @@ rules: {
   'bl-zod/schema-naming': 'error',
   // tanstack-router
   'bl-tanstack-router/create-route-property-order': 'error',
+  'bl-tanstack-router/no-control-flow-outside-edge': 'error',
   'bl-tanstack-router/no-dynamic-to': 'error',
   'bl-tanstack-router/no-get-route-api': 'error',
   'bl-tanstack-router/no-hooks-in-route-lifecycle': 'error',
   'bl-tanstack-router/no-imperative-location-navigation': 'error',
+  'bl-tanstack-router/no-loader-data-in-not-found': 'error',
+  'bl-tanstack-router/no-not-found-in-component': 'error',
+  'bl-tanstack-router/no-not-found-route': 'error',
   'bl-tanstack-router/no-relative-to-without-from': 'error',
   'bl-tanstack-router/no-href': 'error',
   'bl-tanstack-router/no-type-assertion': 'error',
   'bl-tanstack-router/no-search-in-loader': 'error',
   'bl-tanstack-router/require-params-with-path-tokens': 'error',
   'bl-tanstack-router/require-hook-from': 'error',
+  'bl-tanstack-router/require-inline-route-options': 'error',
   'bl-tanstack-router/require-throw-not-found': 'error',
   'bl-tanstack-router/require-throw-redirect': 'error',
   'bl-tanstack-router/require-validate-search-when-used': 'error',

@@ -134,8 +134,8 @@ Generated: `dist/` — do not edit.
 | react | 12 |
 | base-ui | 1 |
 | zod | 2 |
-| tanstack-router | 14 |
+| tanstack-router | 19 |
 | elysia | 15 |
 | effect | 25 |
 | tailwind | 1 |
-| **total** | **88** |
+| **total** | **93** |

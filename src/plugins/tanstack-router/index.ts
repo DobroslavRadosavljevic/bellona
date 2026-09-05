@@ -3,6 +3,10 @@ import {
   createRoutePropertyOrder,
   createRoutePropertyOrderName,
 } from './rules/create-route-property-order.ts';
+import {
+  noControlFlowOutsideEdge,
+  noControlFlowOutsideEdgeName,
+} from './rules/no-control-flow-outside-edge.ts';
 import { noDynamicRouterTo, noDynamicRouterToName } from './rules/no-dynamic-router-to.ts';
 import { noGetRouteApi, noGetRouteApiName } from './rules/no-get-route-api.ts';
 import {
@@ -14,6 +18,15 @@ import {
   noImperativeLocationNavigationName,
 } from './rules/no-imperative-location-navigation.ts';
 import {
+  noLoaderDataInNotFound,
+  noLoaderDataInNotFoundName,
+} from './rules/no-loader-data-in-not-found.ts';
+import {
+  noNotFoundInComponent,
+  noNotFoundInComponentName,
+} from './rules/no-not-found-in-component.ts';
+import { noNotFoundRoute, noNotFoundRouteName } from './rules/no-not-found-route.ts';
+import {
   noRelativeRouterToWithoutFrom,
   noRelativeRouterToWithoutFromName,
 } from './rules/no-relative-router-to-without-from.ts';
@@ -23,6 +36,10 @@ import {
   noRouterTypeAssertionName,
 } from './rules/no-router-type-assertion.ts';
 import { noSearchInLoader, noSearchInLoaderName } from './rules/no-search-in-loader.ts';
+import {
+  requireInlineRouteOptions,
+  requireInlineRouteOptionsName,
+} from './rules/require-inline-route-options.ts';
 import {
   requireParamsWithPathTokens,
   requireParamsWithPathTokensName,
@@ -40,16 +57,21 @@ import {
 
 const tanstackRouter = defineBellonaPlugin('bl-tanstack-router', {
   [createRoutePropertyOrderName]: createRoutePropertyOrder,
+  [noControlFlowOutsideEdgeName]: noControlFlowOutsideEdge,
   [noDynamicRouterToName]: noDynamicRouterTo,
   [noGetRouteApiName]: noGetRouteApi,
   [noHooksInRouteLifecycleName]: noHooksInRouteLifecycle,
   [noImperativeLocationNavigationName]: noImperativeLocationNavigation,
+  [noLoaderDataInNotFoundName]: noLoaderDataInNotFound,
+  [noNotFoundInComponentName]: noNotFoundInComponent,
+  [noNotFoundRouteName]: noNotFoundRoute,
   [noRelativeRouterToWithoutFromName]: noRelativeRouterToWithoutFrom,
   [noRouterHrefName]: noRouterHref,
   [noRouterTypeAssertionName]: noRouterTypeAssertion,
   [noSearchInLoaderName]: noSearchInLoader,
   [requireParamsWithPathTokensName]: requireParamsWithPathTokens,
   [requireRouterHookFromName]: requireRouterHookFrom,
+  [requireInlineRouteOptionsName]: requireInlineRouteOptions,
   [requireThrowNotFoundName]: requireThrowNotFound,
   [requireThrowRedirectName]: requireThrowRedirect,
   [requireValidateSearchWhenUsedName]: requireValidateSearchWhenUsed,
@@ -59,6 +81,8 @@ export default tanstackRouter;
 export {
   createRoutePropertyOrder,
   createRoutePropertyOrderName,
+  noControlFlowOutsideEdge,
+  noControlFlowOutsideEdgeName,
   noDynamicRouterTo,
   noDynamicRouterToName,
   noGetRouteApi,
@@ -67,6 +91,12 @@ export {
   noHooksInRouteLifecycleName,
   noImperativeLocationNavigation,
   noImperativeLocationNavigationName,
+  noLoaderDataInNotFound,
+  noLoaderDataInNotFoundName,
+  noNotFoundInComponent,
+  noNotFoundInComponentName,
+  noNotFoundRoute,
+  noNotFoundRouteName,
   noRelativeRouterToWithoutFrom,
   noRelativeRouterToWithoutFromName,
   noRouterHref,
@@ -75,6 +105,8 @@ export {
   noRouterTypeAssertionName,
   noSearchInLoader,
   noSearchInLoaderName,
+  requireInlineRouteOptions,
+  requireInlineRouteOptionsName,
   requireParamsWithPathTokens,
   requireParamsWithPathTokensName,
   requireRouterHookFrom,

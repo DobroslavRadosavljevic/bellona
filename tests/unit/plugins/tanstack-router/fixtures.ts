@@ -1,5 +1,9 @@
 export const APP_FILENAME = 'src/routes/posts.tsx';
 
+export const LIB_FILENAME = 'src/lib/posts.ts';
+
+export const COLOCATED_LIB_FILENAME = 'src/routes/-lib/posts.ts';
+
 const DEFAULT_IMPORTS = [
   'Link',
   'Navigate',
@@ -23,4 +27,15 @@ export function fileRouteCode(options: string, extra = ''): string {
     'createFileRoute',
     'useSearch',
   ]);
+}
+
+export function fileRouteWith(names: readonly string[], options: string, extra = ''): string {
+  return routerCode(`export const Route = createFileRoute('/posts')({ ${options} })\n${extra}`, [
+    'createFileRoute',
+    ...names,
+  ]);
+}
+
+export function startServerFnCode(body: string, names: readonly string[] = ['notFound']): string {
+  return `import { createServerFn } from '@tanstack/react-start';\nimport { ${names.join(', ')} } from '@tanstack/react-router';\n${body}`;
 }

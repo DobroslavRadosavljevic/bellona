@@ -9,6 +9,16 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-09-05
+
+### Added
+
+- `bl-tanstack-router/no-control-flow-outside-edge`: keep `notFound()` and `redirect()` in route modules or `createServerFn` handlers.
+- `bl-tanstack-router/no-not-found-in-component`: do not throw `notFound()` from route UI (`component` / pending / error / not-found).
+- `bl-tanstack-router/no-loader-data-in-not-found`: do not call `useLoaderData` inside `notFoundComponent`.
+- `bl-tanstack-router/no-not-found-route`: ban the deprecated `NotFoundRoute` / `notFoundRoute` API.
+- `bl-tanstack-router/require-inline-route-options`: pass an inline options object to `createFileRoute` / `createRoute` / `createRootRoute` / `createLazy*`. Do not pass a shared helper such as `legalRoute("…")`.
+
 ## [0.4.2] - 2026-09-05
 
 ### Added
@@ -64,7 +74,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.3...HEAD
+[0.4.3]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.3
 [0.4.2]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.2
 [0.4.1]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.1
 [0.4.0]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.0
