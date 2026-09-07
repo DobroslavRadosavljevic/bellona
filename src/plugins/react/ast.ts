@@ -1,6 +1,7 @@
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsNumber, isJsString } from '../../lib/js-kind.ts';
+import { isHookName } from './filename.ts';
 
 function isTsExpressionWrapper(
   node: ESTree.Node,
@@ -72,6 +73,46 @@ export function getCallName(node: ESTree.CallExpression): string | undefined {
     return propertyName;
   }
   return undefined;
+}
+
+function hookNameFromCall(name: string | undefined): string | undefined {
+  if (name === undefined) {
+    return undefined;
+  }
+  const separator = name.lastIndexOf('.');
+  return separator === -1 ? name : name.slice(separator + 1);
+}
+
+export function isHookCall(node: ESTree.CallExpression): boolean {
+  return isHookName(hookNameFromCall(getCallName(node)));
+}
+
+export function isBareHookCall(node: ESTree.CallExpression): boolean {
+  let current: ESTree.Node = node;
+  let parent: ESTree.Node | undefined = node.parent ?? undefined;
+
+  while (parent !== undefined && parent.type === 'ParenthesizedExpression') {
+    current = parent;
+    parent = parent.parent ?? undefined;
+  }
+
+  if (parent === undefined) {
+    return true;
+  }
+
+  if (parent.type === 'ExpressionStatement') {
+    return parent.expression === current;
+  }
+
+  if (parent.type === 'VariableDeclarator') {
+    return parent.init === current;
+  }
+
+  if (parent.type === 'AssignmentExpression') {
+    return parent.right === current;
+  }
+
+  return false;
 }
 
 function isComponentWrapperName(name: string | undefined): boolean {

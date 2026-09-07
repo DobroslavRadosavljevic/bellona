@@ -308,6 +308,27 @@ export function pathHasParamToken(value: string): boolean {
   return /\$/u.test(value);
 }
 
+/** Required `$postId` / splat `$`. Optional `{ -$locale }` / `prefix{-$name}` do not count. */
+export function pathHasRequiredParamToken(value: string): boolean {
+  let braceDepth = 0;
+  for (const char of value) {
+    if (char === '{') {
+      braceDepth += 1;
+      continue;
+    }
+    if (char === '}') {
+      if (braceDepth > 0) {
+        braceDepth -= 1;
+      }
+      continue;
+    }
+    if (char === '$' && braceDepth === 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function sortRoutePropertiesByOrder<T extends { name: string }>(
   properties: readonly T[],
 ): T[] | undefined {

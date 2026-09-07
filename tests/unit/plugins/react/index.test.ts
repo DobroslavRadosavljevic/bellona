@@ -18,6 +18,7 @@ describe('react plugin', () => {
       'no-native-html',
       'no-namespace',
       'no-render-helper-functions-in-components',
+      'require-bare-hook-call',
     ]);
   });
 });

@@ -89,10 +89,13 @@ export const Route = createFileRoute('/{-$locale}/accessibility/')({
 
 ## `bl-tanstack-router/require-params-with-path-tokens`
 
-If `to` contains `$` tokens, pass a `params` object.
+If `to` contains a **required** `$` token (`$postId`, splat `$`), pass a `params` object.
+
+Optional tokens (`{-$locale}`, `/posts/{-$category}`, `prefix{-$name}.txt`) do not need `params`.
 
 ```ts
 navigate({ to: '/posts/$postId', params: { postId: id } })
+<Link to="/{-$locale}/blog/authors" />
 ```
 
 ## `bl-tanstack-router/require-hook-from`

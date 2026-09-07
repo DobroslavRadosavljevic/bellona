@@ -22,6 +22,19 @@ runTanstackRouterRule(requireParamsWithPathTokensName, {
     ),
     validWith(routerCode('linkOptions({ to: "/posts" })'), { filename: APP_FILENAME }),
     validWith(routerCode('<Link to="." />'), { filename: APP_FILENAME }),
+    validWith(routerCode('<Link to="/{-$locale}/blog/authors" />'), {
+      filename: APP_FILENAME,
+    }),
+    validWith(routerCode('<Link to="/posts/{-$category}" />'), { filename: APP_FILENAME }),
+    validWith(routerCode('<Link to="/files/prefix{-$name}.txt" />'), {
+      filename: APP_FILENAME,
+    }),
+    validWith(routerCode('navigate({ to: "/{-$year}/{-$month}/{-$day}" })'), {
+      filename: APP_FILENAME,
+    }),
+    validWith(routerCode('<Link to="/{-$locale}/posts/$postId" params={{ postId }} />'), {
+      filename: APP_FILENAME,
+    }),
     validWith(routerCode('<Navigate to="/posts" />'), { filename: APP_FILENAME }),
     validWith(routerCode('<Link to="/posts/$postId" from="/posts/$postId" />'), {
       filename: APP_FILENAME,
@@ -43,6 +56,16 @@ runTanstackRouterRule(requireParamsWithPathTokensName, {
     invalidWith({
       filename: APP_FILENAME,
       code: routerCode('<Link to="/posts/$postId" />'),
+      errors: [missingParams],
+    }),
+    invalidWith({
+      filename: APP_FILENAME,
+      code: routerCode('<Link to="/{-$locale}/posts/$postId" />'),
+      errors: [missingParams],
+    }),
+    invalidWith({
+      filename: APP_FILENAME,
+      code: routerCode('navigate({ to: "/{-$locale}/blog/$slug" })'),
       errors: [missingParams],
     }),
     invalidWith({

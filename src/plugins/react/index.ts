@@ -33,6 +33,7 @@ import {
   noRenderHelperFunctionsInComponents,
   noRenderHelperFunctionsInComponentsName,
 } from './rules/no-render-helper-functions-in-components.ts';
+import { requireBareHookCall, requireBareHookCallName } from './rules/require-bare-hook-call.ts';
 
 const react = defineBellonaPlugin('bl-react', {
   [componentFileNameMatchName]: componentFileNameMatch,
@@ -48,6 +49,7 @@ const react = defineBellonaPlugin('bl-react', {
   [noNativeHtmlName]: noNativeHtml,
   [noReactNamespaceName]: noReactNamespace,
   [noRenderHelperFunctionsInComponentsName]: noRenderHelperFunctionsInComponents,
+  [requireBareHookCallName]: requireBareHookCall,
 });
 
 export default react;
@@ -78,4 +80,6 @@ export {
   noReactNamespaceName,
   noRenderHelperFunctionsInComponents,
   noRenderHelperFunctionsInComponentsName,
+  requireBareHookCall,
+  requireBareHookCallName,
 };

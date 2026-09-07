@@ -9,6 +9,16 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-09-07
+
+### Added
+
+- `bl-react/require-bare-hook-call`: write `const tags = useSomethingTags();` only. Do not add `.prop`, `?.`, `??`, or other syntax after the hook call.
+
+### Changed
+
+- `bl-tanstack-router/require-params-with-path-tokens`: do not require `params` for optional path tokens (`{-$locale}`, `prefix{-$name}`). Still require `params` for `$postId` and mixed paths.
+
 ## [0.4.3] - 2026-09-05
 
 ### Added
@@ -74,7 +84,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.3...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.4...HEAD
+[0.4.4]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.4
 [0.4.3]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.3
 [0.4.2]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.2
 [0.4.1]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.1

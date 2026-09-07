@@ -4,7 +4,7 @@ import type { ESTree } from '@oxlint/plugins';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipRouterFile } from '../options.ts';
-import { pathHasParamToken } from '../route.ts';
+import { pathHasRequiredParamToken } from '../route.ts';
 import {
   getJsxAttrValue,
   getNavOptionObjects,
@@ -24,7 +24,7 @@ function reportIfMissingParams(
     return;
   }
   const path = getStaticRoutePathValue(toValue);
-  if (path === undefined || !pathHasParamToken(path)) {
+  if (path === undefined || !pathHasRequiredParamToken(path)) {
     return;
   }
   report({ messageId: 'missingParams', node: toValue });
@@ -37,12 +37,12 @@ export const requireParamsWithPathTokens: CreateOnceRule = defineBellonaRule({
     type: 'problem',
     docs: {
       description:
-        'Require `params` when `to` includes a `$` token and `from` is not set to inherit params',
+        'Require `params` when `to` includes a required `$` token and `from` is not set to inherit params',
     },
     messages: {
       missingParams: agentDiagnostic({
-        problem: '`to` contains `$` path tokens but this call has no `params` object.',
-        why: 'Tokens such as `$postId` are not filled by interpolating into `to`. Without `params`, the URL is incomplete and types are wrong.',
+        problem: '`to` contains a required `$` path token but this call has no `params` object.',
+        why: 'Required tokens such as `$postId` need a `params` object. Optional tokens such as `{-$locale}` do not.',
         fix: 'Keep the literal path and pass params: `navigate({ to: "/posts/$postId", params: { postId } })` or the same `params` object on `<Link to="/posts/$postId" />`.',
         avoid: 'Do not write `to: `/posts/${id}``. Do not disable the rule.',
       }),

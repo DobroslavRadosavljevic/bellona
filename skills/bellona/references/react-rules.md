@@ -128,3 +128,15 @@ function Card() {
 function CardTitle() { return <h1 />; }
 function Card() { return <CardTitle />; }
 ```
+
+## `bl-react/require-bare-hook-call`
+
+A `useX()` call must be the whole right-hand side or a standalone statement.
+
+```tsx
+const tags = useSomethingTags()
+```
+
+Do not write `.prop`, `?.`, `??`, `()`, `as`, or other syntax after the call. Handle null or array on the next lines.
+
+Skip: tests, `allow`. Allowed forms: `const x = useFoo()`, `const [a, b] = useState(0)`, `useEffect(() => {}, [])`.

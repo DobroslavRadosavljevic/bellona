@@ -128,6 +128,7 @@ Most of these apply to `.tsx` / `.jsx`. Test and spec files are skipped.
 - `bl-react/no-native-html` (`tags`, optional `replacements` map of `{ component, from }`)
 - `bl-react/no-namespace`
 - `bl-react/no-render-helper-functions-in-components`
+- `bl-react/require-bare-hook-call`
 
 ### `bellona/base-ui`
 
