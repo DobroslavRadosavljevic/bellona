@@ -1,5 +1,5 @@
-import type { CreateOnceRule } from '@oxlint/plugins';
-import type { ESTree, Variable } from '@oxlint/plugins';
+import type { CreateOnceRule, Scope, SourceCode, Variable } from '@oxlint/plugins';
+import type { ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
@@ -172,21 +172,14 @@ function functionBoundary(node: ESTree.Node): ESTree.Node | null {
 }
 
 function resolvedVariableForIdentifier(
-  scopes: readonly {
-    readonly references: readonly {
-      readonly identifier: ESTree.Node;
-      readonly resolved: Variable | null;
-    }[];
-  }[],
+  sourceCode: SourceCode,
   identifier: ESTree.IdentifierReference,
 ): Variable | null {
-  for (const scope of scopes) {
-    const reference = scope.references.find(
-      (candidate) =>
-        candidate.identifier.start === identifier.start &&
-        candidate.identifier.end === identifier.end,
-    );
-    if (reference !== undefined) return reference.resolved;
+  let scope: Scope | null = sourceCode.getScope(identifier);
+  while (scope !== null) {
+    const variable = scope.set.get(identifier.name);
+    if (variable !== undefined) return variable;
+    scope = scope.upper;
   }
   return null;
 }
@@ -202,7 +195,7 @@ function variableDeclarator(variable: Variable): ESTree.VariableDeclarator | nul
 
 function knownValueEvidence(
   expression: ESTree.Expression,
-  scopes: Parameters<typeof resolvedVariableForIdentifier>[0],
+  sourceCode: SourceCode,
   boundary: ESTree.Node | null,
   visitedVariables: ReadonlySet<Variable>,
 ): KnownValueEvidence | null {
@@ -229,7 +222,7 @@ function knownValueEvidence(
   }
 
   if (unwrapped.type !== 'Identifier') return null;
-  const variable = resolvedVariableForIdentifier(scopes, unwrapped);
+  const variable = resolvedVariableForIdentifier(sourceCode, unwrapped);
   if (variable === null || visitedVariables.has(variable)) return null;
 
   const annotatedIdentifier = variable.identifiers.find(
@@ -257,7 +250,7 @@ function knownValueEvidence(
 
   return knownValueEvidence(
     declarator.init,
-    scopes,
+    sourceCode,
     boundary,
     new Set([...visitedVariables, variable]),
   );
@@ -265,7 +258,7 @@ function knownValueEvidence(
 
 function widenedBinding(
   variable: Variable,
-  scopes: Parameters<typeof resolvedVariableForIdentifier>[0],
+  sourceCode: SourceCode,
 ): {
   readonly broadKind: BroadTypeKind;
   readonly evidence: KnownValueEvidence;
@@ -297,7 +290,12 @@ function widenedBinding(
     initializerAssertion !== null && initializerBroadKind !== null
       ? assertedExpression(initializerAssertion)
       : declarator.init;
-  const evidence = knownValueEvidence(originalExpression, scopes, boundary, new Set([variable]));
+  const evidence = knownValueEvidence(
+    originalExpression,
+    sourceCode,
+    boundary,
+    new Set([variable]),
+  );
   return evidence === null ? null : { broadKind, evidence, declaredAt: declarator.end, boundary };
 }
 
@@ -336,15 +334,13 @@ export const noWidenThenAssert: CreateOnceRule = defineBellonaRule({
     },
   },
   createOnce(context) {
-    let scopes: Parameters<typeof resolvedVariableForIdentifier>[0] = [];
-
     const checkAssertion = (node: ESTree.TSAsExpression | ESTree.TSTypeAssertion) => {
       const expression = assertedExpression(node);
       if (expression.type !== 'Identifier') return;
 
-      const variable = resolvedVariableForIdentifier(scopes, expression);
+      const variable = resolvedVariableForIdentifier(context.sourceCode, expression);
       if (variable === null) return;
-      const widened = widenedBinding(variable, scopes);
+      const widened = widenedBinding(variable, context.sourceCode);
       if (
         widened === null ||
         node.start <= widened.declaredAt ||
@@ -367,9 +363,6 @@ export const noWidenThenAssert: CreateOnceRule = defineBellonaRule({
     };
 
     return {
-      Program() {
-        scopes = context.sourceCode.scopeManager.scopes;
-      },
       TSAsExpression: checkAssertion,
       TSTypeAssertion: checkAssertion,
     };

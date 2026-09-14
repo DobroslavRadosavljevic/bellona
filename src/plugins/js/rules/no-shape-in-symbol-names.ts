@@ -7,11 +7,11 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 const DEFAULT_TERM = 'shape';
 
-function containsForbiddenTerm(name: string, term: string, caseSensitive: boolean): boolean {
+function containsForbiddenTerm(name: string, needle: string, caseSensitive: boolean): boolean {
   if (caseSensitive) {
-    return name.includes(term);
+    return name.includes(needle);
   }
-  return name.toLowerCase().includes(term.toLowerCase());
+  return name.toLowerCase().includes(needle);
 }
 
 /** Ban a configurable substring (default `shape`) in JavaScript and TypeScript symbol names. */
@@ -47,11 +47,12 @@ export const forbiddenTermInNames: CreateOnceRule = defineBellonaRule({
     defaultOptions: [{ term: DEFAULT_TERM }],
   },
   createOnce(context) {
+    let term = DEFAULT_TERM;
+    let caseSensitive = false;
+    let needle = DEFAULT_TERM;
+
     const reportForbiddenSymbolName = (node: ESTree.Node & { name: string }) => {
-      const options = objectOptionAt(context, 0);
-      const term = stringField(options, 'term', DEFAULT_TERM);
-      const caseSensitive = booleanField(options, 'caseSensitive', false);
-      if (!containsForbiddenTerm(node.name, term, caseSensitive)) {
+      if (!containsForbiddenTerm(node.name, needle, caseSensitive)) {
         return;
       }
       context.report({
@@ -62,6 +63,12 @@ export const forbiddenTermInNames: CreateOnceRule = defineBellonaRule({
     };
 
     return {
+      before() {
+        const options = objectOptionAt(context, 0);
+        term = stringField(options, 'term', DEFAULT_TERM);
+        caseSensitive = booleanField(options, 'caseSensitive', false);
+        needle = caseSensitive ? term : term.toLowerCase();
+      },
       Identifier: reportForbiddenSymbolName,
       PrivateIdentifier: reportForbiddenSymbolName,
       JSXIdentifier: reportForbiddenSymbolName,

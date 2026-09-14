@@ -18,9 +18,11 @@ export function forEachChild(
   keys: readonly string[],
   visit: (child: ESTree.Node) => void,
 ): void {
-  const allowed = new Set(keys);
+  if (keys.length === 0) {
+    return;
+  }
   for (const [key, value] of Object.entries(node)) {
-    if (!allowed.has(key) || key === 'parent') {
+    if (key === 'parent' || !keys.includes(key)) {
       continue;
     }
     if (Array.isArray(value)) {

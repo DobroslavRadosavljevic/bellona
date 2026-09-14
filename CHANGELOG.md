@@ -9,6 +9,19 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.5] - 2026-09-14
+
+### Added
+
+- `bun run bench`: time every Bellona rule on a mixed synthetic corpus. Flags: `--plugin`, `--rule`, `--scale`, `--repeat`, `--json`, `--keep`.
+
+### Changed
+
+- `bl-js/no-useless-reexport`: resolve local import uses from scope references instead of walking the whole file once per import.
+- `bl-js/no-widen-then-assert`: resolve identifiers with `getScope` instead of scanning every scope on each assertion.
+- `bl-js/no-unsafe-dictionary-type`: cache dictionary classification per type node in a file.
+- `bl-js/require-safety-comment-for-type-assertion`, `bl-js/no-shape-in-symbol-names`, and `bl-js/no-unknown-parameters`: read options once in `before()`.
+
 ## [0.4.4] - 2026-09-07
 
 ### Added
@@ -84,7 +97,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.5
 [0.4.4]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.4
 [0.4.3]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.3
 [0.4.2]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.2

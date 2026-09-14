@@ -23,8 +23,7 @@ function isConstAssertion(node: TypeAssertion): boolean {
   );
 }
 
-function hasSafetyComment(sourceCode: SourceCode, node: TypeAssertion, marker: string): boolean {
-  const pattern = new RegExp(`\\b${marker.replaceAll(/[.*+?^${}()|[\]\\]/gu, '\\$&')}\\s*:`, 'u');
+function hasSafetyComment(sourceCode: SourceCode, node: TypeAssertion, pattern: RegExp): boolean {
   let current: ESTree.Node = node;
   while (true) {
     if (
@@ -73,13 +72,19 @@ export const requireSafetyCommentForTypeAssertion: CreateOnceRule = defineBellon
     defaultOptions: [{ marker: 'SAFETY' }],
   },
   createOnce(context) {
+    let marker = 'SAFETY';
+    let pattern = /\bSAFETY\s*:/u;
+
     const checkAssertion = (node: TypeAssertion) => {
-      const marker = stringField(objectOptionAt(context, 0), 'marker', 'SAFETY');
-      if (isConstAssertion(node) || hasSafetyComment(context.sourceCode, node, marker)) return;
+      if (isConstAssertion(node) || hasSafetyComment(context.sourceCode, node, pattern)) return;
       context.report({ node, messageId: 'missingSafetyComment', data: { marker } });
     };
 
     return {
+      before() {
+        marker = stringField(objectOptionAt(context, 0), 'marker', 'SAFETY');
+        pattern = new RegExp(`\\b${marker.replaceAll(/[.*+?^${}()|[\]\\]/gu, '\\$&')}\\s*:`, 'u');
+      },
       TSAsExpression: checkAssertion,
       TSTypeAssertion: checkAssertion,
     };

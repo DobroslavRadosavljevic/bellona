@@ -16,6 +16,7 @@
 - Lint: `bun run lint` / `bun run lint:fix`
 - Types: `bun run typecheck`
 - Format: `bun run format` / `bun run format:check`
+- Bench all rules: `bun run bench` (`--plugin js`, `--rule bl-js/max-classes`, `--scale 8`, `--repeat 1`, `--json`)
 - Build / watch: `bun run build` / `bun run dev`
 - Gate (local stand-in for CI): `bun run check`
 - npm web login: `bun run login` (opens the npm login page; token goes to the user `~/.npmrc`)

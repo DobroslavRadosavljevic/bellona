@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.4**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.4.5**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 

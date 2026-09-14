@@ -1,7 +1,6 @@
 import type { CreateOnceRule, Scope, SourceCode, Variable } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { isAstNode } from '../../../lib/ast-node.ts';
 import { isJsString } from '../../../lib/js-kind.ts';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
@@ -36,26 +35,6 @@ function moduleExportName(node: ESTree.ModuleExportName): string | null {
 
 function parentOf(node: ESTree.Node): ESTree.Node | undefined {
   return node.parent ?? undefined;
-}
-
-function walk(node: ESTree.Node, visit: (child: ESTree.Node) => void): void {
-  visit(node);
-  for (const [key, value] of Object.entries(node)) {
-    if (key === 'parent') {
-      continue;
-    }
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (isAstNode(item)) {
-          walk(item, visit);
-        }
-      }
-      continue;
-    }
-    if (isAstNode(value)) {
-      walk(value, visit);
-    }
-  }
 }
 
 function isDirective(statement: ESTree.Directive | ESTree.Statement): boolean {
@@ -176,32 +155,31 @@ function importVariable(sourceCode: SourceCode, local: ESTree.BindingIdentifier)
   return resolveNamedVariable(sourceCode, local);
 }
 
-function nameIsUsedLocally(
-  sourceCode: SourceCode,
-  program: ESTree.Program,
-  imported: ImportedName,
-): boolean {
+function identifierIsLocalUse(node: ESTree.Node, importedLocal: ESTree.BindingIdentifier): boolean {
+  return (
+    node !== importedLocal &&
+    !isImportNameIdentifier(node) &&
+    !isInsideExportFrom(node) &&
+    !isLocalReexportIdentifier(node)
+  );
+}
+
+function nameIsUsedLocally(sourceCode: SourceCode, imported: ImportedName): boolean {
   const variable = importVariable(sourceCode, imported.local);
-  let used = false;
-  walk(program, (node) => {
-    if (used || node.type !== 'Identifier' || node.name !== imported.local.name) {
-      return;
+  if (variable === null) {
+    return false;
+  }
+  for (const reference of variable.references) {
+    if (identifierIsLocalUse(reference.identifier, imported.local)) {
+      return true;
     }
-    if (
-      node === imported.local ||
-      isImportNameIdentifier(node) ||
-      isInsideExportFrom(node) ||
-      isLocalReexportIdentifier(node)
-    ) {
-      return;
+  }
+  for (const identifier of variable.identifiers) {
+    if (identifierIsLocalUse(identifier, imported.local)) {
+      return true;
     }
-    const resolved = resolveNamedVariable(sourceCode, node);
-    if (resolved !== null && variable !== null && resolved !== variable) {
-      return;
-    }
-    used = true;
-  });
-  return used;
+  }
+  return false;
 }
 
 function namedExportOfLocal(
@@ -220,24 +198,30 @@ function namedExportOfLocal(
   return undefined;
 }
 
-function hasExportOfLocal(program: ESTree.Program, localName: string): boolean {
+function exportedLocalNames(program: ESTree.Program): ReadonlySet<string> {
+  const names = new Set<string>();
   for (const statement of program.body) {
     if (
       statement.type === 'ExportDefaultDeclaration' &&
       statement.declaration.type === 'Identifier'
     ) {
-      if (statement.declaration.name === localName) {
-        return true;
+      names.add(statement.declaration.name);
+      continue;
+    }
+    if (statement.type !== 'ExportNamedDeclaration' || statement.source !== null) {
+      continue;
+    }
+    if (statement.declaration !== null) {
+      continue;
+    }
+    for (const specifier of statement.specifiers) {
+      const local = moduleExportName(specifier.local);
+      if (local !== null) {
+        names.add(local);
       }
     }
-    if (
-      statement.type === 'ExportNamedDeclaration' &&
-      namedExportOfLocal(statement, localName) !== undefined
-    ) {
-      return true;
-    }
   }
-  return false;
+  return names;
 }
 
 function collectImportReexports(
@@ -246,7 +230,7 @@ function collectImportReexports(
   imported: ImportedName,
   allowRenames: boolean,
 ): Finding[] {
-  if (nameIsUsedLocally(sourceCode, program, imported)) {
+  if (nameIsUsedLocally(sourceCode, imported)) {
     return [];
   }
   const findings: Finding[] = [];
@@ -455,8 +439,9 @@ export const noUselessReexport: CreateOnceRule = defineBellonaRule({
         }
 
         const importedLocals = new Set(imported.map((entry) => entry.local.name));
+        const exportedLocals = exportedLocalNames(node);
         for (const entry of imported) {
-          if (hasExportOfLocal(node, entry.local.name)) {
+          if (exportedLocals.has(entry.local.name)) {
             hasReexport = true;
           }
           findings.push(...collectImportReexports(context.sourceCode, node, entry, allowRenames));

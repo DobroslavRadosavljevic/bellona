@@ -75,8 +75,9 @@ export const noUnknownParameters: CreateOnceRule = defineBellonaRule({
     defaultOptions: [{ allow: ['cause'] }],
   },
   createOnce(context) {
+    let allow: readonly string[] = ['cause'];
+
     const checkParameters = (node: ParameterOwner) => {
-      const allow = stringListField(objectOptionAt(context, 0), 'allow', ['cause']);
       for (const parameter of node.params) {
         const annotation = parameterAnnotation(parameter);
         if (annotation?.typeAnnotation.type !== 'TSUnknownKeyword') continue;
@@ -91,6 +92,9 @@ export const noUnknownParameters: CreateOnceRule = defineBellonaRule({
     };
 
     return {
+      before() {
+        allow = stringListField(objectOptionAt(context, 0), 'allow', ['cause']);
+      },
       ArrowFunctionExpression: checkParameters,
       FunctionDeclaration: checkParameters,
       FunctionExpression: checkParameters,

@@ -233,6 +233,18 @@ npx skills add DobroslavRadosavljevic/bellona --skill bellona
 
 Use `--skill bellona` so only this skill is installed.
 
+## Rule speed bench
+
+Time every Bellona rule on a mixed synthetic corpus (JS, React, Effect, Elysia, TanStack Router, Tailwind, Zod, Base UI):
+
+```sh
+bun run bench
+bun run bench -- --plugin js --rule no-useless-reexport
+bun run bench -- --scale 16 --repeat 3 --json
+```
+
+`net` is rule time minus a baseline that loads all plugins with rules off.
+
 ## License
 
 [MIT](./LICENSE)

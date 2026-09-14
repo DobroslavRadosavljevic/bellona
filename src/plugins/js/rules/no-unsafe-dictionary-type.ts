@@ -73,13 +73,23 @@ function isPlainAliasConsumerUse(node: ESTree.TSType, environment: TypeEnvironme
   return name !== null && environment.aliases.has(name) && !isInsideTypeAliasDeclaration(node);
 }
 
-function shouldReportType(node: ESTree.TSType, environment: TypeEnvironment): boolean {
+function shouldReportType(
+  node: ESTree.TSType,
+  environment: TypeEnvironment,
+  cache: WeakMap<ESTree.TSType, ReturnType<typeof classifyUnsafeDictionary>>,
+): boolean {
   if (isPlainAliasConsumerUse(node, environment)) return false;
-  if (classifyUnsafeDictionary(node, environment) === null) return false;
+  const cachedClassify = (type: ESTree.TSType) => {
+    const hit = cache.get(type);
+    if (hit !== undefined) return hit;
+    const classified = classifyUnsafeDictionary(type, environment);
+    cache.set(type, classified);
+    return classified;
+  };
+  if (cachedClassify(node) === null) return false;
   let current: ESTree.Node | null = node.parent;
   while (current !== null && current.type !== 'Program') {
-    if (isTypeNode(current) && classifyUnsafeDictionary(current, environment) !== null)
-      return false;
+    if (isTypeNode(current) && cachedClassify(current) !== null) return false;
     current = current.parent;
   }
   return true;
@@ -108,11 +118,12 @@ export const noUnsafeDictionaryType: CreateOnceRule = defineBellonaRule({
   },
   createOnce(context) {
     let environment: TypeEnvironment | null = null;
+    const classifyCache = new WeakMap<ESTree.TSType, ReturnType<typeof classifyUnsafeDictionary>>();
     const report = (node: ESTree.Node, value: string) => {
       context.report({ node, messageId: 'unsafeDictionary', data: { value } });
     };
     const reportIfUnsafe = (node: ESTree.TSType) => {
-      if (environment === null || !shouldReportType(node, environment)) return;
+      if (environment === null || !shouldReportType(node, environment, classifyCache)) return;
       const unsafe = classifyUnsafeDictionary(node, environment);
       if (unsafe === null) return;
       report(node, unsafe.unsafeValue);
