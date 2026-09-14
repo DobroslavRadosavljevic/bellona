@@ -1,7 +1,7 @@
 import type { ESTree } from '@oxlint/plugins';
 
 import { isJsNumber, isJsString } from '../../lib/js-kind.ts';
-import { isHookName } from './filename.ts';
+import { isComponentName, isHookName } from './filename.ts';
 
 function isTsExpressionWrapper(
   node: ESTree.Node,
@@ -110,6 +110,15 @@ export function isBareHookCall(node: ESTree.CallExpression): boolean {
 
   if (parent.type === 'AssignmentExpression') {
     return parent.right === current;
+  }
+
+  if (parent.type === 'ReturnStatement') {
+    return parent.argument === current;
+  }
+
+  if (parent.type === 'ArrowFunctionExpression' && parent.body === current) {
+    const name = getDeclaredFunctionName(parent);
+    return isHookName(name) || isComponentName(name);
   }
 
   return false;

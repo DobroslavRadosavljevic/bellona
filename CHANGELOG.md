@@ -9,6 +9,12 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-09-14
+
+### Changed
+
+- `bl-react/require-bare-hook-call`: allow `return useFoo()` and a named hook or component arrow that is only `() => useFoo()`. Still flag `.prop`, `?.`, `??`, and other syntax after the call.
+
 ## [0.4.5] - 2026-09-14
 
 ### Added
@@ -97,7 +103,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.5...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.6
 [0.4.5]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.5
 [0.4.4]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.4
 [0.4.3]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.3

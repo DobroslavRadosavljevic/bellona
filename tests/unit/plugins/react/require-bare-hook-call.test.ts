@@ -20,6 +20,19 @@ runReactRule(requireBareHookCallName, {
     validWith('tags = useSomethingTags();', { filename: 'file.tsx' }),
     validWith('tags ??= useSomethingTags();', { filename: 'file.tsx' }),
     validWith('const tags = (useSomethingTags());', { filename: 'file.tsx' }),
+    validWith('return useSomethingTags();', { filename: 'file.tsx' }),
+    validWith('return (useSomethingTags());', { filename: 'file.tsx' }),
+    validWith('function useTags() { return useSomethingTags(); }', { filename: 'file.tsx' }),
+    validWith('function Header() { return useRender({ defaultTagName: "header" }); }', {
+      filename: 'file.tsx',
+    }),
+    validWith('function useItems() { return useMemo(() => ({ get() { return 1; } }), []); }', {
+      filename: 'file.tsx',
+    }),
+    validWith('const useTags = () => useSomethingTags();', { filename: 'file.tsx' }),
+    validWith('const Header = () => useRender({ defaultTagName: "header" });', {
+      filename: 'file.tsx',
+    }),
     validWith('const tags = ((useSomethingTags()));', { filename: 'file.tsx' }),
     validWith('const tags = useSomethingTags<string[]>();', { filename: 'file.tsx' }),
     validWith('const a = useFoo(), b = 1;', { filename: 'file.tsx' }),
@@ -132,7 +145,7 @@ runReactRule(requireBareHookCallName, {
     }),
     invalidWith({
       filename: 'file.tsx',
-      code: 'return useSomethingTags();',
+      code: 'return useSomethingTags()?.tags;',
       errors: notBare,
     }),
     invalidWith({
@@ -214,6 +227,9 @@ runReactRule(
     valid: [
       validWith('const tags = useSomethingTags();', { filename: 'use-tags.ts' }),
       validWith('const tags = useSomethingTags()?.x;', { filename: 'use-tags.test.ts' }),
+      validWith('export function useTags() { return useSomethingTags(); }', {
+        filename: 'use-tags.ts',
+      }),
     ],
     invalid: [
       invalidWith({
@@ -223,7 +239,7 @@ runReactRule(
       }),
       invalidWith({
         filename: 'use-tags.ts',
-        code: 'export function useTags() { return useSomethingTags(); }',
+        code: 'export function useTags() { return useSomethingTags()?.tags; }',
         errors: notBare,
       }),
     ],

@@ -1,7 +1,7 @@
 ---
 name: bellona
 description: >-
-  Install, configure, and enable bellona 0.4.5 Oxlint JS plugins (bellona/js, bellona/react,
+  Install, configure, and enable bellona 0.4.6 Oxlint JS plugins (bellona/js, bellona/react,
   bellona/base-ui, bellona/zod, bellona/tanstack-router, bellona/elysia, bellona/effect,
   bellona/tailwind). Follow Problem / Why / Fix / Avoid diagnostics. Use when adding
   oxlint.config.ts jsPlugins, turning on bl-* rules, debugging bellona lint, writing a
@@ -14,7 +14,7 @@ description: >-
 
 # Bellona
 
-Bellona is a set of **opt-in Oxlint JS plugins** (this skill matches **bellona 0.4.5**: 8 plugins, 94 rules). Install the package, load only the subpaths you need, then turn rules on by id. **Nothing is enabled by default.** There is no recommended config.
+Bellona is a set of **opt-in Oxlint JS plugins** (this skill matches **bellona 0.4.6**: 8 plugins, 94 rules). Install the package, load only the subpaths you need, then turn rules on by id. **Nothing is enabled by default.** There is no recommended config.
 
 JS plugins are **alpha** in Oxlint (outside semver). Pin `oxlint` in the consuming app to the same minor as bellona’s peer (`oxlint` ^1.78).
 
