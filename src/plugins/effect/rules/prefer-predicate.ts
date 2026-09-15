@@ -9,19 +9,22 @@ import {
   shouldSkipEffectStyleFile,
 } from '../options.ts';
 
-const PREDICATE_NAMES = new Set([
-  'isString',
-  'isObject',
-  'isRecord',
-  'isNumber',
-  'isBoolean',
-  'isUndefined',
-  'isNull',
-  'isFunction',
-  'isDate',
-  'isPromise',
-  'isError',
-  'isNullish',
+const LOCAL_PREDICATE_REPLACEMENTS = new Map<string, string>([
+  ['isString', 'Predicate.isString'],
+  ['isObject', 'Predicate.isObject'],
+  ['isRecord', 'Predicate.isObject'],
+  ['isNumber', 'Predicate.isNumber'],
+  ['isBoolean', 'Predicate.isBoolean'],
+  ['isUndefined', 'Predicate.isUndefined'],
+  ['isNull', 'Predicate.isNull'],
+  ['isFunction', 'Predicate.isFunction'],
+  ['isDate', 'Predicate.isDate'],
+  ['isPromise', 'Predicate.isPromise'],
+  ['isError', 'Predicate.isError'],
+  ['isNullish', 'Predicate.isNullish'],
+  ['isNullable', 'Predicate.isNullish'],
+  ['isNotNullable', 'Predicate.isNotNullish'],
+  ['isReadonlyRecord', 'Predicate.isReadonlyObject'],
 ]);
 
 export const preferPredicateName = bnRuleName('prefer-predicate');
@@ -45,15 +48,15 @@ export const preferPredicate: CreateOnceRule = defineBellonaRule({
     type: 'suggestion',
     docs: {
       description:
-        'Use Predicate.isString / isObject / isNumber instead of local type-guard helpers',
+        'Use Predicate.isString / isObject instead of local type-guard helpers; v4 isRecord is Predicate.isObject',
     },
     messages: {
       predicate: agentDiagnostic({
         problem:
-          'This file defines a local `{{name}}` helper (`isString` / `isObject` / `isNullish` / …). Effect already exports `Predicate.{{name}}`.',
-        why: 'Local type guards duplicate `effect/Predicate` and often use `typeof` (also banned).',
-        fix: 'Import `{ Predicate }` from `effect/Predicate` (or the namespace you already use) and call `Predicate.{{name}}`. Delete the local helper.',
-        avoid: 'Do not rename the helper to `checkString`. Do not disable the rule.',
+          'This file defines a local `{{name}}` helper (`isString` / `isObject` / `isNullish` / …). Effect already exports `{{replacement}}`.',
+        why: 'Local type guards duplicate `effect/Predicate` and often use `typeof` (also banned). v4 renamed `isRecord` to `isObject` and v3 `isObject` to `isObjectKeyword`.',
+        fix: 'Import `{ Predicate }` from `effect/Predicate` (or the namespace you already use) and call `{{replacement}}`. Delete the local helper.',
+        avoid: 'Do not keep a local `isRecord`. Do not disable the rule.',
       }),
     },
     schema: [ALLOW_OPTION_SCHEMA],
@@ -79,13 +82,17 @@ export const preferPredicate: CreateOnceRule = defineBellonaRule({
 
     function report(node: ESTree.Node): void {
       const name = declaredName(node);
-      if (name === undefined || !PREDICATE_NAMES.has(name)) {
+      if (name === undefined) {
+        return;
+      }
+      const replacement = LOCAL_PREDICATE_REPLACEMENTS.get(name);
+      if (replacement === undefined) {
         return;
       }
       context.report({
         messageId: 'predicate',
         node: node.type === 'FunctionDeclaration' && node.id !== null ? node.id : node,
-        data: { name },
+        data: { name, replacement },
       });
     }
   },

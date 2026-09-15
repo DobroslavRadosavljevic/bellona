@@ -1,6 +1,6 @@
 # bellona/effect rules
 
-Plugin name: `bl-effect`. Ids: `bl-effect/<slug>`. Target **Effect v4** (`effect@rc`). Do not mix v3 APIs.
+Plugin name: `bl-effect`. Ids: `bl-effect/<slug>`. Target **Effect v4** (`effect@rc`, currently `4.0.0-rc.115`). Do not mix v3 APIs.
 
 **Skip (all):** files that do not import `effect`, `effect/…`, or `@effect/…`, and `allow` matches.
 
@@ -24,18 +24,22 @@ Disallow moved v3 specifiers. Exact map (partial):
 | `effect/FiberRef` | `effect/References` |
 | `effect/JSONSchema` | `effect/JsonSchema` |
 | `effect/TestClock` | `effect/testing/TestClock` |
-| `effect/FastCheck` | `effect/testing/FastCheck` |
+| `effect/FastCheck` | `fast-check` (Schema generation: `effect/unstable/arbitrary`) |
+| `effect/ParseResult` | `effect/SchemaIssue` (parsers: `effect/SchemaParser`) |
+| `effect/SchemaError` | `effect/Schema` (`Schema.SchemaError` / `Schema.isSchemaError`) |
+| `effect/testing/FastCheck` | `fast-check` |
 | `effect/TRef` (and other `T*`) | `effect/TxRef` (`Tx*`) |
 | `@effect/platform/HttpClient` (and HttpServer/Router) | `effect/unstable/http` |
 | `@effect/platform/HttpApi*` | `effect/unstable/httpapi` |
 | `@effect/sql/*` | `effect/unstable/sql` |
-| `@effect/cli/*` | `effect/unstable/cli` |
+| `@effect/cli/*` | `effect/unstable/cli` (`Args` → `Argument`, `Options` → `Flag`) |
 | `@effect/rpc/*` | `effect/unstable/rpc` |
 | `@effect/cluster/*` | `effect/unstable/cluster` |
 | `@effect/workflow/*` | `effect/unstable/workflow` |
 | `@effect/ai/*` | `effect/unstable/ai` |
 | `@effect/opentelemetry/Otlp*` | `effect/unstable/observability` |
 | `effect/Mailbox` | `effect/Queue` |
+| `effect/unstable/encoding/Msgpack` | `effect/unstable/encoding/SchemaBinary` |
 | `@effect/platform/FileSystem` | `effect/FileSystem` |
 | `@effect/platform/Path` | `effect/Path` |
 
@@ -62,6 +66,11 @@ Current v4 packages are **not** flagged: `effect`, `effect/…`, `@effect/vitest
 | `Layer.catchAll` | `Layer.catch` |
 | `Stream.async` | `Stream.callback` |
 | `Scope.extend` | `Scope.provide` |
+| `Predicate.isRecord` | `Predicate.isObject` |
+| `Predicate.isObject` (v3 arrays + functions) | `Predicate.isObjectKeyword` |
+| `Predicate.isNullable` | `Predicate.isNullish` |
+| `Predicate.isNotNullable` | `Predicate.isNotNullish` |
+| `Predicate.isReadonlyRecord` | `Predicate.isReadonlyObject` |
 
 ### `bl-effect/no-v3-service-tags`
 
@@ -86,7 +95,7 @@ Object-form `Schema.decode({ … })` transforms are not flagged.
 
 ### `bl-effect/prefer-fn`
 
-Prefer `Effect.fn("name")` over a function that **returns** `Effect.gen`. Do not wrap `Effect.gen` in a plain function. Vitest `it.effect` callbacks are excluded.
+Prefer `Effect.fn("name")` over a function that **returns** `Effect.gen`. `Effect.fnUntraced` is valid for library and hot-path code with no span. Do not wrap `Effect.gen` in a plain function. Vitest `it.effect` callbacks are excluded.
 
 ```ts
 // good
@@ -101,7 +110,7 @@ export const loadUser = Effect.fn('loadUser')(function* (id: string) {
 
 ### `bl-effect/no-pipe-on-fn`
 
-Do not `.pipe` the result of `Effect.fn(...)(...)`. Pass extra combinators as extra arguments to `Effect.fn`.
+Do not `.pipe` the result of `Effect.fn(...)(...)` or `Effect.fnUntraced(...)`. Pass extra combinators as extra arguments.
 
 ### `bl-effect/no-try-catch-in-gen`
 
@@ -110,6 +119,10 @@ Disallow `try/catch` inside `Effect.gen` / `Effect.fn` generators. Use Effect er
 ### `bl-effect/no-throw-in-gen`
 
 Disallow `throw` inside those generators. Use `return yield* Effect.fail(...)` or `Schema.TaggedError`.
+
+### `bl-effect/require-gen-self-options`
+
+Class methods must use `Effect.gen({ self: this }, function* () { … })`. Do not pass a bare `this` as the first argument.
 
 ### `bl-effect/require-return-yield-on-fail`
 
@@ -132,9 +145,9 @@ Schema.Literals(['a', 'b'])
 
 ### `bl-effect/schema-no-legacy-filter`
 
-Disallow v3 Schema methods: `filter`, `optionalWith`, `positive`, `negative`, `nonNegative`, `nonPositive`, `pattern`, plus exports `nonEmptyString`.
+Disallow v3 Schema methods: `filter`, `filterEffect`, `optionalWith`, `positive`, `negative`, `nonNegative`, `nonPositive`, `pattern`, `rename`, plus exports `nonEmptyString`, `encodedSchema`, `typeSchema`, `encodedBoundSchema`, `toArbitrary`.
 
-Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.String.check(Schema.isNonEmpty())`.
+Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.encodeKeys` / `Schema.toEncoded` / `Schema.toType` / `Schema.String.check(Schema.isNonEmpty())`.
 
 ### `bl-effect/prefer-date-from-string`
 
@@ -146,7 +159,7 @@ Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.String.
 
 ### `bl-effect/prefer-predicate`
 
-**Tests skipped.** Do not write local `isString` / `isObject` / `isNumber` / `isBoolean` / `isUndefined` / `isNull` / `isFunction` / `isDate` / `isPromise` / `isError` / `isNullish` / `isRecord` helpers. Use `Predicate.*`.
+**Tests skipped.** Do not write local `isString` / `isObject` / `isNumber` / `isBoolean` / `isUndefined` / `isNull` / `isFunction` / `isDate` / `isPromise` / `isError` / `isNullish` / `isRecord` helpers. Use `Predicate.*`. A local `isRecord` is `Predicate.isObject`. v3 `Predicate.isObject` (arrays and functions) is `Predicate.isObjectKeyword`.
 
 ### `bl-effect/no-date-now`
 

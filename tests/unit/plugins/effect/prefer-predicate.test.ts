@@ -3,9 +3,18 @@ import { error, validWith } from '../../lib/cases.ts';
 import { NO_EFFECT, testTs, ts, withEffect } from './fixtures.ts';
 import { runEffectRule } from './harness.ts';
 
+function localGuard(name: string, replacement: string) {
+  return { messageId: 'predicate' as const, data: { name, replacement } };
+}
+
 runEffectRule(preferPredicateName, {
   valid: [
     { ...ts, code: withEffect('if (Predicate.isString(x)) { x }') },
+    { ...ts, code: withEffect('if (Predicate.isObject(x)) { x }') },
+    { ...ts, code: withEffect('if (Predicate.isObjectKeyword(x)) { x }') },
+    { ...ts, code: withEffect('if (Predicate.isNullish(x)) { x }') },
+    { ...ts, code: withEffect('if (Predicate.isNotNullish(x)) { x }') },
+    { ...ts, code: withEffect('if (Predicate.isReadonlyObject(x)) { x }') },
     { ...ts, code: withEffect('function isUser(u: unknown) { return true }') },
     {
       ...testTs,
@@ -25,17 +34,19 @@ runEffectRule(preferPredicateName, {
       code: withEffect(
         'function isString(u: unknown): u is string { return typeof u === "string" }',
       ),
-      errors: [error('predicate')],
+      errors: [localGuard('isString', 'Predicate.isString')],
     },
     {
       ...ts,
       code: withEffect('const isObject = (u: unknown) => u !== null && typeof u === "object"'),
-      errors: [error('predicate')],
+      errors: [localGuard('isObject', 'Predicate.isObject')],
     },
     {
       ...ts,
-      code: withEffect('const isRecord = (u: unknown) => true'),
-      errors: [error('predicate')],
+      code: withEffect(
+        'function isRecord(u: unknown): u is Record<string, unknown> { return u !== null && typeof u === "object" && !Array.isArray(u) }',
+      ),
+      errors: [localGuard('isRecord', 'Predicate.isObject')],
     },
     {
       ...ts,
@@ -86,7 +97,29 @@ runEffectRule(preferPredicateName, {
     {
       ...ts,
       code: withEffect('function isNullish(u: unknown) { return u == null }'),
-      errors: [error('predicate')],
+      errors: [localGuard('isNullish', 'Predicate.isNullish')],
+    },
+    {
+      ...ts,
+      code: withEffect('function isNullable(u: unknown) { return u == null }'),
+      errors: [localGuard('isNullable', 'Predicate.isNullish')],
+    },
+    {
+      ...ts,
+      code: withEffect('function isNotNullable(u: unknown) { return u != null }'),
+      errors: [localGuard('isNotNullable', 'Predicate.isNotNullish')],
+    },
+    {
+      ...ts,
+      code: withEffect('function isReadonlyRecord(u: unknown) { return true }'),
+      errors: [localGuard('isReadonlyRecord', 'Predicate.isReadonlyObject')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'export const isRecord = function (u: unknown) { return Predicate.isObject(u) }',
+      ),
+      errors: [localGuard('isRecord', 'Predicate.isObject')],
     },
   ],
 });

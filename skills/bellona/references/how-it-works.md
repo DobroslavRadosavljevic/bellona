@@ -136,6 +136,6 @@ Generated: `dist/` — do not edit.
 | zod | 2 |
 | tanstack-router | 19 |
 | elysia | 15 |
-| effect | 25 |
+| effect | 26 |
 | tailwind | 1 |
-| **total** | **93** |
+| **total** | **94** |

@@ -9,6 +9,21 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.7] - 2026-09-15
+
+### Added
+
+- `bl-effect/require-gen-self-options`: flag `Effect.gen(this, function* () { … })`. Use `Effect.gen({ self: this }, function* () { … })` (`effect@4.0.0-rc.115`).
+
+### Changed
+
+- Effect rules target Effect **`4.0.0-rc.115`**.
+- `bl-effect/no-v3-imports`: `effect/FastCheck` and `effect/testing/FastCheck` → `fast-check`; `effect/ParseResult` → `effect/SchemaIssue`; `effect/SchemaError` → `effect/Schema`; `@effect/cli/Args` → `effect/unstable/cli/Argument`; `@effect/cli/Options` → `effect/unstable/cli/Flag`; `effect/unstable/encoding/Msgpack` → `SchemaBinary`.
+- `bl-effect/schema-no-legacy-filter`: also flag `filterEffect`, `rename`, `encodedSchema`, `typeSchema`, `encodedBoundSchema`, and `toArbitrary`.
+- `bl-effect/no-v3-apis`: also flag v4 Predicate renames (`isRecord` → `isObject`, `isNullable` → `isNullish`, `isNotNullable` → `isNotNullish`, `isReadonlyRecord` → `isReadonlyObject`).
+- `bl-effect/prefer-predicate`: point local `isRecord` / `isNullable` / `isNotNullable` / `isReadonlyRecord` helpers at the v4 `Predicate.*` names.
+- `bl-effect/prefer-fn` / `bl-effect/no-pipe-on-fn`: treat `Effect.fnUntraced` as the library/hot-path form from Effect RC `LLMS.md`.
+
 ## [0.4.6] - 2026-09-14
 
 ### Changed
@@ -103,7 +118,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.6...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.7...HEAD
+[0.4.7]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.7
 [0.4.6]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.6
 [0.4.5]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.5
 [0.4.4]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.4

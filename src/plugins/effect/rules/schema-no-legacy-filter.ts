@@ -13,16 +13,22 @@ import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from
 
 const LEGACY_METHODS = new Set([
   'filter',
+  'filterEffect',
   'optionalWith',
   'positive',
   'negative',
   'nonNegative',
   'nonPositive',
   'pattern',
+  'rename',
 ]);
 
 const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
   ['filter', 'Schema.check / Schema.refine'],
+  [
+    'filterEffect',
+    'Schema.decode({ decode: SchemaGetter.checkEffect(...), encode: SchemaGetter.passthrough() })',
+  ],
   ['optionalWith', 'Schema.optionalKey / withDecodingDefaultType*'],
   ['positive', 'Schema.check(Schema.isGreaterThan(0))'],
   ['negative', 'Schema.check(Schema.isLessThan(0))'],
@@ -30,6 +36,11 @@ const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
   ['nonPositive', 'Schema.check(Schema.isLessThanOrEqualTo(0))'],
   ['nonEmptyString', 'Schema.String.check(Schema.isNonEmpty())'],
   ['pattern', 'Schema.check(Schema.isPattern(regex))'],
+  ['rename', 'Schema.encodeKeys'],
+  ['encodedSchema', 'Schema.toEncoded'],
+  ['typeSchema', 'Schema.toType'],
+  ['encodedBoundSchema', 'Schema.toEncoded'],
+  ['toArbitrary', 'Arbitrary.schema (effect/unstable/arbitrary)'],
 ]);
 
 export const schemaNoLegacyFilterName = bnRuleName('schema-no-legacy-filter');
@@ -73,7 +84,7 @@ export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
       legacy: agentDiagnostic({
         problem:
           'This uses v3 Schema API `Schema.{{name}}`. The v4 replacement is `{{replacement}}`.',
-        why: '`filter` / `optionalWith` / `positive` / `pattern` / `nonEmptyString` and friends were replaced by `Schema.check` / `Schema.refine` / `Schema.optionalKey`.',
+        why: '`filter` / `filterEffect` / `optionalWith` / `positive` / `pattern` / `rename` / `encodedSchema` and friends were replaced by `Schema.check` / `Schema.refine` / `Schema.encodeKeys` / `Schema.toEncoded`.',
         fix: 'Replace `Schema.{{name}}` with `{{replacement}}` (example: `Schema.String.check(Schema.isNonEmpty())` instead of `nonEmptyString`).',
         avoid: 'Do not keep the v3 method on a renamed import. Do not disable the rule.',
       }),

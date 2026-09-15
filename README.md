@@ -199,6 +199,7 @@ Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some 
 - `bl-effect/no-pipe-on-fn`
 - `bl-effect/no-try-catch-in-gen`
 - `bl-effect/no-throw-in-gen`
+- `bl-effect/require-gen-self-options`
 - `bl-effect/require-return-yield-on-fail`
 - `bl-effect/schema-union-array`
 - `bl-effect/prefer-date-from-string`
@@ -215,7 +216,7 @@ Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some 
 - `bl-effect/prefer-predicate` (test files skipped)
 - `bl-effect/no-yield-ref-handle`
 - `bl-effect/prefer-vitest` (test files only)
-- `bl-effect/schema-no-legacy-filter`
+- `bl-effect/schema-no-legacy-filter` (`filter` / `filterEffect` / `rename` / `encodedSchema` / `typeSchema`)
 
 ### `bellona/tailwind`
 

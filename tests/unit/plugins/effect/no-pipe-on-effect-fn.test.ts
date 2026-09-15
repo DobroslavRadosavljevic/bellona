@@ -51,5 +51,19 @@ runEffectRule(noPipeOnEffectFnName, {
       code: `import { Effect as E } from 'effect';\nE.fn("loadUser")(function*() { return 1 }).pipe((x) => x)`,
       errors: [error('pipe')],
     },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.fnUntraced(function*() { return 1 }).pipe(Effect.catch(() => Effect.succeed(1)))',
+      ),
+      errors: [error('pipe')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.fnUntracedEager(function*() { return 1 }).pipe(Effect.catch(() => Effect.succeed(1)))',
+      ),
+      errors: [error('pipe')],
+    },
   ],
 });

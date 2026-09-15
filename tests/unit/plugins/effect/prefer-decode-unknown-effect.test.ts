@@ -3,6 +3,10 @@ import { error, validWith } from '../../lib/cases.ts';
 import { NO_EFFECT, ts, withEffect } from './fixtures.ts';
 import { runEffectRule } from './harness.ts';
 
+function decoder(name: string, replacement: string) {
+  return { messageId: 'decoder' as const, data: { name, replacement } };
+}
+
 runEffectRule(preferDecodeUnknownEffectName, {
   valid: [
     { ...ts, code: withEffect('Schema.decodeUnknownEffect(Schema.String)') },
@@ -23,7 +27,7 @@ runEffectRule(preferDecodeUnknownEffectName, {
     {
       ...ts,
       code: withEffect('Schema.decodeUnknown(Schema.String)'),
-      errors: [error('decoder')],
+      errors: [decoder('decodeUnknown', 'Schema.decodeUnknownEffect')],
     },
     {
       ...ts,
@@ -33,7 +37,7 @@ runEffectRule(preferDecodeUnknownEffectName, {
     {
       ...ts,
       code: withEffect('Schema.decodeUnknownEither(Schema.String)'),
-      errors: [error('decoder')],
+      errors: [decoder('decodeUnknownEither', 'Schema.decodeUnknownExit')],
     },
     {
       ...ts,
@@ -67,8 +71,19 @@ runEffectRule(preferDecodeUnknownEffectName, {
     },
     {
       ...ts,
-      code: "import { decodeUnknown, String } from 'effect/Schema';\ndecodeUnknown(String)",
+      code: `import { decodeUnknown, String } from 'effect/Schema';\ndecodeUnknown(String)`,
       errors: [error('decoder')],
+    },
+    {
+      ...ts,
+      code: withEffect(`
+const parse = Schema.decodeUnknown(Schema.String)
+const roundTrip = Schema.encodeUnknownEither(Schema.Number)
+`),
+      errors: [
+        decoder('decodeUnknown', 'Schema.decodeUnknownEffect'),
+        decoder('encodeUnknownEither', 'Schema.encodeUnknownExit'),
+      ],
     },
   ],
 });

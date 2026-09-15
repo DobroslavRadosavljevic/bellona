@@ -41,7 +41,7 @@ export const noV3Imports: CreateOnceRule = defineBellonaRule({
       moved: agentDiagnostic({
         problem:
           'This import specifier `"{{source}}"` moved in Effect v4. Import `{{replacement}}` instead.',
-        why: 'v3 module paths (`effect/Either`, `@effect/platform/HttpClient`, `effect/TestClock`, …) do not match v4 (`effect/Result`, `effect/unstable/http`, `effect/testing/TestClock`, …).',
+        why: 'v3 module paths (`effect/Either`, `@effect/platform/HttpClient`, `effect/TestClock`, …) do not match v4 (`effect/Result`, `effect/unstable/http`, `effect/testing/TestClock`, `fast-check`, …).',
         fix: 'Change the import to `{{replacement}}` and update the named bindings (e.g. `Either` → `Result`, `TRef` → `TxRef`). See bellona `effect-rules.md` for the map.',
         avoid: 'Do not re-export the old path. Do not disable the rule.',
       }),

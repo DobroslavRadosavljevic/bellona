@@ -37,6 +37,13 @@ const STREAM_REPLACEMENTS = new Map<string, string>([['async', 'Stream.callback'
 
 const SCOPE_REPLACEMENTS = new Map<string, string>([['extend', 'Scope.provide']]);
 
+const PREDICATE_REPLACEMENTS = new Map<string, string>([
+  ['isRecord', 'Predicate.isObject'],
+  ['isNullable', 'Predicate.isNullish'],
+  ['isNotNullable', 'Predicate.isNotNullish'],
+  ['isReadonlyRecord', 'Predicate.isReadonlyObject'],
+]);
+
 export const noV3EffectApisName = bnRuleName('no-v3-apis');
 
 function v3ApiOf(
@@ -61,6 +68,11 @@ function v3ApiOf(
   for (const [name, replacement] of SCOPE_REPLACEMENTS) {
     if (isModuleMember(node, bindings, 'scope', name)) {
       return { api: `Scope.${name}`, replacement };
+    }
+  }
+  for (const [name, replacement] of PREDICATE_REPLACEMENTS) {
+    if (isModuleMember(node, bindings, 'predicate', name)) {
+      return { api: `Predicate.${name}`, replacement };
     }
   }
   return undefined;

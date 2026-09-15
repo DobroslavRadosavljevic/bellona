@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.6**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.4.7**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 
@@ -269,6 +269,7 @@ rules: {
   'bl-effect/no-pipe-on-fn': 'error',
   'bl-effect/no-try-catch-in-gen': 'error',
   'bl-effect/no-throw-in-gen': 'error',
+  'bl-effect/require-gen-self-options': 'error',
   'bl-effect/require-return-yield-on-fail': 'error',
   'bl-effect/schema-union-array': 'error',
   'bl-effect/prefer-date-from-string': 'error',

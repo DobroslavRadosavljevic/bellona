@@ -3,7 +3,12 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getStaticPropertyName, unwrapExpression } from '../ast.ts';
-import { collectEffectBindings, isEffectFnAppliedCall, type EffectBindings } from '../bindings.ts';
+import {
+  collectEffectBindings,
+  isEffectFnAppliedCall,
+  isEffectFnUntracedCall,
+  type EffectBindings,
+} from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
 
 export const noPipeOnEffectFnName = bnRuleName('no-pipe-on-fn');
@@ -18,8 +23,8 @@ export const noPipeOnEffectFn: CreateOnceRule = defineBellonaRule({
       pipe: agentDiagnostic({
         problem:
           'This pipes the result of `Effect.fn(...)(...)` with `.pipe`. Extra combinators belong on `Effect.fn` itself.',
-        why: '`.pipe` after `fn` is a second composition path. `Effect.fn("name")(gen, combinator, …)` is the v4 slot.',
-        fix: 'Pass combinators as extra arguments: `Effect.fn("loadUser")(function* () { … }, Effect.catchTag("Boom", …))`. Remove `.pipe`.',
+        why: '`.pipe` after `fn` / `fnUntraced` is a second composition path. Extra combinators belong as extra arguments.',
+        fix: 'Pass combinators as extra arguments: `Effect.fn("loadUser")(function* () { … }, Effect.catchTag("Boom", …))` (same extra-arg slot on `fnUntraced`). Remove `.pipe`.',
         avoid: 'Do not assign to a temp and pipe. Do not disable the rule.',
       }),
     },
@@ -41,7 +46,10 @@ export const noPipeOnEffectFn: CreateOnceRule = defineBellonaRule({
           return;
         }
         const object = unwrapExpression(node.object);
-        if (object?.type !== 'CallExpression' || !isEffectFnAppliedCall(object, bindings)) {
+        if (object?.type !== 'CallExpression') {
+          return;
+        }
+        if (!isEffectFnAppliedCall(object, bindings) && !isEffectFnUntracedCall(object, bindings)) {
           return;
         }
         context.report({ messageId: 'pipe', node });

@@ -47,14 +47,15 @@ export const preferEffectFn: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Prefer Effect.fn("name") over functions that return Effect.gen',
+      description:
+        'Prefer Effect.fn("name") or Effect.fnUntraced over functions that return Effect.gen',
     },
     messages: {
       wrap: agentDiagnostic({
         problem:
-          'This function returns `Effect.gen(...)`. Wrap it with `Effect.fn("{{name}}")` instead. `it.effect` callbacks are excluded.',
-        why: '`Effect.fn` is the v4 named, traceable function. A plain function that returns `gen` hides the span name and the extra-combinator slot.',
-        fix: 'Write `export const {{name}} = Effect.fn("{{name}}")(function* (id: string) { return yield* find(id) })`. Pass extra combinators as extra arguments to `Effect.fn`, not `.pipe` on the result.',
+          'This function returns `Effect.gen(...)`. Wrap it with `Effect.fn("{{name}}")` or `Effect.fnUntraced`. `it.effect` callbacks are excluded.',
+        why: '`Effect.fn` is the v4 named, traceable function. `Effect.fnUntraced` is for library code and hot paths without a span. A plain function that returns `gen` hides both.',
+        fix: 'Write `export const {{name}} = Effect.fn("{{name}}")(function* (id: string) { return yield* find(id) })`. For a library helper, use `Effect.fnUntraced(function* (…) { … })`. Pass extra combinators as extra arguments, not `.pipe` on the result.',
         avoid:
           'Do not keep a wrapper `function {{name}}() { return Effect.gen(...) }`. Do not disable the rule.',
       }),

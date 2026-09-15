@@ -11,6 +11,12 @@ runEffectRule(preferEffectFnName, {
         'export const loadUser = Effect.fn("loadUser")(function*(id: string) { return id })',
       ),
     },
+    {
+      ...ts,
+      code: withEffect(
+        'export const validateBatchSize = Effect.fnUntraced(function*(size: number) { return size })',
+      ),
+    },
     { ...ts, code: withEffect('export const program = Effect.gen(function*() { return 1 })') },
     { ...ts, code: withEffect('export const ok = () => Effect.succeed(1)') },
     {
@@ -33,7 +39,7 @@ runEffectRule(preferEffectFnName, {
     {
       ...ts,
       code: withEffect('function loadUser() { return Effect.gen(function*() { return 1 }) }'),
-      errors: [error('wrap')],
+      errors: [{ messageId: 'wrap', data: { name: 'loadUser' } }],
     },
     {
       ...ts,

@@ -21,7 +21,7 @@ describe('plugins', () => {
     expect(effect.meta.name).toBe('bl-effect');
     expect(tailwind.meta.name).toBe('bl-tailwind');
     expect(Object.keys(js.rules).every((name) => !name.includes('/'))).toBe(true);
-    expect(Object.keys(effect.rules)).toHaveLength(25);
+    expect(Object.keys(effect.rules)).toHaveLength(26);
     expect(plugins).toEqual({
       js: 'bellona/js',
       react: 'bellona/react',

@@ -13,9 +13,9 @@ import {
 } from '../../../../src/plugins/effect/v3-imports.ts';
 
 describe('effect plugin', () => {
-  it('registers 25 rules under meta.name bl-effect', () => {
+  it('registers 26 rules under meta.name bl-effect', () => {
     expect(effect.meta.name).toBe('bl-effect');
-    expect(Object.keys(effect.rules)).toHaveLength(25);
+    expect(Object.keys(effect.rules)).toHaveLength(26);
   });
 });
 
@@ -62,11 +62,20 @@ describe('v3ImportReplacement', () => {
     expect(v3ImportReplacement('effect/Either')).toBe('effect/Result');
     expect(v3ImportReplacement('effect/FiberRef')).toBe('effect/References');
     expect(v3ImportReplacement('effect/JSONSchema')).toBe('effect/JsonSchema');
+    expect(v3ImportReplacement('effect/FastCheck')).toBe('fast-check');
+    expect(v3ImportReplacement('effect/testing/FastCheck')).toBe('fast-check');
+    expect(v3ImportReplacement('effect/ParseResult')).toBe('effect/SchemaIssue');
+    expect(v3ImportReplacement('effect/SchemaError')).toBe('effect/Schema');
     expect(v3ImportReplacement('effect/TRef')).toBe('effect/TxRef');
     expect(v3ImportReplacement('effect/TestClock')).toBe('effect/testing/TestClock');
     expect(v3ImportReplacement('@effect/platform/HttpClient')).toBe('effect/unstable/http');
     expect(v3ImportReplacement('@effect/sql/SqlClient')).toBe('effect/unstable/sql');
+    expect(v3ImportReplacement('@effect/cli/Args')).toBe('effect/unstable/cli/Argument');
+    expect(v3ImportReplacement('@effect/cli/Options')).toBe('effect/unstable/cli/Flag');
     expect(v3ImportReplacement('effect/Mailbox')).toBe('effect/Queue');
+    expect(v3ImportReplacement('effect/unstable/encoding/Msgpack')).toBe(
+      'effect/unstable/encoding/SchemaBinary',
+    );
   });
 
   it('maps v3 package prefixes', () => {

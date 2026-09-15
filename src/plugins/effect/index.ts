@@ -32,6 +32,10 @@ import { preferServiceOf, preferServiceOfName } from './rules/prefer-service-of.
 import { preferTryPromise, preferTryPromiseName } from './rules/prefer-try-promise.ts';
 import { requireEffectFnName, requireEffectFnNameName } from './rules/require-effect-fn-name.ts';
 import {
+  requireGenSelfOptions,
+  requireGenSelfOptionsName,
+} from './rules/require-gen-self-options.ts';
+import {
   requireReturnYieldOnFail,
   requireReturnYieldOnFailName,
 } from './rules/require-return-yield-on-fail.ts';
@@ -64,6 +68,7 @@ const effect = defineBellonaPlugin('bl-effect', {
   [preferServiceOfName]: preferServiceOf,
   [preferTryPromiseName]: preferTryPromise,
   [requireEffectFnNameName]: requireEffectFnName,
+  [requireGenSelfOptionsName]: requireGenSelfOptions,
   [requireReturnYieldOnFailName]: requireReturnYieldOnFail,
   [requireServiceIdPathName]: requireServiceIdPath,
   [requireServiceStaticLayerName]: requireServiceStaticLayer,
@@ -113,6 +118,8 @@ export {
   preferTryPromiseName,
   requireEffectFnName,
   requireEffectFnNameName,
+  requireGenSelfOptions,
+  requireGenSelfOptionsName,
   requireReturnYieldOnFail,
   requireReturnYieldOnFailName,
   requireServiceIdPath,
