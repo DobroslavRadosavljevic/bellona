@@ -1,4 +1,0 @@
-interface:
-  display_name: "Effect"
-  short_description: "Build Effect v4 RC code"
-  default_prompt: "Use $effect to build, review, migrate, or debug this Effect v4 RC implementation with current documentation and the full module catalog."
