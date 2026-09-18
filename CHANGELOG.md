@@ -9,6 +9,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.8] - 2026-09-18
+
 ### Fixed
 
 - `bl-effect/prefer-service-of`: check service factory returns without flagging data returned by nested methods, helpers, or transaction callbacks.
@@ -122,7 +124,8 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 - Specifier catalog on the package root (`plugins.js`, `plugins.react`, and the other keys).
 - Consumer agent skill under `skills/bellona/`.
 
-[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.7...HEAD
+[Unreleased]: https://github.com/DobroslavRadosavljevic/bellona/compare/v0.4.8...HEAD
+[0.4.8]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.8
 [0.4.7]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.7
 [0.4.6]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.6
 [0.4.5]: https://github.com/DobroslavRadosavljevic/bellona/releases/tag/v0.4.5

@@ -185,7 +185,7 @@ Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.encodeK
 
 ### `bl-effect/prefer-service-of`
 
-**Tests skipped.** Return `Database.of({ ... })`, not a plain object, when implementing a `Context.Service`.
+**Tests skipped.** Return `Database.of({ ... })`, not a plain object, when implementing a `Context.Service`. Nested method, helper, and transaction callback returns are not flagged.
 
 ### `bl-effect/no-run-promise-in-modules`
 
