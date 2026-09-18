@@ -46,6 +46,50 @@ class Helper {
       ),
       { filename: 'src/app.ts', options: [{ allow: ['app.ts'] }] },
     ),
+
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.effect(Database, Effect.fn("Database.make")(function*() {
+    return Database.of({
+      query: Effect.fn("Database.query")(function*() {
+        return { id: "user" }
+      }),
+      transaction: Effect.fn("Database.transaction")(function*() {
+        return yield* db.transaction(Effect.fn("Database.transaction.tx")(function*() {
+          return { user, workspace }
+        }))
+      }),
+      read() { return { ok: true } },
+      arrow: () => { return { ok: true } },
+    })
+  })())
+}
+`),
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.effect(Database, Effect.succeed(Database.of({
+    read() { return { ok: true } },
+  })))
+}
+`),
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.effect(Database, Effect.gen(function*() {
+    function helper() { return { ok: true } }
+    const rows = items.map((item) => { return { id: item.id } })
+    return Database.of({ helper, rows })
+  }))
+}
+`),
+    },
   ],
   invalid: [
     {
@@ -66,6 +110,32 @@ class Database extends Context.Service<Database, { query(sql: string): string }>
   static readonly layer = Layer.effect(Database, Effect.succeed({ query: (sql: string) => sql }))
 }
 `),
+      errors: [error('of')],
+    },
+
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.effect(Database, Effect.fn("Database.make")(function*() {
+    return { read() { return { ok: true } } }
+  })())
+}
+`),
+      errors: [error('of')],
+    },
+    {
+      ...ts,
+      code: `
+import { Service } from "effect/Context";
+import { effect as layerEffect } from "effect/Layer";
+import { sync } from "effect/Effect";
+class Database extends Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = layerEffect(Database, sync(() => {
+    return { read() { return { ok: true } } }
+  }))
+}
+`,
       errors: [error('of')],
     },
   ],

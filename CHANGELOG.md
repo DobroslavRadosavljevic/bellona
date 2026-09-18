@@ -9,6 +9,10 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+### Fixed
+
+- `bl-effect/prefer-service-of`: check service factory returns without flagging data returned by nested methods, helpers, or transaction callbacks.
+
 ## [0.4.7] - 2026-09-15
 
 ### Added

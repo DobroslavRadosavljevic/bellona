@@ -78,16 +78,49 @@ export const preferServiceOf: CreateOnceRule = defineBellonaRule({
         context.report({ messageId: 'of', node, data: { name } });
         return;
       }
-      let current: ESTree.Node | undefined = node;
+      let current: ESTree.Node | undefined = node.parent ?? undefined;
       while (current !== undefined) {
         if (
-          current.type === 'CallExpression' &&
-          isModuleCall(current, bindings, 'layer', 'effect')
+          current.type === 'FunctionExpression' ||
+          current.type === 'FunctionDeclaration' ||
+          current.type === 'ArrowFunctionExpression'
         ) {
-          context.report({ messageId: 'of', node, data: { name } });
-          return;
+          break;
         }
         current = current.parent ?? undefined;
+      }
+      if (current === undefined) {
+        return;
+      }
+
+      // Follow only the factory expression. Never cross another function body.
+      while (current.parent !== null) {
+        const parent: ESTree.Node = current.parent;
+        if (unwrapExpression(parent) === current) {
+          current = parent;
+          continue;
+        }
+        if (parent.type !== 'CallExpression') {
+          return;
+        }
+        if (isModuleCall(parent, bindings, 'layer', 'effect')) {
+          if (getCallArgument(parent, 1) === unwrapExpression(current)) {
+            context.report({ messageId: 'of', node, data: { name } });
+          }
+          return;
+        }
+        const callee = unwrapExpression(parent.callee);
+        const factoryCall = callee?.type === 'CallExpression' ? callee : parent;
+        const isFactory =
+          isModuleCall(factoryCall, bindings, 'effect', 'gen') ||
+          isModuleCall(factoryCall, bindings, 'effect', 'sync') ||
+          isModuleCall(factoryCall, bindings, 'effect', 'fn') ||
+          isModuleCall(factoryCall, bindings, 'effect', 'fnUntraced');
+        const isFactoryInvocation = current.type === 'CallExpression' && callee === current;
+        if (!isFactory && !isFactoryInvocation) {
+          return;
+        }
+        current = parent;
       }
     }
   },
