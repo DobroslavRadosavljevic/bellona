@@ -175,6 +175,20 @@ Prefer `Schema.check` / `Schema.refine` / `Schema.optionalKey` / `Schema.encodeK
 
 ## Services / runtime
 
+### `bl-effect/require-service-filename`
+
+Files that define `Context.Service` must end with `.service.ts`.
+This includes class and value forms, named import aliases, and namespace imports.
+Files that only import or use a service do not need this suffix.
+Test files are checked. Use `allow` for explicit exceptions.
+
+### `bl-effect/max-services`
+
+Allow at most one `Context.Service` definition per file.
+Class and value forms count. A class factory counts once.
+The rule reports the second definition. Move each extra service into its own file.
+Test files are checked. Use `allow` for explicit exceptions.
+
 ### `bl-effect/require-service-id-path`
 
 **Tests skipped.** `Context.Service` ids must look like `pkg/dir/Name` (two or more non-empty `/` segments). Not `"Database"`.

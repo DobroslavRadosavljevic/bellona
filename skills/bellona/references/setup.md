@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.8**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.4.9**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 
@@ -276,6 +276,8 @@ rules: {
   'bl-effect/prefer-decode-unknown': 'error',
   'bl-effect/no-it-scoped': 'error',
   'bl-effect/no-run-promise-in-modules': 'error',
+  'bl-effect/require-service-filename': 'error',
+  'bl-effect/max-services': 'error',
   'bl-effect/require-service-id-path': 'error',
   'bl-effect/require-service-static-layer': 'error',
   'bl-effect/prefer-service-of': 'error',

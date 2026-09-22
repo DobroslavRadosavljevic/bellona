@@ -206,6 +206,8 @@ Files that do not import `effect`, `effect/*`, or `@effect/*` are skipped. Some 
 - `bl-effect/prefer-decode-unknown`
 - `bl-effect/no-it-scoped`
 - `bl-effect/no-run-promise-in-modules` (`entry`, default `/main.ts` `/server.ts` `/index.ts` `/app.ts` `/runtime.ts`; test files skipped)
+- `bl-effect/require-service-filename` (requires `.service.ts`, including test files)
+- `bl-effect/max-services` (at most one service per file, including test files)
 - `bl-effect/require-service-id-path` (test files skipped)
 - `bl-effect/require-service-static-layer` (test files skipped)
 - `bl-effect/prefer-service-of` (test files skipped)

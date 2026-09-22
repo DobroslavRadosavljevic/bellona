@@ -9,6 +9,13 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+## [0.4.9] - 2026-09-22
+
+### Added
+
+- `bl-effect/require-service-filename`: require `.service.ts` for files that define an Effect v4 service.
+- `bl-effect/max-services`: allow at most one Effect v4 service per file.
+
 ## [0.4.8] - 2026-09-18
 
 ### Fixed

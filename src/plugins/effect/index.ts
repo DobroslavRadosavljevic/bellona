@@ -1,4 +1,5 @@
 import { defineBellonaPlugin } from '../../lib/plugin.ts';
+import { maxServices, maxServicesName } from './rules/max-services.ts';
 import { noDateNowInEffect, noDateNowInEffectName } from './rules/no-date-now-in-effect.ts';
 import { noItEffectScoped, noItEffectScopedName } from './rules/no-it-effect-scoped.ts';
 import { noPipeOnEffectFn, noPipeOnEffectFnName } from './rules/no-pipe-on-effect-fn.ts';
@@ -39,6 +40,10 @@ import {
   requireReturnYieldOnFail,
   requireReturnYieldOnFailName,
 } from './rules/require-return-yield-on-fail.ts';
+import {
+  requireServiceFilename,
+  requireServiceFilenameName,
+} from './rules/require-service-filename.ts';
 import { requireServiceIdPath, requireServiceIdPathName } from './rules/require-service-id-path.ts';
 import {
   requireServiceStaticLayer,
@@ -48,6 +53,7 @@ import { schemaNoLegacyFilter, schemaNoLegacyFilterName } from './rules/schema-n
 import { schemaUnionArray, schemaUnionArrayName } from './rules/schema-union-array.ts';
 
 const effect = defineBellonaPlugin('bl-effect', {
+  [maxServicesName]: maxServices,
   [noDateNowInEffectName]: noDateNowInEffect,
   [noItEffectScopedName]: noItEffectScoped,
   [noPipeOnEffectFnName]: noPipeOnEffectFn,
@@ -70,6 +76,7 @@ const effect = defineBellonaPlugin('bl-effect', {
   [requireEffectFnNameName]: requireEffectFnName,
   [requireGenSelfOptionsName]: requireGenSelfOptions,
   [requireReturnYieldOnFailName]: requireReturnYieldOnFail,
+  [requireServiceFilenameName]: requireServiceFilename,
   [requireServiceIdPathName]: requireServiceIdPath,
   [requireServiceStaticLayerName]: requireServiceStaticLayer,
   [schemaNoLegacyFilterName]: schemaNoLegacyFilter,
@@ -78,6 +85,8 @@ const effect = defineBellonaPlugin('bl-effect', {
 
 export default effect;
 export {
+  maxServices,
+  maxServicesName,
   noDateNowInEffect,
   noDateNowInEffectName,
   noItEffectScoped,
@@ -122,6 +131,8 @@ export {
   requireGenSelfOptionsName,
   requireReturnYieldOnFail,
   requireReturnYieldOnFailName,
+  requireServiceFilename,
+  requireServiceFilenameName,
   requireServiceIdPath,
   requireServiceIdPathName,
   requireServiceStaticLayer,
