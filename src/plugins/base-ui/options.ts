@@ -156,3 +156,31 @@ export function readNativeButtonWithRenderOptions(context: Context): NativeButto
     requireExplicitWhenUnknown: booleanField(options, 'requireExplicitWhenUnknown', false),
   };
 }
+
+export const COMPONENT_AS_RENDER_OPTION_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    allow: {
+      type: 'array',
+      items: { type: 'string', minLength: 1 },
+      uniqueItems: true,
+    },
+    ignore: {
+      type: 'array',
+      items: { type: 'string', minLength: 1 },
+      uniqueItems: true,
+    },
+  },
+} as const;
+
+export const DEFAULT_COMPONENT_AS_RENDER_OPTIONS = [{ allow: [], ignore: [] }];
+
+export function readAllowList(context: Context): readonly string[] {
+  return stringListField(objectOptionAt(context, 0), 'allow', []);
+}
+
+/** JSX element names whose `render` prop is not a Base UI `render` prop. */
+export function readIgnoredComponents(context: Context): ReadonlySet<string> {
+  return toNameSet(stringListField(objectOptionAt(context, 0), 'ignore', []));
+}

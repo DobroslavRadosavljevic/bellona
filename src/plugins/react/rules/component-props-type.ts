@@ -45,12 +45,20 @@ function unwrapType(type: ESTree.TSType): ESTree.TSType {
   return current;
 }
 
+/** `FooProps` → `FooProps`. `React.FC` → `FC` (last segment of a qualified name). */
 function typeReferenceName(type: ESTree.TSType): string | undefined {
   const unwrapped = unwrapType(type);
-  if (unwrapped.type !== 'TSTypeReference' || unwrapped.typeName.type !== 'Identifier') {
+  if (unwrapped.type !== 'TSTypeReference') {
     return undefined;
   }
-  return unwrapped.typeName.name;
+  const { typeName } = unwrapped;
+  if (typeName.type === 'Identifier') {
+    return typeName.name;
+  }
+  if (typeName.type === 'TSQualifiedName') {
+    return typeName.right.name;
+  }
+  return undefined;
 }
 
 function firstTypeArgument(type: ESTree.TSType): ESTree.TSType | undefined {

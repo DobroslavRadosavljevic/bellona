@@ -2,7 +2,7 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
-import { enclosingFunction, isReturnedNode, unwrapExpression } from '../ast.ts';
+import { enclosingFunction, isReturnedNode, outerParent, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
   generatorFromEffectGenOrFn,
@@ -51,6 +51,12 @@ export const requireReturnYieldOnFail: CreateOnceRule = defineBellonaRule({
           return;
         }
         if (isReturnedNode(node)) {
+          return;
+        }
+        // Only a fail that is a whole statement or a whole initializer lets the code go on.
+        // `row ?? (yield* fail)` and `ok ? value : yield* fail` are values, not statements.
+        const parent = outerParent(node);
+        if (parent?.type !== 'ExpressionStatement' && parent?.type !== 'VariableDeclarator') {
           return;
         }
         const argument = unwrapExpression(node.argument);

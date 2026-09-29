@@ -7,13 +7,31 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 
 type TypeAssertion = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
 
-const commentOwnerKinds = new Set([
-  'ExpressionStatement',
-  'PropertyDefinition',
-  'ReturnStatement',
-  'ThrowStatement',
-  'VariableDeclaration',
-]);
+const classFieldKinds: ReadonlySet<string> = new Set(['AccessorProperty', 'PropertyDefinition']);
+
+/**
+ * The comment owner is the nearest statement, declaration, or class field.
+ * A comment above an enclosing `function` or `if` block does not describe an
+ * assertion deep inside it.
+ */
+function isCommentOwner(node: ESTree.Node): boolean {
+  return (
+    node.type.endsWith('Statement') ||
+    node.type.endsWith('Declaration') ||
+    classFieldKinds.has(node.type)
+  );
+}
+
+function hasMarkerBefore(
+  sourceCode: SourceCode,
+  node: ESTree.Node,
+  assertion: TypeAssertion,
+  pattern: RegExp,
+): boolean {
+  return sourceCode
+    .getCommentsBefore(node)
+    .some((comment) => comment.end <= assertion.start && pattern.test(comment.value));
+}
 
 function isConstAssertion(node: TypeAssertion): boolean {
   return (
@@ -26,14 +44,16 @@ function isConstAssertion(node: TypeAssertion): boolean {
 function hasSafetyComment(sourceCode: SourceCode, node: TypeAssertion, pattern: RegExp): boolean {
   let current: ESTree.Node = node;
   while (true) {
-    if (
-      sourceCode
-        .getCommentsBefore(current)
-        .some((comment) => comment.end <= node.start && pattern.test(comment.value))
-    ) {
-      return true;
+    if (hasMarkerBefore(sourceCode, current, node, pattern)) return true;
+    if (isCommentOwner(current)) {
+      // `// SAFETY: …` above `export const x = y as T` sits before the export.
+      const { parent } = current;
+      return (
+        (parent.type === 'ExportNamedDeclaration' || parent.type === 'ExportDefaultDeclaration') &&
+        hasMarkerBefore(sourceCode, parent, node, pattern)
+      );
     }
-    if (commentOwnerKinds.has(current.type) || current.parent.type === 'Program') return false;
+    if (current.parent.type === 'Program') return false;
     current = current.parent;
   }
 }
@@ -55,7 +75,7 @@ export const requireSafetyCommentForTypeAssertion: CreateOnceRule = defineBellon
         problem:
           'This type assertion (`as T` or `<T>x`) has no nearby comment that contains `{{marker}}:` (default marker `SAFETY`). `as const` does not need a comment.',
         why: 'An assertion forges a type TypeScript could not prove. Without a stated invariant, later readers cannot tell what was checked.',
-        fix: 'Prefer removing the assertion and parsing instead. If the assertion must stay, put a comment on the assertion or its containing statement (`ExpressionStatement`, `VariableDeclaration`, `ReturnStatement`, `ThrowStatement`, `PropertyDefinition`) like `// {{marker}}: UserSchema.parse already validated this JSON`.',
+        fix: 'Prefer removing the assertion and parsing instead. If the assertion must stay, put a comment on the assertion or on the nearest statement or class field that contains it (an `export` in front also counts), like `// {{marker}}: UserSchema.parse already validated this JSON`.',
         avoid:
           'Do not add an empty `{{marker}}:` comment. Do not move the comment to an unrelated line. Do not switch to a chained assertion. Do not disable the rule.',
       }),

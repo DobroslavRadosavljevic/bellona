@@ -16,6 +16,30 @@ runEffectRule(requireReturnYieldOnFailName, {
       ),
     },
     { ...ts, code: withEffect('Effect.gen(function*() { return yield* Effect.succeed(1) })') },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.gen(function*() { const row = [1].at(0); const value = row ?? (yield* Effect.fail("x")); return value })',
+      ),
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.gen(function*() { const ok = true; return ok ? 1 : yield* Effect.fail("x") })',
+      ),
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.gen(function*() { const ok = true; const value = ok ? 1 : yield* Effect.fail("x"); return value })',
+      ),
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.gen(function*() { return yield* Effect.succeed(1).pipe(Effect.andThen(() => Effect.fail("x"))) })',
+      ),
+    },
     { ...ts, code: withEffect('function* g() { yield* Effect.fail("x") }') },
     {
       ...ts,
@@ -64,6 +88,21 @@ runEffectRule(requireReturnYieldOnFailName, {
     {
       ...ts,
       code: withEffect('Effect.gen(function*() { yield* Effect.dieMessage("x") })'),
+      errors: [error('returnYield')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.gen(function*() { yield* Effect.die(new Error("x")) })'),
+      errors: [error('returnYield')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.gen(function*() { yield* Effect.failCause(cause) })'),
+      errors: [error('returnYield')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.gen(function*() { yield* Effect.failCauseSync(() => cause) })'),
       errors: [error('returnYield')],
     },
     {

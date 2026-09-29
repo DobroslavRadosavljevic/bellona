@@ -8,6 +8,7 @@ describe('react plugin', () => {
       'component-file-name-match',
       'component-props-type',
       'hook-file-name-match',
+      'no-forward-ref',
       'no-impl-component-suffix',
       'no-jsx-iife-in-components',
       'no-jsx-local-constants-in-components',
@@ -16,8 +17,9 @@ describe('react plugin', () => {
       'no-multi-component-files',
       'no-multi-hook-files',
       'no-native-html',
-      'no-namespace',
+      'no-react-namespace',
       'no-render-helper-functions-in-components',
+      'prefer-context-as-provider',
       'require-bare-hook-call',
     ]);
   });

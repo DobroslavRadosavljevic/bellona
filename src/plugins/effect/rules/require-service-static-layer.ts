@@ -3,7 +3,7 @@ import type { ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
-import { getCallArgument, hasStaticClassMember, objectHasMakeOption } from '../ast.ts';
+import { hasStaticClassMember } from '../ast.ts';
 import {
   collectEffectBindings,
   isContextServiceClassSuper,
@@ -22,14 +22,13 @@ export const requireServiceStaticLayer: CreateOnceRule = defineBellonaRule({
     type: 'suggestion',
     docs: {
       description:
-        'Require Context.Service classes to declare static readonly layer (or options.make)',
+        'Require Context.Service classes to declare static readonly layer, also when they set options.make',
     },
     messages: {
       layer: agentDiagnostic({
-        problem:
-          'This `Context.Service` class has no `static readonly layer` (and no `options.make` that provides one).',
-        why: 'v4 services are provided through a static layer, not `.Default`. Without it, the app cannot `Layer.provide` the service.',
-        fix: 'Add `static readonly layer = Layer.effect(this, …)` (or the documented `make` options) on the class.',
+        problem: 'This `Context.Service` class has no `static readonly layer`.',
+        why: 'v4 services are provided through a static layer, not `.Default`. `options.make` only stores the constructor Effect on the class. It does not make a layer.',
+        fix: 'Add `static readonly layer = Layer.effect(this, Effect.gen(function* () { … }))`. When the class has `make`, write `static readonly layer = Layer.effect(this, this.make)`.',
         avoid: 'Do not add `.Default`. Do not disable the rule.',
       }),
       defaultMember: agentDiagnostic({
@@ -66,12 +65,6 @@ export const requireServiceStaticLayer: CreateOnceRule = defineBellonaRule({
       }
       if (hasStaticClassMember(node, 'Default')) {
         context.report({ messageId: 'defaultMember', node });
-      }
-      const superCall = node.superClass;
-      if (superCall !== null && superCall !== undefined && superCall.type === 'CallExpression') {
-        if (objectHasMakeOption(getCallArgument(superCall, 1))) {
-          return;
-        }
       }
       if (hasStaticClassMember(node, 'layer')) {
         return;

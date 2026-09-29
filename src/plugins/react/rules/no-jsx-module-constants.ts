@@ -17,7 +17,7 @@ export const noJsxModuleConstants: CreateOnceRule = defineBellonaRule({
     messages: {
       moduleConst: agentDiagnostic({
         problem: 'This module assigns JSX to a module-level `const` (`const icon = <Svg />`).',
-        why: 'Module-level JSX is created once and reused as an element, not as a component. It cannot take props cleanly and is easy to share by accident.',
+        why: 'Module-level JSX is an element, not a component. It cannot take props, and it hides a UI part from the component file rules. (React allows a shared element, and React Compiler hoists static JSX itself, so this is a structure rule, not a bug fix.)',
         fix: 'Move the JSX into a component file (PascalCase). Export that component and render `<Icon />` (pass props as needed).',
         avoid:
           'Do not wrap the element in a function that is not a component (`function getIcon()`). Do not disable the rule.',

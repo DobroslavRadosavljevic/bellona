@@ -11,7 +11,7 @@ describe('bench options', () => {
       'js',
       '--plugin=react',
       '--rule',
-      'max-classes',
+      'no-inline-import-type',
       '--scale',
       '4',
       '--repeat=2',
@@ -20,7 +20,7 @@ describe('bench options', () => {
     ]);
     expect(options).toEqual({
       pluginIds: ['js', 'react'],
-      ruleFilters: ['max-classes'],
+      ruleFilters: ['no-inline-import-type'],
       scale: 4,
       repeat: 2,
       keep: true,
@@ -33,7 +33,7 @@ describe('bench options', () => {
 describe('bench corpus', () => {
   it('writes eight domains per scale step', () => {
     const files = buildCorpusFiles(2);
-    expect(corpusStats(files).files).toBe(16);
+    expect(corpusStats(files).files).toBe(18);
     expect(files.some((file) => file.relativePath.startsWith('js/'))).toBe(true);
     expect(files.some((file) => file.relativePath.startsWith('elysia/routes/'))).toBe(true);
   });
@@ -47,8 +47,8 @@ describe('bench report', () => {
           pluginId: 'js',
           sourcePath: 'src/plugins/js/index.ts',
           metaName: 'bl-js',
-          ruleName: 'max-classes',
-          ruleId: 'bl-js/max-classes',
+          ruleName: 'no-inline-import-type',
+          ruleId: 'bl-js/no-inline-import-type',
         },
         milliseconds: 120,
       },

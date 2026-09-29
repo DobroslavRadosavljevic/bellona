@@ -44,6 +44,13 @@ runEffectRule(noTryCatchInEffectGenName, {
       code: withEffect(
         'Effect.gen(function*() { try { return 1 } finally { yield* Effect.void } })',
       ),
+      errors: [error('tryFinally')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Effect.gen(function*() { try { yield* load } catch { return 0 } finally { done() } })',
+      ),
       errors: [error('tryCatch')],
     },
   ],

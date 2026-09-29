@@ -1,4 +1,5 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
+import type { ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
@@ -7,6 +8,7 @@ import {
   collectEffectBindings,
   isModuleCall,
   isModuleMember,
+  isSchemaValue,
   type EffectBindings,
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
@@ -22,7 +24,20 @@ const LEGACY_DECODERS = new Map<string, string>([
   ['encode', 'Schema.encodeEffect'],
 ]);
 
+/** v4 keeps these names for transformations: `Schema.decode({ decode, encode })`. */
 const TRANSFORM_DECODERS = new Set(['decode', 'encode']);
+
+/**
+ * True when a `Schema.decode` / `Schema.encode` argument is a schema, which is the v3 form.
+ * v4 takes a transformation: an object literal, `SchemaTransformation.trim()`, or a
+ * variable. Only a `Schema.*` value or a PascalCase name (`User`) reads as a schema.
+ */
+function isV3DecoderArgument(node: ESTree.Node | undefined, bindings: EffectBindings): boolean {
+  if (node?.type === 'Identifier') {
+    return /^[A-Z]/u.test(node.name);
+  }
+  return isSchemaValue(node, bindings);
+}
 
 export const preferDecodeUnknownEffectName = bnRuleName('prefer-decode-unknown');
 
@@ -38,7 +53,7 @@ export const preferDecodeUnknownEffect: CreateOnceRule = defineBellonaRule({
         problem:
           'This calls `Schema.{{name}}`. Effect v4 renamed decode/encode helpers to `*Effect` / `*Exit`.',
         why: 'The old names are v3. The v4 names make the Effect/Exit channel obvious.',
-        fix: 'Replace `Schema.{{name}}` with `{{replacement}}`. Object-form `Schema.decode({ … })` transforms are not this rule.',
+        fix: 'Replace `Schema.{{name}}` with `{{replacement}}`. v4 `Schema.decode(transformation)` / `Schema.encode(transformation)` are not this rule.',
         avoid: 'Do not keep the old name behind an alias. Do not disable the rule.',
       }),
     },
@@ -62,7 +77,7 @@ export const preferDecodeUnknownEffect: CreateOnceRule = defineBellonaRule({
           }
           if (
             TRANSFORM_DECODERS.has(name) &&
-            getCallArgument(node, 0)?.type === 'ObjectExpression'
+            !isV3DecoderArgument(getCallArgument(node, 0), bindings)
           ) {
             return;
           }

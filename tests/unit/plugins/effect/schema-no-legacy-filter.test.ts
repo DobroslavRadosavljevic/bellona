@@ -11,6 +11,13 @@ runEffectRule(schemaNoLegacyFilterName, {
   valid: [
     { ...ts, code: withEffect('Schema.String.check(Schema.isMinLength(1))') },
     { ...ts, code: withEffect('Schema.Number.check(Schema.isGreaterThan(0))') },
+    {
+      ...ts,
+      code: withEffect(
+        'Schema.Number.check(Schema.isInt(), Schema.isBetween({ minimum: 1, maximum: 9 }))',
+      ),
+    },
+    { ...ts, code: withEffect('Schema.String.check(Schema.isUUID())') },
     { ...ts, code: withEffect('Schema.optionalKey(Schema.String)') },
     {
       ...ts,
@@ -25,6 +32,15 @@ runEffectRule(schemaNoLegacyFilterName, {
       ),
     },
     { ...ts, code: withEffect('[1,2,3].filter((n) => n > 0)') },
+    {
+      ...ts,
+      code: withEffect('Schema.Literals(["a", "b"]).literals.filter((value) => value !== "a")'),
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.Array(Schema.String).makeUnsafe(["a"]).filter(Boolean)'),
+    },
+    { ...ts, code: withEffect('Schema.Struct({ a: Schema.String }).fields.a.pattern') },
     { ...ts, code: NO_EFFECT },
     validWith(withEffect('Schema.String.filter((s) => s.length > 0)'), {
       filename: 'src/app.ts',
@@ -34,13 +50,45 @@ runEffectRule(schemaNoLegacyFilterName, {
   invalid: [
     {
       ...ts,
+      code: withEffect('Schema.Number.pipe(Schema.int())'),
+      errors: [legacy('int', 'Schema.check(Schema.isInt())')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.Number.pipe(Schema.greaterThan(0))'),
+      errors: [legacy('greaterThan', 'Schema.check(Schema.isGreaterThan(n))')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.Number.pipe(Schema.between(1, 9))'),
+      errors: [legacy('between', 'Schema.check(Schema.isBetween({ minimum, maximum }))')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.String.pipe(Schema.minLength(1))'),
+      errors: [legacy('minLength', 'Schema.check(Schema.isMinLength(n))')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.String.pipe(Schema.maxLength(9))'),
+      errors: [legacy('maxLength', 'Schema.check(Schema.isMaxLength(n))')],
+    },
+    {
+      ...ts,
+      code: withEffect('const Id = Schema.UUID'),
+      errors: [legacy('UUID', 'Schema.String.check(Schema.isUUID())')],
+    },
+    {
+      ...ts,
       code: withEffect('Schema.String.filter((s) => s.length > 0)'),
       errors: [error('legacy')],
     },
     {
       ...ts,
       code: withEffect('Schema.filter((s: string) => s.length > 0)'),
-      errors: [error('legacy')],
+      errors: [
+        legacy('filter', 'Schema.check(Schema.makeFilter(predicate)) / Schema.refine(refinement)'),
+      ],
     },
     {
       ...ts,
@@ -65,7 +113,9 @@ runEffectRule(schemaNoLegacyFilterName, {
     {
       ...ts,
       code: withEffect('Schema.nonEmptyString()'),
-      errors: [error('legacy')],
+      errors: [
+        legacy('nonEmptyString', 'Schema.check(Schema.isNonEmpty()) / Schema.NonEmptyString'),
+      ],
     },
     {
       ...ts,
@@ -85,6 +135,13 @@ runEffectRule(schemaNoLegacyFilterName, {
     {
       ...ts,
       code: withEffect('Schema.String.pattern(/^[a-z]+$/)'),
+      errors: [error('legacy')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'Schema.Array(Schema.Number).pipe(Schema.check(Schema.isMinLength(1))).filter(() => true)',
+      ),
       errors: [error('legacy')],
     },
     {

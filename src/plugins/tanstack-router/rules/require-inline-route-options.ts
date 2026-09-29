@@ -23,7 +23,7 @@ export const requireInlineRouteOptions: CreateOnceRule = defineBellonaRule({
       inlineOptions: agentDiagnostic({
         problem:
           '`{{factoryName}}` is given a helper, variable, or spread instead of an inline route options object.',
-        why: 'A shared helper hides `loader`, `component`, and the other route keys. The route file then does not show the page.',
+        why: 'The router plugin code-splits `component`, `loader`, and the other route keys only from an inline object. A helper or variable keeps them in the main bundle and hides the page from the route file.',
         fix: 'Pass an object literal on this call: `createFileRoute("/posts")({ component: PostsPage })`. Put shared UI in the `component` value, not in place of the options object.',
         avoid:
           'Do not pass `legalRoute("…")` or `{ ...legalRoute("…") }`. Do not store options in a shared variable. Do not disable the rule.',

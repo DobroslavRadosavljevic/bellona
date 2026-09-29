@@ -7,12 +7,9 @@ import {
   noControlFlowOutsideEdge,
   noControlFlowOutsideEdgeName,
 } from './rules/no-control-flow-outside-edge.ts';
+import { noDeprecatedApis, noDeprecatedApisName } from './rules/no-deprecated-apis.ts';
 import { noDynamicRouterTo, noDynamicRouterToName } from './rules/no-dynamic-router-to.ts';
 import { noGetRouteApi, noGetRouteApiName } from './rules/no-get-route-api.ts';
-import {
-  noHooksInRouteLifecycle,
-  noHooksInRouteLifecycleName,
-} from './rules/no-hooks-in-route-lifecycle.ts';
 import {
   noImperativeLocationNavigation,
   noImperativeLocationNavigationName,
@@ -37,30 +34,26 @@ import {
 } from './rules/no-router-type-assertion.ts';
 import { noSearchInLoader, noSearchInLoaderName } from './rules/no-search-in-loader.ts';
 import {
+  noWholeSearchLoaderDeps,
+  noWholeSearchLoaderDepsName,
+} from './rules/no-whole-search-loader-deps.ts';
+import {
   requireInlineRouteOptions,
   requireInlineRouteOptionsName,
 } from './rules/require-inline-route-options.ts';
-import {
-  requireParamsWithPathTokens,
-  requireParamsWithPathTokensName,
-} from './rules/require-params-with-path-tokens.ts';
 import {
   requireRouterHookFrom,
   requireRouterHookFromName,
 } from './rules/require-router-hook-from.ts';
 import { requireThrowNotFound, requireThrowNotFoundName } from './rules/require-throw-not-found.ts';
 import { requireThrowRedirect, requireThrowRedirectName } from './rules/require-throw-redirect.ts';
-import {
-  requireValidateSearchWhenUsed,
-  requireValidateSearchWhenUsedName,
-} from './rules/require-validate-search-when-used.ts';
 
 const tanstackRouter = defineBellonaPlugin('bl-tanstack-router', {
   [createRoutePropertyOrderName]: createRoutePropertyOrder,
   [noControlFlowOutsideEdgeName]: noControlFlowOutsideEdge,
+  [noDeprecatedApisName]: noDeprecatedApis,
   [noDynamicRouterToName]: noDynamicRouterTo,
   [noGetRouteApiName]: noGetRouteApi,
-  [noHooksInRouteLifecycleName]: noHooksInRouteLifecycle,
   [noImperativeLocationNavigationName]: noImperativeLocationNavigation,
   [noLoaderDataInNotFoundName]: noLoaderDataInNotFound,
   [noNotFoundInComponentName]: noNotFoundInComponent,
@@ -69,12 +62,11 @@ const tanstackRouter = defineBellonaPlugin('bl-tanstack-router', {
   [noRouterHrefName]: noRouterHref,
   [noRouterTypeAssertionName]: noRouterTypeAssertion,
   [noSearchInLoaderName]: noSearchInLoader,
-  [requireParamsWithPathTokensName]: requireParamsWithPathTokens,
+  [noWholeSearchLoaderDepsName]: noWholeSearchLoaderDeps,
   [requireRouterHookFromName]: requireRouterHookFrom,
   [requireInlineRouteOptionsName]: requireInlineRouteOptions,
   [requireThrowNotFoundName]: requireThrowNotFound,
   [requireThrowRedirectName]: requireThrowRedirect,
-  [requireValidateSearchWhenUsedName]: requireValidateSearchWhenUsed,
 });
 
 export default tanstackRouter;
@@ -83,12 +75,12 @@ export {
   createRoutePropertyOrderName,
   noControlFlowOutsideEdge,
   noControlFlowOutsideEdgeName,
+  noDeprecatedApis,
+  noDeprecatedApisName,
   noDynamicRouterTo,
   noDynamicRouterToName,
   noGetRouteApi,
   noGetRouteApiName,
-  noHooksInRouteLifecycle,
-  noHooksInRouteLifecycleName,
   noImperativeLocationNavigation,
   noImperativeLocationNavigationName,
   noLoaderDataInNotFound,
@@ -105,16 +97,14 @@ export {
   noRouterTypeAssertionName,
   noSearchInLoader,
   noSearchInLoaderName,
+  noWholeSearchLoaderDeps,
+  noWholeSearchLoaderDepsName,
   requireInlineRouteOptions,
   requireInlineRouteOptionsName,
-  requireParamsWithPathTokens,
-  requireParamsWithPathTokensName,
   requireRouterHookFrom,
   requireRouterHookFromName,
   requireThrowNotFound,
   requireThrowNotFoundName,
   requireThrowRedirect,
   requireThrowRedirectName,
-  requireValidateSearchWhenUsed,
-  requireValidateSearchWhenUsedName,
 };

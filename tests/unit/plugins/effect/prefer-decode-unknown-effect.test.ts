@@ -17,6 +17,19 @@ runEffectRule(preferDecodeUnknownEffectName, {
       ...ts,
       code: withEffect('Schema.decode({ decode: (n) => n, encode: (n) => n })'),
     },
+    // v4 `Schema.decode` / `Schema.encode` take a transformation, not a schema.
+    {
+      ...ts,
+      code: `import { Schema, SchemaTransformation } from 'effect';\nSchema.String.pipe(Schema.decode(SchemaTransformation.trim()))`,
+    },
+    {
+      ...ts,
+      code: `import { Schema, SchemaTransformation } from 'effect';\nSchema.String.pipe(Schema.encode(SchemaTransformation.toLowerCase()))`,
+    },
+    {
+      ...ts,
+      code: withEffect('const trim = makeTrim()\nSchema.String.pipe(Schema.decode(trim))'),
+    },
     { ...ts, code: NO_EFFECT },
     validWith(withEffect('Schema.decodeUnknown(Schema.String)'), {
       filename: 'src/app.ts',
@@ -73,6 +86,16 @@ runEffectRule(preferDecodeUnknownEffectName, {
       ...ts,
       code: `import { decodeUnknown, String } from 'effect/Schema';\ndecodeUnknown(String)`,
       errors: [error('decoder')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.decode(User)(input)'),
+      errors: [decoder('decode', 'Schema.decodeEffect')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.decode(Schema.Struct({ id: Schema.String }))'),
+      errors: [decoder('decode', 'Schema.decodeEffect')],
     },
     {
       ...ts,

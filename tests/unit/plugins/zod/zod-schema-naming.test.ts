@@ -21,6 +21,19 @@ runZodRule(zodSchemaNamingName, {
     { code: withZod('export function build() { return z.object({}); }') },
     { code: withZod('export { UserSchema };') },
     { code: 'export const user = z.object({});' },
+    // Parse / codec / function results are values, not schemas.
+    { code: withZod('export const env = z.object({ PORT: z.string() }).parse(process.env);') },
+    { code: withZod('export const result = z.string().safeParse(input);') },
+    { code: withZod('export const pending = z.string().parseAsync(input);') },
+    { code: withZod('export const date = z.iso.date().decode("2020-01-01");') },
+    { code: withZod('export const jsonSchema = z.object({}).toJSONSchema();') },
+    { code: withZod('export const meta = z.string().meta();') },
+    { code: withZod('export const optional = z.string().optional().isOptional();') },
+    {
+      code: withZod(
+        'export const trim = z.function({ input: [z.string()], output: z.string() }).implement((s) => s.trim());',
+      ),
+    },
     validWith(withZod('export const user = z.object({});'), { filename: 'schema.test.ts' }),
     validWith(withZod('export const user = z.object({});'), {
       filename: 'src/generated/schema.ts',
@@ -98,6 +111,30 @@ runZodRule(zodSchemaNamingName, {
     }),
     invalidWith({
       code: withZod('export const branded = z.string().brand<"UserId">();'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const described = z.string().meta({ id: "x" });'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const flag = z.stringbool();'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const id = z.uuidv7();'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const key = z.ksuid();'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const maybe = z.optional(z.string());'),
+      errors: [error('naming')],
+    }),
+    invalidWith({
+      code: withZod('export const keys = z.keyof(z.object({ a: z.string() }));'),
       errors: [error('naming')],
     }),
     invalidWith({

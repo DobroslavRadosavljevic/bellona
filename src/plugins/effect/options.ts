@@ -41,6 +41,43 @@ export const ENTRY_OPTION_SCHEMA = {
   },
 } as const;
 
+const STRING_LIST = {
+  type: 'array',
+  items: { type: 'string', minLength: 1 },
+  uniqueItems: true,
+} as const;
+
+/** `allow` (file paths) plus `callees` (call names to skip). */
+export const CALLEES_OPTION_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: { allow: STRING_LIST, callees: STRING_LIST },
+} as const;
+
+/** CLI handlers run once for each process, so a span on them is useful. */
+export const DEFAULT_TRACED_CALLEES = ['Command.make', 'Command.withHandler'];
+
+export const DEFAULT_CALLEES_OPTIONS = [{ allow: [], callees: DEFAULT_TRACED_CALLEES }];
+
+export const DEFAULT_SIGNAL_APIS = ['fetch'];
+
+/** `allow` (file paths) plus `apis` (functions that take an `AbortSignal`). */
+export const SIGNAL_APIS_OPTION_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: { allow: STRING_LIST, apis: STRING_LIST },
+} as const;
+
+export const DEFAULT_SIGNAL_APIS_OPTIONS = [{ allow: [], apis: DEFAULT_SIGNAL_APIS }];
+
+export function readCalleeList(context: Context): readonly string[] {
+  return stringListField(objectOptionAt(context, 0), 'callees', DEFAULT_TRACED_CALLEES);
+}
+
+export function readSignalApiList(context: Context): readonly string[] {
+  return stringListField(objectOptionAt(context, 0), 'apis', DEFAULT_SIGNAL_APIS);
+}
+
 export const DEFAULT_ALLOW_OPTIONS = [{ allow: [] }];
 
 export const DEFAULT_ENTRY_OPTIONS = [{ allow: [], entry: DEFAULT_ENTRY_ALLOW }];

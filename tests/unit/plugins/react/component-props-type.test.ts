@@ -9,6 +9,14 @@ runReactRule(componentPropsTypeName, {
   valid: [
     validWith(propsAndComponent, { filename: 'metric-card.tsx' }),
     validWith(
+      'type MetricCardProps = { title: string };\nexport const MetricCard: React.FC<MetricCardProps> = ({ title }) => null;',
+      { filename: 'metric-card.tsx' },
+    ),
+    validWith(
+      'type MetricCardProps = { title: string };\nexport function MetricCard({ title }: MetricCardProps) {\n  const rows = items.map(() => {\n    function MetricRow(props: { id: string }) { return null; }\n    return null;\n  });\n  return null;\n}',
+      { filename: 'metric-card.tsx' },
+    ),
+    validWith(
       'interface MetricCardProps { title: string }\nfunction MetricCard({ title }: MetricCardProps) { return null; }',
       { filename: 'metric-card.tsx' },
     ),

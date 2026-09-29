@@ -1,7 +1,7 @@
 {
   "name": "bellona",
-  "version": "0.4.9",
-  "description": "Opt-in Oxlint JS plugins for JS/TS, React, Base UI, Zod, TanStack Router, Elysia, Effect, and Tailwind.",
+  "version": "0.5.0",
+  "description": "Opt-in Oxlint JS plugins for JS/TS, React, Base UI, Zod, TanStack Query, TanStack Router, Elysia, Effect, and Tailwind.",
   "keywords": [
     "base-ui",
     "effect",
@@ -13,6 +13,7 @@
     "react",
     "rules",
     "tailwind",
+    "tanstack-query",
     "tanstack-router",
     "typescript",
     "zod"
@@ -32,7 +33,9 @@
   },
   "files": [
     "dist",
-    "skills/bellona"
+    "skills/bellona",
+    "docs/tanstack-query.md",
+    "CHANGELOG.md"
   ],
   "type": "module",
   "sideEffects": false,
@@ -64,6 +67,11 @@
       "types": "./dist/zod.d.ts",
       "import": "./dist/zod.js",
       "default": "./dist/zod.js"
+    },
+    "./tanstack-query": {
+      "types": "./dist/tanstack-query.d.ts",
+      "import": "./dist/tanstack-query.js",
+      "default": "./dist/tanstack-query.js"
     },
     "./tanstack-router": {
       "types": "./dist/tanstack-router.d.ts",

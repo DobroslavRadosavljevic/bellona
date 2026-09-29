@@ -9,6 +9,7 @@ runJsRule(noObjectParametersName, {
     'function f(value: Alias) {}',
     'interface Owner { readonly id: string } function f(value: Owner) {}',
     'function f<Value>(value: Value) {}',
+    'function f(value: User): void;\nfunction f(value: Team): void;\nfunction f(value: object) {}',
     'function f<Value extends object>(value: Value) {}',
     'function f<Value extends Owner, Owner extends { readonly id: string }>(value: Value) {}',
     'type Owner = { readonly id: string }; function f<Value extends Owner>(value: Value) {}',
@@ -19,6 +20,22 @@ runJsRule(noObjectParametersName, {
     'type Item = object; type Unpacked<Input> = Input extends Promise<infer Item> ? (value: Item) => void : never;',
   ],
   invalid: [
+    {
+      code: 'function f(value: object = {}) {}',
+      errors: [{ messageId: 'objectParameter', data: { parameter: 'value' } }],
+    },
+    {
+      code: 'class Store { constructor(private readonly value: object) {} }',
+      errors: [{ messageId: 'objectParameter', data: { parameter: 'value' } }],
+    },
+    {
+      code: 'function f(...values: object) {}',
+      errors: [{ messageId: 'objectParameter', data: { parameter: 'values' } }],
+    },
+    {
+      code: 'function f(value: object): void;\nfunction f(value: object) {}',
+      errors: [error],
+    },
     { code: 'function f(value: object) {}', errors: [error] },
     { code: 'type Alias = object; function f(value: Alias) {}', errors: [error] },
     { code: 'type Alias = (object); function f(value: Alias) {}', errors: [error] },

@@ -10,12 +10,24 @@ runJsRule(requireSafetyCommentForTypeAssertionName, {
     '// SAFETY: The parser established the UserId invariant.\nconst id = value as UserId;',
     'function parse(): UserId {\n// SAFETY: Validation above established the UserId invariant.\nreturn value as UserId;\n}',
     'const id = /* SAFETY: Validation established the invariant. */ value as UserId;',
+    '// SAFETY: The parser established the UserId invariant.\nexport const id = value as UserId;',
+    '/** SAFETY: The parser established the UserId invariant. */\nexport default value as UserId;',
+    'class Store {\n  // SAFETY: The parser established the UserId invariant.\n  id = value as UserId;\n}',
+    '// SAFETY: The guard above proved a string.\nif ((value as string).length > 0) run();',
     {
       code: '// INVARIANT: The parser established the UserId invariant.\nconst id = value as UserId;',
       options: [{ marker: 'INVARIANT' }],
     },
   ],
   invalid: [
+    {
+      code: '// SAFETY: This covers only the function signature.\nfunction run() {\n  if ((value as string).length > 0) stop();\n}',
+      errors: [error],
+    },
+    {
+      code: '// SAFETY: This covers only the first statement.\nconst a = 1;\nexport const id = value as UserId;',
+      errors: [error],
+    },
     { code: 'const id = value as UserId;', errors: [error] },
     { code: 'const id = <UserId>value;', errors: [error] },
     { code: 'const id = value as UserId; // SAFETY: Too late.', errors: [error] },

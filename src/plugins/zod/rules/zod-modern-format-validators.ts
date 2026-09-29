@@ -6,8 +6,10 @@ import { getStaticPropertyName, isZStringSchemaExpression, unwrapExpression } fr
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipZodFile } from '../options.ts';
 
 /**
- * Deprecated `z.string()` format methods → Zod 4 top-level factories.
- * ISO date/time methods map to `z.iso.*`. `ip` has no single replacement.
+ * `z.string()` format methods → Zod 4 top-level factories.
+ * Zod 4 marks the chains `@deprecated`. It removed `.ip()` / `.cidr()`, so those
+ * map to a union. ISO date/time methods map to `z.iso.*`. Versioned UUID
+ * chains keep their version (`z.uuidv4()`), so the check does not get looser.
  */
 function formatReplacement(method: string): string | undefined {
   switch (method) {
@@ -18,10 +20,11 @@ function formatReplacement(method: string): string | undefined {
     case 'httpUrl':
       return 'z.httpUrl()';
     case 'uuid':
+      return 'z.uuid()';
     case 'uuidv4':
     case 'uuidv6':
     case 'uuidv7':
-      return 'z.uuid()';
+      return `z.${method}()`;
     case 'guid':
       return 'z.guid()';
     case 'hostname':
@@ -41,17 +44,23 @@ function formatReplacement(method: string): string | undefined {
     case 'nanoid':
       return 'z.nanoid()';
     case 'cuid':
-      return 'z.cuid()';
+      return 'z.cuid2() for new ids, or z.cuid() to keep CUID v1';
     case 'cuid2':
       return 'z.cuid2()';
     case 'ulid':
       return 'z.ulid()';
+    case 'xid':
+      return 'z.xid()';
+    case 'ksuid':
+      return 'z.ksuid()';
     case 'ipv4':
       return 'z.ipv4()';
     case 'ipv6':
       return 'z.ipv6()';
     case 'ip':
-      return 'z.ipv4() or z.ipv6()';
+      return 'z.union([z.ipv4(), z.ipv6()])';
+    case 'cidr':
+      return 'z.union([z.cidrv4(), z.cidrv6()])';
     case 'mac':
       return 'z.mac()';
     case 'cidrv4':
@@ -87,8 +96,8 @@ export const zodModernFormatValidators: CreateOnceRule = defineBellonaRule({
     messages: {
       preferTopLevel: agentDiagnostic({
         problem:
-          'This uses deprecated Zod 3 string format chaining: `z.string().{{method}}()`. Zod 4 exposes top-level factories.',
-        why: 'The chained methods are deprecated. Top-level factories (`z.email()`, `z.iso.datetime()`, …) are the v4 contract.',
+          'This chains a string format on `z.string()`: `z.string().{{method}}()`. Zod 4 has a top-level factory for this format.',
+        why: 'Zod 4 marks the `z.string()` format chains `@deprecated`. It removed `.ip()` and `.cidr()`. Top-level factories (`z.email()`, `z.iso.datetime()`, …) are the v4 API and give a format-specific type.',
         fix: 'Replace `z.string().{{method}}()` with `{{replacement}}`. Keep other refinements on the result if needed.',
         avoid:
           'Do not keep `z.string()` and add `.{{method}}()` again. Do not wrap in `z.string().pipe(...)`. Do not disable the rule.',

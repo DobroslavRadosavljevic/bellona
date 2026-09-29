@@ -19,6 +19,9 @@ export const ROUTE_FACTORY_EXPORTS = new Set([
 
 export const SERVER_FN_EXPORTS = new Set(['createServerFn']);
 
+/** Start request and function middleware. The Start docs throw `redirect()` in `.server()`. */
+export const MIDDLEWARE_EXPORTS = new Set(['createMiddleware']);
+
 export const NOT_FOUND_EXPORTS = new Set(['notFound']);
 
 export const REDIRECT_EXPORTS = new Set(['redirect']);
@@ -45,6 +48,7 @@ export type RouterEdgeBindings = {
   readonly routeFactories: ReadonlySet<string>;
   readonly routeFactoryByLocal: ReadonlyMap<string, string>;
   readonly serverFn: ReadonlySet<string>;
+  readonly middleware: ReadonlySet<string>;
   readonly notFound: ReadonlySet<string>;
   readonly redirect: ReadonlySet<string>;
   readonly useLoaderData: ReadonlySet<string>;
@@ -85,7 +89,7 @@ function walkNodes(node: ESTree.Node, visit: (child: ESTree.Node) => void): void
   }
 }
 
-function importedModuleName(node: ESTree.ImportSpecifier): string | undefined {
+export function importedModuleName(node: ESTree.ImportSpecifier): string | undefined {
   if (node.imported.type === 'Identifier') {
     return node.imported.name;
   }
@@ -131,6 +135,33 @@ function addCanonicalAndAliases(
   return new Set(addCanonicalAndAliasesMap(program, exportedNames).keys());
 }
 
+/**
+ * Local names of router-module imports, mapped to the exported name. No canonical names are
+ * added, so a local `Route` or `Router` does not match unless it is imported from the router.
+ */
+export function collectRouterImportNames(program: ESTree.Program): ReadonlyMap<string, string> {
+  const locals = new Map<string, string>();
+  for (const statement of program.body) {
+    if (statement.type !== 'ImportDeclaration') {
+      continue;
+    }
+    const source = statement.source.value;
+    if (!isJsString(source) || !ROUTER_MODULE_SET.has(source)) {
+      continue;
+    }
+    for (const specifier of statement.specifiers) {
+      if (specifier.type !== 'ImportSpecifier') {
+        continue;
+      }
+      const exported = importedModuleName(specifier);
+      if (exported !== undefined) {
+        locals.set(specifier.local.name, exported);
+      }
+    }
+  }
+  return locals;
+}
+
 function collectNamespaceLocals(program: ESTree.Program): Set<string> {
   const locals = new Set<string>();
   for (const statement of program.body) {
@@ -157,6 +188,7 @@ export function collectRouterEdgeBindings(program: ESTree.Program): RouterEdgeBi
     routeFactories: new Set(routeFactoryByLocal.keys()),
     routeFactoryByLocal,
     serverFn: addCanonicalAndAliases(program, SERVER_FN_EXPORTS),
+    middleware: addCanonicalAndAliases(program, MIDDLEWARE_EXPORTS),
     notFound: addCanonicalAndAliases(program, NOT_FOUND_EXPORTS),
     redirect: addCanonicalAndAliases(program, REDIRECT_EXPORTS),
     useLoaderData: addCanonicalAndAliases(program, USE_LOADER_DATA_EXPORTS),
@@ -172,7 +204,7 @@ function calleeIdentifierName(
   return callee?.type === 'Identifier' ? callee.name : undefined;
 }
 
-function calleeNamespaceMember(
+export function calleeNamespaceMember(
   node: ESTree.CallExpression | ESTree.NewExpression,
   namespaces: ReadonlySet<string>,
 ): string | undefined {
@@ -289,18 +321,33 @@ export function isInlineRouteOptions(argument: ESTree.Node): boolean {
   }
 }
 
-export function programDefinesRouterEdge(program: ESTree.Program): boolean {
-  const bindings = collectRouterEdgeBindings(program);
+function programHasCall(
+  program: ESTree.Program,
+  matches: (node: ESTree.CallExpression) => boolean,
+): boolean {
   let found = false;
   walkNodes(program, (node) => {
     if (found || node.type !== 'CallExpression') {
       return;
     }
-    if (isRouterEdgeFactoryCall(node, bindings)) {
+    if (matches(node)) {
       found = true;
     }
   });
   return found;
+}
+
+export function programDefinesRouterEdge(program: ESTree.Program): boolean {
+  const bindings = collectRouterEdgeBindings(program);
+  return programHasCall(program, (node) => isRouterEdgeFactoryCall(node, bindings));
+}
+
+/** True when the file calls `createMiddleware`, where Start throws `redirect()` for auth gates. */
+export function programDefinesMiddleware(program: ESTree.Program): boolean {
+  const bindings = collectRouterEdgeBindings(program);
+  return programHasCall(program, (node) =>
+    isNamedFactoryCall(node, bindings.middleware, bindings.namespaces, MIDDLEWARE_EXPORTS),
+  );
 }
 
 export function isControlFlowNotFoundCall(

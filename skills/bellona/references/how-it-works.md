@@ -2,7 +2,7 @@
 
 ## Package shape
 
-- **Runtime:** ESM (`"type": "module"`). The npm tarball is `dist/` plus `skills/bellona/`. npm also adds `README.md`, `LICENSE`, and `CHANGELOG.md`.
+- **Runtime:** ESM (`"type": "module"`). The npm tarball includes `dist/`, `skills/bellona/`, the Query guide, and `CHANGELOG.md`. It also includes `README.md` and `LICENSE`.
 - **Build:** tsdown 0.22, one entry per plugin plus the catalog (`src/index.ts` → `bellona`).
 - **Lint API:** `@oxlint/plugins` `CreateOnceRule`. No ESLint `create`. No `eslintCompatPlugin`.
 - **Peer:** `oxlint` ^1.78. **Dependency:** `@oxlint/plugins` ^1.78.
@@ -16,6 +16,7 @@
 | `./react` | `src/plugins/react/index.ts` |
 | `./base-ui` | `src/plugins/base-ui/index.ts` |
 | `./zod` | `src/plugins/zod/index.ts` |
+| `./tanstack-query` | `src/plugins/tanstack-query/index.ts` |
 | `./tanstack-router` | `src/plugins/tanstack-router/index.ts` |
 | `./elysia` | `src/plugins/elysia/index.ts` |
 | `./effect` | `src/plugins/effect/index.ts` |

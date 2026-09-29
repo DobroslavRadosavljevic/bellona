@@ -10,6 +10,10 @@ runReactRule(
         filename: 'use-user-profile.ts',
       }),
       validWith(
+        'export function useUserProfile() {\n  return useMemo(() => {\n    function useInner() { return 1; }\n    return useInner;\n  }, []);\n}',
+        { filename: 'use-user-profile.ts' },
+      ),
+      validWith(
         'export function useUserProfile() {\n  function useInner() { return 1; }\n  return useInner();\n}',
         { filename: 'use-user-profile.ts' },
       ),

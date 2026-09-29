@@ -40,7 +40,7 @@ export const preferResolveForAuth: CreateOnceRule = defineBellonaRule({
       preferResolve: agentDiagnostic({
         problem:
           'This `/plugins/` Elysia plugin uses `.derive` for cookie / `Authorization` / user / session. Auth context belongs on `.resolve` (or a macro).',
-        why: '`.derive` runs more often and is the wrong slot for request auth. `.resolve` is the documented place for derived request context such as the user.',
+        why: '`.derive` runs in the transform phase, before schema validation, so it reads unvalidated `headers` / `cookie`. `.resolve` runs after validation. The Elysia docs recommend `.resolve` for auth for this reason.',
         fix: 'Move the auth/session logic to `.resolve(({ cookie, headers }) => ({ user }))` or a macro. Stop using `.derive` for those fields.',
         avoid: 'Do not keep `.derive` and also add `.resolve`. Do not disable the rule.',
       }),

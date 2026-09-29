@@ -11,6 +11,18 @@ const elysiaImport = `import { Elysia } from 'elysia'\n`;
 runElysiaRule(requirePluginNameName, {
   valid: [
     {
+      name: 'routes leaf export: require-route-export-name reports it',
+      filename: 'src/modules/billing/routes/status.ts',
+      languageOptions: ts.languageOptions,
+      code: `${elysiaImport}export const billingStatusRoute = new Elysia().get('/', () => 'ok')`,
+    },
+    {
+      name: 'routes leaf default export: require-route-export-name reports it',
+      filename: 'src/routes/health.ts',
+      languageOptions: ts.languageOptions,
+      code: `${elysiaImport}export default new Elysia()`,
+    },
+    {
       ...ts,
       code: `${elysiaImport}export const auth = new Elysia({ name: 'auth' }).get('/', () => 'ok')`,
     },
@@ -70,6 +82,20 @@ runElysiaRule(requirePluginNameName, {
   ],
   invalid: [
     {
+      name: 'file outside routes/ is still checked',
+      filename: 'src/modules/billing/plugins/status.ts',
+      languageOptions: ts.languageOptions,
+      code: `${elysiaImport}export const billingStatusRoute = new Elysia()`,
+      errors: [error('missingName')],
+    },
+    {
+      name: 'routes leaf: instance that is not the export init is still checked',
+      filename: 'src/modules/billing/routes/status.ts',
+      languageOptions: ts.languageOptions,
+      code: `${elysiaImport}export const billingStatusRoute = wrap(new Elysia())`,
+      errors: [error('missingName')],
+    },
+    {
       ...ts,
       code: `${elysiaImport}export const auth = new Elysia().get('/', () => 'ok')`,
       errors: [error('missingName')],
@@ -79,23 +105,10 @@ runElysiaRule(requirePluginNameName, {
       code: `${elysiaImport}export default new Elysia({ prefix: '/auth' })`,
       errors: [error('missingName')],
     },
-    // Route files are no longer entry-allowlisted
-    {
-      filename: 'src/modules/billing/routes/status.ts',
-      languageOptions: ts.languageOptions,
-      code: `${elysiaImport}export const BILLING_STATUS_ROUTE = new Elysia()`,
-      errors: [error('missingName')],
-    },
     {
       filename: 'src/controllers/users.ts',
       languageOptions: ts.languageOptions,
       code: `${elysiaImport}export const users = new Elysia({ prefix: '/users' })`,
-      errors: [error('missingName')],
-    },
-    {
-      filename: 'src/routes/health.ts',
-      languageOptions: ts.languageOptions,
-      code: `${elysiaImport}export const health = new Elysia()`,
       errors: [error('missingName')],
     },
     {

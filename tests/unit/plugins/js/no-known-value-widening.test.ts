@@ -2,6 +2,7 @@ import { noKnownValueWideningName } from '../../../../src/plugins/js/rules/no-kn
 import { runJsRule } from './harness.ts';
 
 const error = { messageId: 'widening' };
+const anonymous = { messageId: 'anonymousObject' };
 
 const prelude = 'type Command = () => void; const startCommand = () => {};';
 
@@ -27,6 +28,18 @@ runJsRule(noKnownValueWideningName, {
     `${prelude} interface Commands { readonly start: Command } function create(): Commands { return { start: startCommand }; }`,
     `${prelude} declare function make(): Record<string, Command>; const commands: Record<string, Command> = make();`,
     `${prelude} import { Commands } from './types'; const commands: Commands = { start: startCommand };`,
+    // A closed key union makes the map exhaustive. That adds a check; it does not widen.
+    'type Tone = "info" | "warn"; const badge: Record<Tone, string> = { info: "a", warn: "b" };',
+    'import type { Tone } from "./tone"; const badge: Record<Tone, string> = { info: "a", warn: "b" };',
+    'import type { Tone } from "./tone"; const badge: Partial<Record<Tone, string>> = { info: "a" };',
+    'import type { Tone } from "./tone"; type Badges = Record<Tone, string>; const badge: Badges = { info: "a", warn: "b" };',
+    'import type { Tone } from "./tone"; const badge: { [K in Tone]: string } = { info: "a", warn: "b" };',
+    'import type { Tone } from "./tone"; type ByTone<V> = Record<Tone, V>; const badge: ByTone<string> = { info: "a", warn: "b" };',
+    'const labels = { a: 1 }; function f(): Record<keyof typeof labels, number> { return { a: 2 }; }',
+    // A lookup by a runtime key needs the dictionary type. Inference rejects `prices[id]` (TS7053).
+    'const prices: Record<string, number> = { a: 1 };\nexport function price(id: string) { return prices[id]; }',
+    'const counts: Record<string, number> = { total: 0 };\nfor (const key of keys) counts[key] = 1;',
+    'let counts: Record<string, number>;\ncounts = { total: 0 };\nexport const read = (key: string) => counts[key];',
   ],
   invalid: [
     { code: 'const value: unknown = {};', errors: [error] },
@@ -47,6 +60,18 @@ runJsRule(noKnownValueWideningName, {
     },
     {
       code: `${prelude} const commands: { start: Command } = { start: startCommand };`,
+      errors: [anonymous],
+    },
+    {
+      code: 'type Key = string; const prices: Record<Key, number> = { a: 1 };',
+      errors: [error],
+    },
+    {
+      code: 'const prices: Record<`model-${string}`, number> = { "model-a": 1 };',
+      errors: [error],
+    },
+    {
+      code: 'const prices: Record<string, number> = { a: 1 };\nexport const a = prices["a"] + prices.a;',
       errors: [error],
     },
     {
@@ -71,7 +96,7 @@ runJsRule(noKnownValueWideningName, {
     },
     {
       code: `${prelude} function create(): { start: Command } { return { start: startCommand }; }`,
-      errors: [error],
+      errors: [anonymous],
     },
     {
       code: `${prelude} const source = { start: startCommand }; const commands: Record<string, Command> = source;`,

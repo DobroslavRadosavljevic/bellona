@@ -292,6 +292,45 @@ export function isEffectFnFactoryCall(
   return isModuleCall(node, bindings, 'effect', 'fn');
 }
 
+/** `Effect.run*` functions. They return a Promise, a value, or a fiber — not an Effect. */
+export const EFFECT_RUNNERS = [
+  'runPromise',
+  'runPromiseExit',
+  'runPromiseWith',
+  'runPromiseExitWith',
+  'runSync',
+  'runSyncExit',
+  'runSyncWith',
+  'runSyncExitWith',
+  'runFork',
+  'runForkWith',
+  'runCallback',
+  'runCallbackWith',
+] as const;
+
+const EFFECT_RUNNER_NAMES: ReadonlySet<string> = new Set(EFFECT_RUNNERS);
+
+/** Effect exports that do not return an Effect: function factories and runners. */
+const NON_EFFECT_EXPORTS: ReadonlySet<string> = new Set([
+  'fn',
+  'fnUntraced',
+  'fnUntracedEager',
+  ...EFFECT_RUNNERS,
+]);
+
+/** True for `Effect.runPromise` and the other `Effect.run*` members (called or not). */
+export function isEffectRunnerMember(
+  node: ESTree.Node | undefined,
+  bindings: EffectBindings,
+): boolean {
+  for (const name of EFFECT_RUNNER_NAMES) {
+    if (isModuleMember(node, bindings, 'effect', name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function isEffectFnUntracedCall(
   node: ESTree.CallExpression,
   bindings: EffectBindings,
@@ -367,7 +406,10 @@ export function isBareVitestItCall(node: ESTree.CallExpression, bindings: Effect
   return method !== 'effect' && method !== 'live' && method !== 'scopedLive';
 }
 
-/** True when a call is `Effect.<export>(...)` other than `fn` / `fnUntraced`. */
+/**
+ * True when a call is `Effect.<export>(...)` that returns an Effect. Function factories
+ * (`fn`, `fnUntraced`, `fnUntracedEager`) and runners (`runPromise`, `runSync`, …) are not.
+ */
 export function isEffectNamespaceCall(
   node: ESTree.CallExpression,
   bindings: EffectBindings,
@@ -375,18 +417,13 @@ export function isEffectNamespaceCall(
   const callee = unwrapExpression(node.callee);
   if (callee?.type === 'Identifier') {
     const bind = bindings.named.get(callee.name);
-    return (
-      bind !== undefined &&
-      bind.kind === 'effect' &&
-      bind.exportName !== 'fn' &&
-      bind.exportName !== 'fnUntraced'
-    );
+    return bind !== undefined && bind.kind === 'effect' && !NON_EFFECT_EXPORTS.has(bind.exportName);
   }
   if (callee?.type !== 'MemberExpression') {
     return false;
   }
   const property = getStaticPropertyName(callee.property);
-  if (property === undefined || property === 'fn' || property === 'fnUntraced') {
+  if (property === undefined || NON_EFFECT_EXPORTS.has(property)) {
     return false;
   }
   const object = unwrapExpression(callee.object);
@@ -526,6 +563,8 @@ export function isEffectFailLikeCall(
   return (
     isModuleCall(node, bindings, 'effect', 'fail') ||
     isModuleCall(node, bindings, 'effect', 'failSync') ||
+    isModuleCall(node, bindings, 'effect', 'failCause') ||
+    isModuleCall(node, bindings, 'effect', 'failCauseSync') ||
     isModuleCall(node, bindings, 'effect', 'die') ||
     isModuleCall(node, bindings, 'effect', 'dieMessage')
   );
@@ -596,4 +635,89 @@ function calleeRoot(node: ESTree.Node | undefined): ESTree.Node | undefined {
     current = unwrapExpression(current.callee);
   }
   return current;
+}
+
+/** Methods that return the same kind of schema, so the chain stays a schema. */
+const SCHEMA_CHAIN_METHODS: ReadonlySet<string> = new Set([
+  'pipe',
+  'check',
+  'annotate',
+  'annotateKey',
+]);
+
+/**
+ * True for a schema value: `Schema`, `Schema.String`, `Schema.Array(item)`, or a
+ * `.pipe` / `.check` / `.annotate` chain on one. Other members and calls (such as
+ * `Schema.Literals([...]).literals` or `.makeUnsafe(value)`) return plain data.
+ */
+export function isSchemaValue(node: ESTree.Node | undefined, bindings: EffectBindings): boolean {
+  const expression = unwrapExpression(node);
+  if (expression?.type === 'Identifier') {
+    return bindings.namespaces.schema.has(expression.name);
+  }
+  if (expression?.type === 'MemberExpression') {
+    const object = unwrapExpression(expression.object);
+    return object?.type === 'Identifier' && bindings.namespaces.schema.has(object.name);
+  }
+  if (expression?.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = unwrapExpression(expression.callee);
+  if (callee?.type !== 'MemberExpression') {
+    return false;
+  }
+  const method = getStaticPropertyName(callee.property);
+  const object = unwrapExpression(callee.object);
+  if (object?.type === 'Identifier' && bindings.namespaces.schema.has(object.name)) {
+    return true;
+  }
+  return (
+    method !== undefined && SCHEMA_CHAIN_METHODS.has(method) && isSchemaValue(object, bindings)
+  );
+}
+
+/** True for `x.pipe(…, Effect.runPromise)`: the chain ends in a runner, so it is not an Effect. */
+function pipeEndsInRunner(node: ESTree.Node | undefined, bindings: EffectBindings): boolean {
+  const call = unwrapExpression(node);
+  if (call?.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = unwrapExpression(call.callee);
+  if (callee?.type !== 'MemberExpression' || getStaticPropertyName(callee.property) !== 'pipe') {
+    return false;
+  }
+  const last = call.arguments[call.arguments.length - 1];
+  return (
+    last !== undefined && last.type !== 'SpreadElement' && isEffectRunnerMember(last, bindings)
+  );
+}
+
+/**
+ * True for an expression that makes an Effect: `Effect.<x>(…)` or a `.pipe(…)` chain on
+ * one. `Effect.fn` / `fnUntraced` factories and `Effect.run*` runners are not Effects.
+ */
+export function isEffectExpression(
+  node: ESTree.Node | undefined,
+  bindings: EffectBindings,
+): boolean {
+  if (pipeEndsInRunner(node, bindings)) {
+    return false;
+  }
+  const root = pipeRoot(node);
+  if (root?.type !== 'CallExpression') {
+    return false;
+  }
+  if (isEffectFnAppliedCall(root, bindings) || isEffectFnFactoryCall(root, bindings)) {
+    return false;
+  }
+  return isEffectNamespaceCall(root, bindings);
+}
+
+/** True when `node` is inside the body of an `Effect.gen` / `Effect.fn` generator (not a nested function). */
+export function isInEffectGenerator(node: ESTree.Node, bindings: EffectBindings): boolean {
+  let current: ESTree.Node | undefined = parentOf(node);
+  while (current !== undefined && !isFunctionLike(current)) {
+    current = parentOf(current);
+  }
+  return current !== undefined && generatorFromEffectGenOrFn(current, bindings) === current;
 }

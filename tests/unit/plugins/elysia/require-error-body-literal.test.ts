@@ -8,6 +8,11 @@ const elysiaImport = `import { Elysia, status } from 'elysia'\n`;
 runElysiaRule(requireErrorBodyLiteralName, {
   valid: [
     {
+      name: 'named success status ignored',
+      ...ts,
+      code: `${elysiaImport}app.get('/', () => status('OK', { code: some.msg, message: 'x' }))`,
+    },
+    {
       name: 'string literal code',
       ...ts,
       code: `${elysiaImport}app.get('/', () => status(400, { code: 'bad_request', message: 'bad' }))`,
@@ -62,6 +67,12 @@ app.get('/', () => status(code, { code: 'pay', message: 'Pay' }))`,
     },
   ],
   invalid: [
+    {
+      name: 'named error status',
+      ...ts,
+      code: `${elysiaImport}app.get('/', () => status('Not Found', { code: reason.code, message: 'x' }))`,
+      errors: [error('nonLiteralCode')],
+    },
     {
       name: 'template literal',
       ...ts,

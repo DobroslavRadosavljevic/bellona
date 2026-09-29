@@ -11,6 +11,7 @@ const WEAK_BARE_UTILITIES = new Set([
   'fixed',
   'flex',
   'grid',
+  'group',
   'grow',
   'hidden',
   'inline',
@@ -19,7 +20,9 @@ const WEAK_BARE_UTILITIES = new Set([
   'italic',
   'lowercase',
   'outline',
+  'ordinal',
   'overline',
+  'peer',
   'relative',
   'ring',
   'rounded',
@@ -29,6 +32,7 @@ const WEAK_BARE_UTILITIES = new Set([
   'static',
   'sticky',
   'table',
+  'transform',
   'truncate',
   'underline',
   'uppercase',
@@ -37,16 +41,36 @@ const WEAK_BARE_UTILITIES = new Set([
 
 /** Hyphenated standalones that almost never appear as English. */
 const STRONG_BARE_UTILITIES = new Set([
+  '@container',
+  'diagonal-fractions',
   'flow-root',
+  'inline-block',
+  'inline-flex',
+  'inline-grid',
+  'inline-table',
   'line-through',
+  'lining-nums',
   'no-underline',
+  'normal-case',
+  'normal-nums',
   'not-italic',
   'not-sr-only',
+  'oldstyle-nums',
+  'proportional-nums',
+  'slashed-zero',
   'sr-only',
+  'stacked-fractions',
   'subpixel-antialiased',
+  'tabular-nums',
 ]);
 
+/**
+ * Utility families. Tailwind v4 reads most values from `@theme` variables, so a
+ * prefix can take any project name (`bg-primary`). See `classifyClassToken`.
+ */
 const UTILITY_PREFIXES = [
+  'forced-color-adjust',
+  'field-sizing',
   'backdrop-blur',
   'backdrop-brightness',
   'backdrop-contrast',
@@ -68,16 +92,22 @@ const UTILITY_PREFIXES = [
   'divide-y',
   'drop-shadow',
   'grid-cols',
+  'grid-flow',
   'grid-rows',
   'hue-rotate',
   'inset-x',
   'inset-y',
   'justify-items',
+  'line-clamp',
   'justify-self',
   'list-image',
+  'max-block',
   'max-h',
+  'max-inline',
   'max-w',
+  'min-block',
   'min-h',
+  'min-inline',
   'min-w',
   'mix-blend',
   'place-content',
@@ -106,22 +136,33 @@ const UTILITY_PREFIXES = [
   'outline',
   'overflow',
   'overscroll',
+  'appearance',
+  'backface',
+  'contain',
+  'isolation',
+  'perspective',
+  'placeholder',
   'rounded',
   'saturate',
+  'scrollbar',
   'tracking',
+  'transform',
   'transition',
   'translate',
   'whitespace',
   'accent',
+  'align',
   'animate',
   'aspect',
   'basis',
   'bg',
   'blur',
   'border',
+  'block',
   'bottom',
   'box',
   'break',
+  'caption',
   'caret',
   'clear',
   'col',
@@ -145,13 +186,17 @@ const UTILITY_PREFIXES = [
   'h',
   'hyphens',
   'indent',
+  'inline',
   'inset',
   'invert',
   'items',
   'left',
   'list',
   'm',
+  'mask',
   'mb',
+  'mbe',
+  'mbs',
   'me',
   'ml',
   'mr',
@@ -164,6 +209,8 @@ const UTILITY_PREFIXES = [
   'origin',
   'p',
   'pb',
+  'pbe',
+  'pbs',
   'pe',
   'pl',
   'pr',
@@ -177,6 +224,7 @@ const UTILITY_PREFIXES = [
   'rotate',
   'row',
   'scale',
+  'scheme',
   'scroll',
   'select',
   'self',
@@ -188,13 +236,17 @@ const UTILITY_PREFIXES = [
   'snap',
   'start',
   'stroke',
+  'tab',
+  'table',
   'text',
   'to',
   'top',
   'touch',
   'via',
   'w',
+  'wrap',
   'z',
+  'zoom',
 ];
 
 const PREFIXES_LONGEST_FIRST: string[] = [];
@@ -313,7 +365,10 @@ const COLOR_NAMES = new Set([
   'indigo',
   'inherit',
   'lime',
+  'mauve',
+  'mist',
   'neutral',
+  'olive',
   'orange',
   'pink',
   'purple',
@@ -322,6 +377,7 @@ const COLOR_NAMES = new Set([
   'sky',
   'slate',
   'stone',
+  'taupe',
   'teal',
   'transparent',
   'violet',
@@ -345,6 +401,9 @@ const COLOR_SHADES = new Set([
 ]);
 
 const SIZE_NAMES = new Set([
+  '2xs',
+  '3xs',
+  'base',
   '2xl',
   '3xl',
   '4xl',
@@ -392,7 +451,7 @@ export function isClassNameBinding(name: string): boolean {
   return /classnames?/iu.test(folded) || /classes/iu.test(folded);
 }
 
-function splitClassTokens(text: string): string[] {
+export function splitClassTokens(text: string): string[] {
   const tokens: string[] = [];
   for (const part of text.trim().split(/\s+/u)) {
     if (part !== '') {
@@ -402,30 +461,75 @@ function splitClassTokens(text: string): string[] {
   return tokens;
 }
 
-function forEachOuterCharacter(text: string, visit: (character: string) => void): void {
-  let depth = 0;
-  for (const character of text) {
+/**
+ * Visit the characters of a token that are outside `[…]` arbitrary values and
+ * outside Tailwind v4 `-(…)` CSS variable values (`bg-(--brand)`).
+ * Returns false when the brackets do not close.
+ */
+function forEachOuterCharacter(
+  text: string,
+  visit: (character: string, index: number) => void,
+): boolean {
+  let squareDepth = 0;
+  let roundDepth = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text.charAt(index);
     if (character === '[') {
-      depth += 1;
+      squareDepth += 1;
       continue;
     }
     if (character === ']') {
-      depth = Math.max(0, depth - 1);
+      squareDepth = Math.max(0, squareDepth - 1);
       continue;
     }
-    if (depth === 0) {
-      visit(character);
+    if (squareDepth > 0) {
+      continue;
+    }
+    if (character === '(' && (roundDepth > 0 || text.charAt(index - 1) === '-')) {
+      roundDepth += 1;
+      continue;
+    }
+    if (character === ')' && roundDepth > 0) {
+      roundDepth -= 1;
+      continue;
+    }
+    if (roundDepth === 0) {
+      visit(character, index);
     }
   }
+  return squareDepth === 0 && roundDepth === 0;
+}
+
+const DIGIT_PATTERN = /\d/u;
+
+/**
+ * `p-0.5` has a decimal point. `flex!` and `!flex` have an important mark.
+ * Other outer punctuation means prose, not a class list.
+ */
+function isAllowedTokenPunctuation(token: string, character: string, index: number): boolean {
+  if (character === '!') {
+    return index === 0 || index === token.length - 1;
+  }
+  if (character === '.') {
+    return (
+      DIGIT_PATTERN.test(token.charAt(index - 1)) && DIGIT_PATTERN.test(token.charAt(index + 1))
+    );
+  }
+  return false;
 }
 
 function hasOuterPunctuation(text: string): boolean {
   let found = false;
-  forEachOuterCharacter(text, (character) => {
-    if (/[.,;!?(){}'"=]/u.test(character)) {
-      found = true;
-    }
-  });
+  for (const token of splitClassTokens(text)) {
+    forEachOuterCharacter(token, (character, index) => {
+      if (
+        /[.,;!?(){}'"=]/u.test(character) &&
+        !isAllowedTokenPunctuation(token, character, index)
+      ) {
+        found = true;
+      }
+    });
+  }
   return found;
 }
 
@@ -455,26 +559,16 @@ interface UtilityBody {
 }
 
 function splitUtilityBody(token: string): UtilityBody {
-  let current = '';
-  let depth = 0;
-  let body = token;
-  let hasVariant = false;
-  for (const character of token) {
-    if (character === '[') {
-      depth += 1;
-    } else if (character === ']') {
-      depth = Math.max(0, depth - 1);
+  let lastColon = -1;
+  forEachOuterCharacter(token, (character, index) => {
+    if (character === ':') {
+      lastColon = index;
     }
-    if (character === ':' && depth === 0) {
-      hasVariant = true;
-      body = '';
-      current = '';
-      continue;
-    }
-    current += character;
-    body = current;
+  });
+  if (lastColon === -1) {
+    return { body: token, hasVariant: false };
   }
-  return { body, hasVariant };
+  return { body: token.slice(lastColon + 1), hasVariant: true };
 }
 
 interface UtilityDecorators {
@@ -493,6 +587,10 @@ function stripUtilityDecorators(utility: string): UtilityDecorators {
     hasImportant = true;
     body = body.slice(1);
   }
+  if (body.endsWith('!') && body.length > 1) {
+    hasImportant = true;
+    body = body.slice(0, -1);
+  }
   if (body.startsWith('-') && body.length > 1) {
     hasNegative = true;
     body = body.slice(1);
@@ -500,7 +598,7 @@ function stripUtilityDecorators(utility: string): UtilityDecorators {
   const slash = body.lastIndexOf('/');
   if (slash !== -1) {
     const opacity = body.slice(slash + 1);
-    if (/^(?:\d{1,3}|\[[^\]]+\])$/u.test(opacity)) {
+    if (/^(?:\d{1,3}(?:\.\d+)?|\[[^\]]+\]|\([^)]+\))$/u.test(opacity)) {
       hasOpacity = true;
       body = body.slice(0, slash);
     }
@@ -528,7 +626,7 @@ function isKnownValue(value: string): boolean {
   if (/^\[[^\]]+\]$/u.test(value)) {
     return true;
   }
-  if (/^\d+(?:\.\d+)?$/u.test(value)) {
+  if (/^\d+(?:\.\d+)?%?$/u.test(value)) {
     return true;
   }
   if (/^\d+\/\d+$/u.test(value)) {
@@ -541,6 +639,16 @@ function isKnownValue(value: string): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * A kebab-case value that is not in the default theme. Tailwind v4 makes a
+ * utility for each `@theme` variable (`--color-primary` gives `bg-primary`),
+ * so project names such as `muted-foreground` are real values.
+ * @see https://tailwindcss.com/docs/theme#theme-variable-namespaces
+ */
+function isThemeLikeValue(value: string): boolean {
+  return /^[a-z0-9][a-z0-9.-]*%?$/u.test(value);
 }
 
 interface PrefixMatch {
@@ -564,43 +672,38 @@ function isClassTokenCharset(token: string): boolean {
   if (token === '') {
     return false;
   }
-  let depth = 0;
-  for (const character of token) {
-    if (character === '[') {
-      depth += 1;
-      continue;
+  let valid = true;
+  const balanced = forEachOuterCharacter(token, (character) => {
+    if (/[A-Z]/u.test(character) || !/[@a-z0-9:./%_*!-]/u.test(character)) {
+      valid = false;
     }
-    if (character === ']') {
-      depth = Math.max(0, depth - 1);
-      continue;
-    }
-    if (depth > 0) {
-      continue;
-    }
-    if (/[A-Z]/u.test(character)) {
-      return false;
-    }
-    if (!/[@a-z0-9:./%_*!-]/u.test(character)) {
-      return false;
-    }
-  }
-  return depth === 0;
+  });
+  return valid && balanced;
 }
 
-function isLetterSlashMime(token: string): boolean {
-  return /[a-z]\/[a-z]/iu.test(token) && !/\/(?:\d{1,3}|\[[^\]]+\])$/u.test(token);
+function isLetterSlashMime(utility: string): boolean {
+  return /[a-z]\/[a-z]/iu.test(utility) && !/\/(?:\d{1,3}|\[[^\]]+\]|\([^)]+\))$/u.test(utility);
 }
+
+/** Marker classes with a name: `group/item`, `peer/email`, `@container/main`. */
+const NAMED_MARKER_PATTERN = /^(?:group|peer|@container)\/[a-z0-9_-]+$/u;
+
+/** Tailwind v4 CSS variable shorthand: `bg-(--brand)`, `w-(--sidebar-width)`. */
+const CSS_VARIABLE_VALUE_PATTERN = /^[a-z][a-z0-9-]*-\((?:[a-z-]+:)?--[a-zA-Z0-9_-]+\)$/u;
 
 export function classifyClassToken(token: string): ClassTokenKind {
-  if (!isClassTokenCharset(token) || STOPWORDS.has(token) || isLetterSlashMime(token)) {
+  if (!isClassTokenCharset(token) || STOPWORDS.has(token)) {
     return 'other';
   }
   const { body: raw, hasVariant } = splitUtilityBody(token);
   if (raw === '') {
     return 'other';
   }
-  if (/^\[[^\]]+\]$/u.test(raw)) {
+  if (/^\[[^\]]+\]$/u.test(raw) || NAMED_MARKER_PATTERN.test(raw)) {
     return 'strong';
+  }
+  if (isLetterSlashMime(raw)) {
+    return 'other';
   }
   const stripped = stripUtilityDecorators(raw);
   const utility = stripped.body;
@@ -615,7 +718,7 @@ export function classifyClassToken(token: string): ClassTokenKind {
   if (WEAK_BARE_UTILITIES.has(utility)) {
     return distinctive ? 'strong' : 'weak';
   }
-  if (/^[a-z][a-z0-9-]*\[[^\]]+\]$/u.test(utility)) {
+  if (/^[a-z][a-z0-9-]*\[[^\]]+\]$/u.test(utility) || CSS_VARIABLE_VALUE_PATTERN.test(utility)) {
     return 'strong';
   }
   const matched = matchPrefix(utility);
@@ -628,10 +731,26 @@ export function classifyClassToken(token: string): ClassTokenKind {
     }
     return distinctive ? 'strong' : 'weak';
   }
-  if (!isKnownValue(matched.value)) {
-    return 'other';
+  if (isKnownValue(matched.value)) {
+    return 'strong';
   }
-  return 'strong';
+  if (isThemeLikeValue(matched.value)) {
+    return distinctive ? 'strong' : 'weak';
+  }
+  return 'other';
+}
+
+/**
+ * The utility part of one class token, without variants, the important mark,
+ * the negative mark, or an opacity modifier. `hover:!bg-black/50` → `bg-black`.
+ */
+export function utilityBodyOf(token: string): string {
+  return stripUtilityDecorators(splitUtilityBody(token).body).body;
+}
+
+/** True when `name` is a utility family (`bg`), or a family plus a value (`bg-red`). */
+export function startsWithUtilityPrefix(name: string): boolean {
+  return name !== '' && matchPrefix(name) !== undefined;
 }
 
 export function isTailwindToken(token: string): boolean {

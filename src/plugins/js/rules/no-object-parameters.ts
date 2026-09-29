@@ -4,6 +4,7 @@ import type { ESTree, SourceCode } from '@oxlint/plugins';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
+import { isOverloadImplementation } from '../shared/overloads.ts';
 
 type Parameter = ESTree.ParamPattern;
 type ParameterOwner =
@@ -29,9 +30,18 @@ function parameterAnnotation(parameter: Parameter): ESTree.TSTypeAnnotation | nu
 }
 
 function parameterName(parameter: Parameter, sourceCode: SourceCode): string {
+  if (parameter.type === 'TSParameterProperty') {
+    return parameterName(parameter.parameter, sourceCode);
+  }
+  if (parameter.type === 'AssignmentPattern') {
+    return parameterName(parameter.left, sourceCode);
+  }
+  if (parameter.type === 'RestElement') {
+    return parameterName(parameter.argument, sourceCode);
+  }
   return parameter.type === 'Identifier'
     ? parameter.name
-    : sourceCode.getText(parameter).replace(/\s*:\s*object\s*$/u, '');
+    : sourceCode.getText(parameter).replace(/\s*:\s*[^:]+$/u, '');
 }
 
 /** Ban the broad object type on function inputs, including local aliases to object. */
@@ -88,6 +98,7 @@ export const noObjectParameters: CreateOnceRule = defineBellonaRule({
     };
 
     const checkParameters = (node: ParameterOwner) => {
+      if (isOverloadImplementation(node)) return;
       const shadowedAliases = lexicalTypeParameterNames(node, context.sourceCode.visitorKeys);
       for (const parameter of node.params) {
         const annotation = parameterAnnotation(parameter);

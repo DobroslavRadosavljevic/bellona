@@ -39,6 +39,17 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'set',
   'enum',
   'nativeEnum',
+  'keyof',
+  'optional',
+  'exactOptional',
+  'nullable',
+  'nullish',
+  'nonoptional',
+  'readonly',
+  'default',
+  'prefault',
+  'catch',
+  'success',
   'literal',
   'union',
   'xor',
@@ -55,12 +66,20 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'preprocess',
   'pipe',
   'codec',
+  'invertCodec',
+  'stringbool',
+  'stringFormat',
   'transform',
   'email',
   'url',
   'httpUrl',
   'uuid',
+  'uuidv4',
+  'uuidv6',
+  'uuidv7',
   'guid',
+  'xid',
+  'ksuid',
   'cuid',
   'cuid2',
   'ulid',
@@ -79,7 +98,46 @@ const ZOD_SCHEMA_BUILDERS = new Set([
   'e164',
   'mac',
   'creditCard',
+  'iban',
+  'currencyCode',
+  'uint64',
 ]);
+
+/**
+ * Chain methods that return a value, not a schema (`z.object(…).parse(env)`).
+ * A chain that calls one of these is not a schema binding.
+ */
+const ZOD_NON_SCHEMA_METHODS = new Set([
+  'parse',
+  'safeParse',
+  'parseAsync',
+  'safeParseAsync',
+  'spa',
+  'encode',
+  'decode',
+  'encodeAsync',
+  'decodeAsync',
+  'safeEncode',
+  'safeDecode',
+  'safeEncodeAsync',
+  'safeDecodeAsync',
+  'implement',
+  'implementAsync',
+  'isOptional',
+  'isNullable',
+  'toJSONSchema',
+]);
+
+/** `.meta()` without arguments reads metadata. With an argument it returns a schema. */
+function isNonSchemaChainCall(method: string | undefined, call: ESTree.CallExpression): boolean {
+  if (method === undefined) {
+    return false;
+  }
+  if (method === 'meta') {
+    return call.arguments.length === 0;
+  }
+  return ZOD_NON_SCHEMA_METHODS.has(method);
+}
 
 const ZOD_ISO_METHODS = new Set(['date', 'time', 'datetime', 'duration']);
 
@@ -113,6 +171,9 @@ function isZodSchemaBuilderCall(init: ESTree.Expression | undefined): boolean {
     }
 
     const method = getStaticPropertyName(callee.property);
+    if (isNonSchemaChainCall(method, current)) {
+      return false;
+    }
     const object = unwrapExpression(callee.object);
     if (object === undefined) {
       return false;

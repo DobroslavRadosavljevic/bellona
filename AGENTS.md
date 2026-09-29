@@ -11,12 +11,12 @@
 
 - Install: `bun install`
 - Test all: `bun run test`
-- Test file: `bunx vitest run tests/unit/plugins/js/max-classes.test.ts`
+- Test file: `bunx vitest run tests/unit/plugins/js/no-inline-import-type.test.ts`
 - Test name: `bunx vitest run path/to/file.test.ts -t "custom max"`
 - Lint: `bun run lint` / `bun run lint:fix`
 - Types: `bun run typecheck`
 - Format: `bun run format` / `bun run format:check`
-- Bench all rules: `bun run bench` (`--plugin js`, `--rule bl-js/max-classes`, `--scale 8`, `--repeat 1`, `--json`)
+- Bench all rules: `bun run bench` (`--plugin js`, `--rule bl-js/no-inline-import-type`, `--scale 8`, `--repeat 1`, `--json`)
 - Build / watch: `bun run build` / `bun run dev`
 - Gate (local stand-in for CI): `bun run check`
 - npm web login: `bun run login` (opens the npm login page; token goes to the user `~/.npmrc`)
@@ -64,11 +64,11 @@ Hard rule for all agent text to humans. Also covers names in the codebase. Do no
 ## Project rules
 
 - New framework/domain = **new** `src/plugins/<id>/` + `package.json` `exports` + `tsdown.config.ts` `entry` + `tests/unit/plugins/<id>/`. TypeScript evidence rules stay on `bellona/js`.
-- `meta.name` is unique per plugin (`bl-js`, `bl-react`, …) so ids are `bl-<plugin>/<slug>` (example: `bl-js/max-classes`)
-- Register with `bnRuleName('slug')` (`max-classes`, never `js-max-classes` or `bn-max-classes`)
+- `meta.name` is unique per plugin (`bl-js`, `bl-react`, …) so ids are `bl-<plugin>/<slug>` (example: `bl-js/no-inline-import-type`)
+- Register with `bnRuleName('slug')` (`no-inline-import-type`, never `js-no-inline-import-type` or `bn-no-inline-import-type`)
 - Rules ship **off**. Never add a recommended config that enables them
 - Prefer `schema` + `defaultOptions`; read options with typed field helpers from visitors/`before`, not from the `createOnce` closure
-- Copy `src/plugins/js/rules/max-classes.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`
+- Copy `src/plugins/js/rules/no-inline-import-type.ts` + `tests/unit/plugins/js/` for a new rule. JS evidence AST lives in `src/plugins/js/shared/`
 - Type rules with `defineBellonaRule` so `createOnce` stays; do not annotate as `Rule` (widens)
 - Do not use `as` / `any` to hide option or AST types — narrow in `src/lib/`
 - `node.parent` is `Node | null`. Coerce with `?? undefined` before `ESTree.Node | undefined` walks

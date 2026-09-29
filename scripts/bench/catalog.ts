@@ -4,6 +4,7 @@ import elysia from '../../src/plugins/elysia/index.ts';
 import js from '../../src/plugins/js/index.ts';
 import react from '../../src/plugins/react/index.ts';
 import tailwind from '../../src/plugins/tailwind/index.ts';
+import tanstackQuery from '../../src/plugins/tanstack-query/index.ts';
 import tanstackRouter from '../../src/plugins/tanstack-router/index.ts';
 import zod from '../../src/plugins/zod/index.ts';
 
@@ -14,6 +15,7 @@ export type BenchPluginId =
   | 'js'
   | 'react'
   | 'tailwind'
+  | 'tanstack-query'
   | 'tanstack-router'
   | 'zod';
 
@@ -58,6 +60,7 @@ const PLUGINS: readonly BenchPlugin[] = [
   toBenchPlugin('js', 'src/plugins/js/index.ts', js),
   toBenchPlugin('react', 'src/plugins/react/index.ts', react),
   toBenchPlugin('tailwind', 'src/plugins/tailwind/index.ts', tailwind),
+  toBenchPlugin('tanstack-query', 'src/plugins/tanstack-query/index.ts', tanstackQuery),
   toBenchPlugin('tanstack-router', 'src/plugins/tanstack-router/index.ts', tanstackRouter),
   toBenchPlugin('zod', 'src/plugins/zod/index.ts', zod),
 ];

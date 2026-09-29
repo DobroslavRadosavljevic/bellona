@@ -48,3 +48,14 @@ export function readAllowedCallees(context: Context): readonly string[] {
 export function shouldSkipTailwindFile(context: Context): boolean {
   return isTestFile(context.filename) || matchesAllow(context.filename, readAllowList(context));
 }
+
+export function readClassAttributes(
+  context: Context,
+  fallback: readonly string[],
+): readonly string[] {
+  return stringListField(objectOptionAt(context, 0), 'attributes', fallback);
+}
+
+export function readClassCallees(context: Context, fallback: readonly string[]): readonly string[] {
+  return stringListField(objectOptionAt(context, 0), 'callees', fallback);
+}

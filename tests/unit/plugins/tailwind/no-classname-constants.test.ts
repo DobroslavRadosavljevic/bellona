@@ -17,6 +17,9 @@ runTailwindRule(noClassnameConstantsName, {
     { code: 'const layout = "flex grid";' },
     { code: 'const position = "relative absolute";' },
     { code: 'const limit = "size-limit";' },
+    { code: 'const pair = "bg-primary text-primary-foreground";' },
+    { code: 'const note = "Save (draft) now";' },
+    { code: 'const version = "v1.2.3 build";' },
     { code: withTv('export const button = tv({ base: "flex items-center text-white" });') },
     {
       code: withTv(
@@ -78,6 +81,31 @@ runTailwindRule(noClassnameConstantsName, {
       code: 'class Host { static lightboxControlClassName = "flex items-center"; }',
       errors: [stored],
     }),
+    invalidWith({
+      name: 'v4 theme color with opacity and a class-name binding',
+      code: 'const headerClassName = "text-xs leading-none text-secondary-foreground/80";',
+      errors: [stored],
+    }),
+    invalidWith({
+      name: 'v4 decimal spacing and important suffix',
+      code: 'const shared = "flex! gap-1.5 items-center";',
+      errors: [stored],
+    }),
+    invalidWith({
+      name: 'v4 CSS variable shorthand',
+      code: 'const ghost = { move: "rounded-sm border border-dashed border-(--event-color)/50" };',
+      errors: [stored],
+    }),
+    invalidWith({
+      name: 'named group and theme colors',
+      code: 'const chip = "group/chip inline-flex items-center bg-secondary text-secondary-foreground";',
+      errors: [stored],
+    }),
+    invalidWith({
+      name: 'arbitrary variant with a side border',
+      code: 'const footRowBorderClasses = "[&:not(:last-child)>td]:border-b";',
+      errors: [stored],
+    }),
   ],
 });
 
@@ -96,6 +124,16 @@ runTailwindRule(
     invalid: [
       invalidWith({
         code: 'function Card() { const className = "flex items-center"; return <div className={className} />; }',
+        errors: [error('localClassNames')],
+      }),
+      invalidWith({
+        name: 'local cn() result inside a component',
+        code: 'function Card({ active }: CardProps) {\n  const chipClassName = cn("inline-flex items-center gap-1", active && "bg-accent");\n  return <span className={chipClassName} />;\n}',
+        errors: [error('localClassNames')],
+      }),
+      invalidWith({
+        name: 'module-level constant in a component file',
+        code: 'const chipClassName = "inline-flex items-center gap-1";\nexport function Card() { return <span className={chipClassName} />; }',
         errors: [stored],
       }),
     ],

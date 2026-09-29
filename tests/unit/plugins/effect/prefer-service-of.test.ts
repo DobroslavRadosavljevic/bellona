@@ -90,6 +90,15 @@ class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
 }
 `),
     },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.succeed(Database, Database.of({ list: () => ({ ok: true }) }))
+  static readonly layerSync = Layer.sync(Database, () => Database.of({ list: () => ({ ok: true }) }))
+}
+`),
+    },
   ],
   invalid: [
     {
@@ -136,6 +145,44 @@ class Database extends Service<Database, {}>()("myapp/db/Database") {
   }))
 }
 `,
+      errors: [error('of')],
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.succeed(Database, { read: () => "1" })
+}
+`),
+      errors: [error('of')],
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.sync(Database, () => ({ read: () => "1" }))
+}
+`),
+      errors: [error('of')],
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.sync(Database, () => {
+    return { read: () => "1" }
+  })
+}
+`),
+      errors: [error('of')],
+    },
+    {
+      ...ts,
+      code: withEffect(`
+class Database extends Context.Service<Database, {}>()("myapp/db/Database") {
+  static readonly layer = Layer.effect(Database, Effect.sync(() => ({ read: () => "1" })))
+}
+`),
       errors: [error('of')],
     },
   ],

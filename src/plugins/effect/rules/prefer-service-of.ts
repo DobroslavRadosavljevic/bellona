@@ -22,14 +22,15 @@ export const preferServiceOf: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Prefer Service.of({ ... }) when returning a Context.Service implementation',
+      description:
+        'Prefer Service.of({ ... }) for a Context.Service implementation in Layer.effect, Layer.sync, or Layer.succeed',
     },
     messages: {
       of: agentDiagnostic({
         problem:
           'This `Context.Service` implementation returns a plain object instead of `{{name}}.of({ … })`.',
-        why: '`.of` is the v4 constructor that brands the service. A plain object is not a typed Service instance.',
-        fix: 'Return `{{name}}.of({ method() { … } })` (or the equivalent members) from `make` / the layer.',
+        why: '`.of` returns its argument. It checks the object against the service shape where you write it, so a wrong member shows on that object. It is the documented v4 style.',
+        fix: 'Return `{{name}}.of({ method() { … } })` from the layer. For a pure service, write `Layer.succeed({{name}}, {{name}}.of({ … }))`.',
         avoid:
           'Do not `as {{name}}` on a plain object. Do not use `.Default`. Do not disable the rule.',
       }),
@@ -50,7 +51,17 @@ export const preferServiceOf: CreateOnceRule = defineBellonaRule({
       ReturnStatement(node) {
         reportPlainObject(node, unwrapExpression(node.argument));
       },
+      ArrowFunctionExpression(node) {
+        // `() => ({ … })` returns the object like `return { … }` does.
+        if (node.expression === true) {
+          reportPlainObject(node.body, unwrapExpression(node.body));
+        }
+      },
       CallExpression(node) {
+        if (isModuleCall(node, bindings, 'layer', 'succeed')) {
+          reportPlainObject(node, getCallArgument(node, 1));
+          return;
+        }
         if (!isModuleCall(node, bindings, 'layer', 'effect')) {
           return;
         }
@@ -103,7 +114,10 @@ export const preferServiceOf: CreateOnceRule = defineBellonaRule({
         if (parent.type !== 'CallExpression') {
           return;
         }
-        if (isModuleCall(parent, bindings, 'layer', 'effect')) {
+        if (
+          isModuleCall(parent, bindings, 'layer', 'effect') ||
+          isModuleCall(parent, bindings, 'layer', 'sync')
+        ) {
           if (getCallArgument(parent, 1) === unwrapExpression(current)) {
             context.report({ messageId: 'of', node, data: { name } });
           }

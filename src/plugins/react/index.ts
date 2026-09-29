@@ -5,6 +5,7 @@ import {
 } from './rules/component-file-name-match.ts';
 import { componentPropsType, componentPropsTypeName } from './rules/component-props-type.ts';
 import { hookFileNameMatch, hookFileNameMatchName } from './rules/hook-file-name-match.ts';
+import { noForwardRef, noForwardRefName } from './rules/no-forward-ref.ts';
 import {
   noImplComponentSuffix,
   noImplComponentSuffixName,
@@ -33,12 +34,17 @@ import {
   noRenderHelperFunctionsInComponents,
   noRenderHelperFunctionsInComponentsName,
 } from './rules/no-render-helper-functions-in-components.ts';
+import {
+  preferContextAsProvider,
+  preferContextAsProviderName,
+} from './rules/prefer-context-as-provider.ts';
 import { requireBareHookCall, requireBareHookCallName } from './rules/require-bare-hook-call.ts';
 
 const react = defineBellonaPlugin('bl-react', {
   [componentFileNameMatchName]: componentFileNameMatch,
   [componentPropsTypeName]: componentPropsType,
   [hookFileNameMatchName]: hookFileNameMatch,
+  [noForwardRefName]: noForwardRef,
   [noImplComponentSuffixName]: noImplComponentSuffix,
   [noJsxIifeInComponentsName]: noJsxIifeInComponents,
   [noJsxLocalConstantsInComponentsName]: noJsxLocalConstantsInComponents,
@@ -49,6 +55,7 @@ const react = defineBellonaPlugin('bl-react', {
   [noNativeHtmlName]: noNativeHtml,
   [noReactNamespaceName]: noReactNamespace,
   [noRenderHelperFunctionsInComponentsName]: noRenderHelperFunctionsInComponents,
+  [preferContextAsProviderName]: preferContextAsProvider,
   [requireBareHookCallName]: requireBareHookCall,
 });
 
@@ -60,6 +67,8 @@ export {
   componentPropsTypeName,
   hookFileNameMatch,
   hookFileNameMatchName,
+  noForwardRef,
+  noForwardRefName,
   noImplComponentSuffix,
   noImplComponentSuffixName,
   noJsxIifeInComponents,
@@ -80,6 +89,8 @@ export {
   noReactNamespaceName,
   noRenderHelperFunctionsInComponents,
   noRenderHelperFunctionsInComponentsName,
+  preferContextAsProvider,
+  preferContextAsProviderName,
   requireBareHookCall,
   requireBareHookCallName,
 };

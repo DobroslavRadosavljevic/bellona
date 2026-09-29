@@ -109,6 +109,20 @@ export function Action${index}() {
 `;
 }
 
+function queryFile(index: number): string {
+  return `import { QueryClient, useQuery, useInfiniteQuery, queryOptions } from '@tanstack/react-query';
+
+const client = new QueryClient();
+const options = queryOptions({ queryKey: ['item', ${index}], cacheTime: 1000 });
+client.prefetchQuery(options);
+export function useItem${index}() {
+  const result = useQuery(options);
+  useInfiniteQuery({ queryKey: ['pages', ${index}], queryFn: ({ direction }) => direction });
+  return result.isInitialLoading;
+}
+`;
+}
+
 export function buildCorpusFiles(scale: number): readonly CorpusFile[] {
   const files: CorpusFile[] = [];
   for (let index = 0; index < scale; index += 1) {
@@ -123,6 +137,7 @@ export function buildCorpusFiles(scale: number): readonly CorpusFile[] {
       relativePath: `tanstack-router/routes/item-${index}.tsx`,
       content: routerFile(index),
     });
+    files.push({ relativePath: `tanstack-query/item-${index}.ts`, content: queryFile(index) });
     files.push({ relativePath: `tailwind/card-${index}.ts`, content: tailwindFile(index) });
     files.push({ relativePath: `zod/item-${index}-schema.ts`, content: zodFile(index) });
     files.push({ relativePath: `base-ui/Action${index}.tsx`, content: baseUiFile(index) });

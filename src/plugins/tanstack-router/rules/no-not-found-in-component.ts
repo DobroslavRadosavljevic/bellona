@@ -24,7 +24,7 @@ export const noNotFoundInComponent: CreateOnceRule = defineBellonaRule({
       notFoundInComponent: agentDiagnostic({
         problem:
           '`notFound()` is called inside a route component (or pending / error / not-found UI).',
-        why: 'A throw during render flickers and leaves loader data untyped. The throw belongs in the loader.',
+        why: 'The router supports it, but the component renders before it throws. A throw in `loader` or `beforeLoad` stops the match before render and lets SSR send a 404 status.',
         fix: 'Throw `notFound()` in `loader` or `beforeLoad` after you load the record. Keep the component for render only.',
         avoid: 'Do not throw `notFound()` from `notFoundComponent`. Do not disable the rule.',
       }),

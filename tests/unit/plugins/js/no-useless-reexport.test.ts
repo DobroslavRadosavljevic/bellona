@@ -65,8 +65,35 @@ runJsRule(noUselessReexportName, {
       filename: 'src/barrel.ts',
       options: [{ allow: ['barrel.ts'] }],
     }),
+    {
+      name: 'use client boundary for a third-party component',
+      code: '"use client";\nexport { Carousel } from "acme-carousel";',
+    },
+    {
+      name: 'use client boundary through a default export',
+      code: "'use client';\nimport { Carousel } from 'acme-carousel';\nexport default Carousel;",
+    },
+    validWith('import config from "@acme/config/oxfmt";\nexport default config;', {
+      name: 'tool config file that a tool loads by path',
+      filename: 'apps/web/oxfmt.config.ts',
+    }),
+    validWith('export { default } from "@acme/config/vitest";', {
+      name: 'tool config file with a longer name',
+      filename: 'apps/api/vitest.unit.config.mts',
+    }),
   ],
   invalid: [
+    invalidWith({
+      name: 'use strict is not a boundary',
+      code: '"use strict";\nexport * from "./foo";',
+      errors: [reexportFile],
+    }),
+    invalidWith({
+      name: 'a file named config is not a tool config file',
+      code: 'import config from "./base";\nexport default config;',
+      filename: 'src/config.ts',
+      errors: [reexportFile],
+    }),
     invalidWith({
       name: 'star re-export file',
       code: 'export * from "./foo";',

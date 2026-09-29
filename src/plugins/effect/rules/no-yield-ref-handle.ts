@@ -40,7 +40,7 @@ export const noYieldRefHandle: CreateOnceRule = defineBellonaRule({
       handle: agentDiagnostic({
         problem:
           'This generator `yield*`s a `{{kind}}` handle. Handles are not Effects. Use `{{replacement}}`.',
-        why: '`Ref` / `Fiber` / `Deferred` values are handles. `yield*` on them does not get/join/await.',
+        why: 'In v4, `Ref` / `Fiber` / `Deferred` are plain handles, not Effects, and not `Yieldable`. `yield*` on one does not get, join, or await. It fails at run time.',
         fix: 'Call `{{replacement}}` (examples: `yield* Ref.get(ref)`, `yield* Fiber.join(fiber)`, `yield* Deferred.await(deferred)`).',
         avoid: 'Do not `yield* ref` after wrapping. Do not disable the rule.',
       }),

@@ -70,15 +70,15 @@ runZodRule(zodModernFormatValidatorsName, {
     }),
     invalidWith({
       code: withZod('const s = z.string().uuidv4();'),
-      errors: [prefer('uuidv4', 'z.uuid()')],
+      errors: [prefer('uuidv4', 'z.uuidv4()')],
     }),
     invalidWith({
       code: withZod('const s = z.string().uuidv6();'),
-      errors: [prefer('uuidv6', 'z.uuid()')],
+      errors: [prefer('uuidv6', 'z.uuidv6()')],
     }),
     invalidWith({
       code: withZod('const s = z.string().uuidv7();'),
-      errors: [prefer('uuidv7', 'z.uuid()')],
+      errors: [prefer('uuidv7', 'z.uuidv7()')],
     }),
     invalidWith({
       code: withZod('const s = z.string().guid();'),
@@ -118,7 +118,7 @@ runZodRule(zodModernFormatValidatorsName, {
     }),
     invalidWith({
       code: withZod('const s = z.string().cuid();'),
-      errors: [prefer('cuid', 'z.cuid()')],
+      errors: [prefer('cuid', 'z.cuid2() for new ids, or z.cuid() to keep CUID v1')],
     }),
     invalidWith({
       code: withZod('const s = z.string().cuid2();'),
@@ -138,7 +138,19 @@ runZodRule(zodModernFormatValidatorsName, {
     }),
     invalidWith({
       code: withZod('const s = z.string().ip();'),
-      errors: [prefer('ip', 'z.ipv4() or z.ipv6()')],
+      errors: [prefer('ip', 'z.union([z.ipv4(), z.ipv6()])')],
+    }),
+    invalidWith({
+      code: withZod('const s = z.string().cidr();'),
+      errors: [prefer('cidr', 'z.union([z.cidrv4(), z.cidrv6()])')],
+    }),
+    invalidWith({
+      code: withZod('const s = z.string().xid();'),
+      errors: [prefer('xid', 'z.xid()')],
+    }),
+    invalidWith({
+      code: withZod('const s = z.string().ksuid();'),
+      errors: [prefer('ksuid', 'z.ksuid()')],
     }),
     invalidWith({
       code: withZod('const s = z.string().mac();'),

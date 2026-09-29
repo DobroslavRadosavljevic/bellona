@@ -38,7 +38,7 @@ export const noDateNowInEffect: CreateOnceRule = defineBellonaRule({
       construct: agentDiagnostic({
         problem: 'This Effect code uses `new Date()` for the current time.',
         why: '`new Date()` reads the system clock and skips `Clock` / `DateTime`, so tests cannot control time.',
-        fix: 'Use `DateTime.now` or `Clock.currentTimeMillis` and convert with `DateTime` helpers. For a timestamp you already have, parse it — do not call `new Date()` for “now”.',
+        fix: 'Use `DateTime.now`, `DateTime.nowAsDate` (when you need a `Date`), or `Clock.currentTimeMillis`. For a timestamp you already have, parse it — do not call `new Date()` for “now”.',
         avoid: 'Do not use `new Date(Date.now())`. Do not disable the rule.',
       }),
     },

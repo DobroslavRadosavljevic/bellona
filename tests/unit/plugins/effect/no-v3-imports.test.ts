@@ -17,6 +17,8 @@ runEffectRule(noV3ImportsName, {
     { ...ts, code: "import { OpenAiClient } from '@effect/ai-openai';" },
     { ...ts, code: "import { it } from '@effect/vitest';" },
     { ...ts, code: "import { FileSystem } from 'effect/FileSystem';" },
+    { ...ts, code: "import { ChildProcess } from 'effect/unstable/process';" },
+    { ...ts, code: "import { Combiner } from 'effect/Combiner';" },
     {
       ...ts,
       code: "import { TestClock } from 'effect/testing/TestClock';",
@@ -42,6 +44,51 @@ runEffectRule(noV3ImportsName, {
     }),
   ],
   invalid: [
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/Command';",
+      errors: [moved('@effect/platform/Command', 'effect/unstable/process')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/CommandExecutor';",
+      errors: [moved('@effect/platform/CommandExecutor', 'effect/unstable/process')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/Socket';",
+      errors: [moved('@effect/platform/Socket', 'effect/unstable/socket')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/Worker';",
+      errors: [moved('@effect/platform/Worker', 'effect/unstable/workers')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/Ndjson';",
+      errors: [moved('@effect/platform/Ndjson', 'effect/unstable/encoding')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/MsgPack';",
+      errors: [moved('@effect/platform/MsgPack', 'effect/unstable/encoding/SchemaBinary')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/HttpApiEndpoint';",
+      errors: [moved('@effect/platform/HttpApiEndpoint', 'effect/unstable/httpapi')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/platform/OpenApi';",
+      errors: [moved('@effect/platform/OpenApi', 'effect/unstable/httpapi')],
+    },
+    {
+      ...ts,
+      code: "import * as M from '@effect/typeclass/Semigroup';",
+      errors: [moved('@effect/typeclass/Semigroup', 'effect/Combiner')],
+    },
     {
       ...ts,
       code: "import { Either } from 'effect/Either';",

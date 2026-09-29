@@ -117,6 +117,15 @@ runTanstackRouterRule(noControlFlowOutsideEdgeName, {
       fileRouteWith(['redirect'], `beforeLoad: () => { throw Route.redirect({ to: '../login' }) }`),
       { filename: APP_FILENAME },
     ),
+    // Start request and function middleware can throw `redirect()`.
+    validWith(
+      `import { createMiddleware } from '@tanstack/react-start';\nimport { redirect } from '@tanstack/react-router';\nexport const auth = createMiddleware().server(async ({ next }) => { if (!session) throw redirect({ to: '/login' }); return next() })`,
+      { filename: 'src/server/auth-middleware.ts' },
+    ),
+    validWith(
+      `import * as Start from '@tanstack/react-start';\nimport { redirect } from '@tanstack/react-router';\nexport const auth = Start.createMiddleware({ type: 'function' }).server(() => { throw redirect({ to: '/login' }) })`,
+      { filename: 'src/server/auth-middleware.ts' },
+    ),
     validWith(
       routerCode('export function isMissing(error: unknown) { return isNotFound(error) }', [
         'isNotFound',

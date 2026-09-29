@@ -10,7 +10,7 @@ npm / pnpm / yarn also work. Peer: `oxlint` `^1.78.0`. Engines: Node `^20.19.0 |
 
 Pin `oxlint` (JS plugins are alpha, outside Oxlint semver). Keep `bellona` and `oxlint` on the same 1.78 minor when possible (`@oxlint/plugins` is bellona’s runtime dependency).
 
-This skill matches **bellona 0.4.9**. Install that version (or later) so new rules and four-part reports exist.
+This skill matches **bellona 0.5.0**. Install that version (or later) so new rules and four-part reports exist.
 
 ## Wire `oxlint.config.ts`
 
@@ -23,14 +23,15 @@ export default defineConfig({
     'bellona/react',
     'bellona/base-ui',
     'bellona/zod',
+    'bellona/tanstack-query',
     'bellona/tanstack-router',
     'bellona/elysia',
     'bellona/effect',
     'bellona/tailwind',
   ],
   rules: {
-    'bl-js/max-classes': ['error', { max: 5 }],
-    'bl-react/no-namespace': 'error',
+    'bl-js/no-inline-import-type': 'error',
+    'bl-react/no-react-namespace': 'error',
     'bl-base-ui/require-native-button-with-render': 'error',
     'bl-zod/schema-naming': 'error',
     'bl-tanstack-router/no-dynamic-to': 'error',
@@ -50,7 +51,7 @@ JSON is valid too:
 {
   "jsPlugins": ["bellona/js"],
   "rules": {
-    "bl-js/max-classes": ["error", { "max": 5 }]
+    "bl-js/no-inline-import-type": "error"
   }
 }
 ```
@@ -73,6 +74,7 @@ defineConfig({
 | `plugins.react` | `bellona/react` |
 | `plugins.baseUi` | `bellona/base-ui` |
 | `plugins.zod` | `bellona/zod` |
+| `plugins.tanstackQuery` | `bellona/tanstack-query` |
 | `plugins.tanstackRouter` | `bellona/tanstack-router` |
 | `plugins.elysia` | `bellona/elysia` |
 | `plugins.effect` | `bellona/effect` |
@@ -83,11 +85,11 @@ defineConfig({
 Format: `bl-<plugin>/<slug>`.
 
 - Plugin `meta.name` is unique (`bl-js`, `bl-react`, `bl-base-ui`, …).
-- The rule key is the slug only (`max-classes`, `require-native-button-with-render`).
+- The rule key is the slug only (`no-inline-import-type`, `require-native-button-with-render`).
 - Severity: `'off' | 'warn' | 'error'` or `['error', { ...options }]`.
 
-Wrong: `bellona/js-max-classes`, `js/max-classes`, `bn-max-classes`.
-Right: `bl-js/max-classes`.
+Wrong: `bellona/js-no-inline-import-type`, `js/no-inline-import-type`, `bn-no-inline-import-type`.
+Right: `bl-js/no-inline-import-type`.
 
 ## Diagnostics
 
@@ -170,7 +172,7 @@ Most bellona rules have **no** autofix. `--fix` will not rewrite `Effect.fn` or 
 Prefer Oxlint directives:
 
 ```ts
-// oxlint-disable-next-line bl-js/max-classes
+// oxlint-disable-next-line bl-js/no-inline-import-type
 ```
 
 ```ts
@@ -186,28 +188,30 @@ Rules stay off until listed. This is a consumer choice, not a package preset. Co
 ```ts
 rules: {
   // js
-  'bl-js/max-classes': 'error',
   'bl-js/no-chained-type-assertions': 'error',
-  'bl-js/no-conditional-empty-object-spread': 'error',
+  'bl-js/no-generic-module-names': 'error',
   'bl-js/no-inline-import-type': 'error',
   'bl-js/no-known-value-widening': 'error',
   'bl-js/no-module-mocking': 'error',
+  'bl-js/no-object-keys-assertion': 'error',
   'bl-js/no-object-parameters': 'error',
-  'bl-js/no-reflect-apply': 'error',
-  'bl-js/no-reflect-get': 'error',
   'bl-js/no-runtime-typeof': 'error',
   'bl-js/no-shape-in-symbol-names': 'error',
   'bl-js/no-unknown-parameters': 'error',
   'bl-js/no-unknown-returns': 'error',
   'bl-js/no-unknown-type-aliases': 'error',
   'bl-js/no-unsafe-dictionary-type': 'error',
+  'bl-js/no-untyped-json': 'error',
   'bl-js/no-useless-reexport': 'error',
   'bl-js/no-widen-then-assert': 'error',
+  'bl-js/require-file-layout': 'error',
+  'bl-js/require-own-key-lookup': 'error',
   'bl-js/require-safety-comment-for-type-assertion': 'error',
   // react
   'bl-react/component-file-name-match': 'error',
   'bl-react/component-props-type': 'error',
   'bl-react/hook-file-name-match': 'error',
+  'bl-react/no-forward-ref': 'error',
   'bl-react/no-impl-component-suffix': 'error',
   'bl-react/no-jsx-iife-in-components': 'error',
   'bl-react/no-jsx-local-constants-in-components': 'error',
@@ -216,41 +220,56 @@ rules: {
   'bl-react/no-multi-component-files': 'error',
   'bl-react/no-multi-hook-files': 'error',
   'bl-react/no-native-html': 'error',
-  'bl-react/no-namespace': 'error',
+  'bl-react/no-react-namespace': 'error',
   'bl-react/no-render-helper-functions-in-components': 'error',
+  'bl-react/prefer-context-as-provider': 'error',
   'bl-react/require-bare-hook-call': 'error',
   // base-ui
+  'bl-base-ui/no-component-as-render': 'error',
   'bl-base-ui/require-native-button-with-render': 'error',
   // zod
   'bl-zod/modern-format-validators': 'error',
+  'bl-zod/no-deprecated-v4-apis': 'error',
   'bl-zod/schema-naming': 'error',
+  // tanstack-query
+  'bl-tanstack-query/exhaustive-deps': 'error',
+  'bl-tanstack-query/no-deprecated-client-methods': 'error',
+  'bl-tanstack-query/no-deprecated-imports': 'error',
+  'bl-tanstack-query/no-deprecated-query-context': 'error',
+  'bl-tanstack-query/no-deprecated-results': 'error',
+  'bl-tanstack-query/no-removed-options': 'error',
+  'bl-tanstack-query/no-rest-destructuring': 'error',
+  'bl-tanstack-query/no-unstable-deps': 'error',
+  'bl-tanstack-query/stable-query-client': 'error',
   // tanstack-router
   'bl-tanstack-router/create-route-property-order': 'error',
   'bl-tanstack-router/no-control-flow-outside-edge': 'error',
+  'bl-tanstack-router/no-deprecated-apis': 'error',
   'bl-tanstack-router/no-dynamic-to': 'error',
   'bl-tanstack-router/no-get-route-api': 'error',
-  'bl-tanstack-router/no-hooks-in-route-lifecycle': 'error',
+  'bl-tanstack-router/no-href': 'error',
   'bl-tanstack-router/no-imperative-location-navigation': 'error',
   'bl-tanstack-router/no-loader-data-in-not-found': 'error',
   'bl-tanstack-router/no-not-found-in-component': 'error',
   'bl-tanstack-router/no-not-found-route': 'error',
   'bl-tanstack-router/no-relative-to-without-from': 'error',
-  'bl-tanstack-router/no-href': 'error',
-  'bl-tanstack-router/no-type-assertion': 'error',
   'bl-tanstack-router/no-search-in-loader': 'error',
-  'bl-tanstack-router/require-params-with-path-tokens': 'error',
+  'bl-tanstack-router/no-type-assertion': 'error',
+  'bl-tanstack-router/no-whole-search-loader-deps': 'error',
   'bl-tanstack-router/require-hook-from': 'error',
   'bl-tanstack-router/require-inline-route-options': 'error',
   'bl-tanstack-router/require-throw-not-found': 'error',
   'bl-tanstack-router/require-throw-redirect': 'error',
-  'bl-tanstack-router/require-validate-search-when-used': 'error',
   // elysia
+  'bl-elysia/hook-after-routes': 'error',
   'bl-elysia/no-context-param': 'error',
-  'bl-elysia/no-controller-context-class': 'error',
   'bl-elysia/no-cookie-undefined-check': 'error',
+  'bl-elysia/no-decorate-singletons': 'error',
+  'bl-elysia/no-elysia-factory-function': 'error',
   'bl-elysia/no-functional-plugin-callback': 'error',
-  'bl-elysia/no-route-factory': 'error',
+  'bl-elysia/no-set-redirect': 'error',
   'bl-elysia/one-route-method-per-file': 'error',
+  'bl-elysia/prefer-eden-treaty-in-tests': 'error',
   'bl-elysia/prefer-resolve-for-auth': 'error',
   'bl-elysia/prefer-status-helper': 'error',
   'bl-elysia/prefer-throw-status': 'error',
@@ -260,37 +279,66 @@ rules: {
   'bl-elysia/require-route-export-name': 'error',
   'bl-elysia/require-route-schema': 'error',
   'bl-elysia/routes-index-mount-only': 'error',
+  'bl-elysia/status-code-in-response': 'error',
   // effect
+  'bl-effect/effect-functions-in-services': 'error',
+  'bl-effect/max-service-methods': 'error',
+  'bl-effect/max-services': 'error',
+  'bl-effect/no-date-now': 'error',
+  'bl-effect/no-duplicate-layer-construction': 'error',
+  'bl-effect/no-eager-acquire': 'error',
+  'bl-effect/no-effect-run-in-tests': 'error',
+  'bl-effect/no-floating-effect': 'error',
+  'bl-effect/no-fork-detach': 'error',
+  'bl-effect/no-forwarding-service': 'error',
+  'bl-effect/no-inferred-service-contract': 'error',
+  'bl-effect/no-interpolated-log-message': 'error',
+  'bl-effect/no-it-scoped': 'error',
+  'bl-effect/no-log-and-rethrow': 'error',
+  'bl-effect/no-module-level-mutable-state': 'error',
+  'bl-effect/no-new-error-in-effect': 'error',
+  'bl-effect/no-per-call-cache-construction': 'error',
+  'bl-effect/no-return-effect-in-gen': 'error',
+  'bl-effect/no-run-promise-in-modules': 'error',
+  'bl-effect/no-service-make-factory': 'error',
+  'bl-effect/no-silent-catch-cause': 'error',
+  'bl-effect/no-status-in-tagged-error': 'error',
+  'bl-effect/no-throw-in-gen': 'error',
+  'bl-effect/no-try-catch-in-gen': 'error',
   'bl-effect/no-v3-apis': 'error',
   'bl-effect/no-v3-imports': 'error',
   'bl-effect/no-v3-service-tags': 'error',
-  'bl-effect/prefer-fn': 'error',
-  'bl-effect/require-fn-name': 'error',
-  'bl-effect/no-pipe-on-fn': 'error',
-  'bl-effect/no-try-catch-in-gen': 'error',
-  'bl-effect/no-throw-in-gen': 'error',
-  'bl-effect/require-gen-self-options': 'error',
-  'bl-effect/require-return-yield-on-fail': 'error',
-  'bl-effect/schema-union-array': 'error',
-  'bl-effect/prefer-date-from-string': 'error',
+  'bl-effect/no-yield-ref-handle': 'error',
+  'bl-effect/prefer-clock-sleep': 'error',
   'bl-effect/prefer-decode-unknown': 'error',
-  'bl-effect/no-it-scoped': 'error',
-  'bl-effect/no-run-promise-in-modules': 'error',
+  'bl-effect/prefer-fn': 'error',
+  'bl-effect/prefer-fn-untraced-in-callbacks': 'error',
+  'bl-effect/prefer-predicate': 'error',
+  'bl-effect/prefer-schema-tagged-error': 'error',
+  'bl-effect/prefer-service-of': 'error',
+  'bl-effect/prefer-try-promise': 'error',
+  'bl-effect/prefer-vitest': 'error',
+  'bl-effect/require-bounded-concurrency': 'error',
+  'bl-effect/require-bounded-retry': 'error',
+  'bl-effect/require-defect-cause': 'error',
+  'bl-effect/require-fn-name': 'error',
+  'bl-effect/require-fn-owner-prefix': 'error',
+  'bl-effect/require-fn-return-annotation': 'error',
+  'bl-effect/require-gen-self-options': 'error',
+  'bl-effect/require-ignore-log': 'error',
+  'bl-effect/require-promise-abort-signal': 'error',
+  'bl-effect/require-redacted-secret-config': 'error',
+  'bl-effect/require-return-yield-on-fail': 'error',
   'bl-effect/require-service-filename': 'error',
-  'bl-effect/max-services': 'error',
   'bl-effect/require-service-id-path': 'error',
   'bl-effect/require-service-static-layer': 'error',
-  'bl-effect/prefer-service-of': 'error',
-  'bl-effect/no-date-now': 'error',
-  'bl-effect/prefer-clock-sleep': 'error',
-  'bl-effect/prefer-schema-tagged-error': 'error',
-  'bl-effect/prefer-try-promise': 'error',
-  'bl-effect/prefer-predicate': 'error',
-  'bl-effect/no-yield-ref-handle': 'error',
-  'bl-effect/prefer-vitest': 'error',
+  'bl-effect/require-timeout-on-external-io': 'error',
   'bl-effect/schema-no-legacy-filter': 'error',
+  'bl-effect/schema-union-array': 'error',
   // tailwind
   'bl-tailwind/no-classname-constants': 'error',
+  'bl-tailwind/no-dynamic-class-construction': 'error',
+  'bl-tailwind/no-v3-arbitrary-var': 'error',
 }
 ```
 

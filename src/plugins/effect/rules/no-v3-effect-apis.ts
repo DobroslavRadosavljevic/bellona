@@ -13,16 +13,24 @@ const EFFECT_REPLACEMENTS = new Map<string, string>([
   ['catchAllDefect', 'Effect.catchDefect'],
   ['catchSome', 'Effect.catchFilter'],
   ['catchSomeCause', 'Effect.catchCauseFilter'],
-  ['catchSomeDefect', 'removed (typed defects only)'],
+  ['catchSomeDefect', 'Effect.catchDefect (die again for defects you do not handle)'],
+  ['tapErrorCause', 'Effect.tapCause'],
+  ['ignoreLogged', 'Effect.ignore({ log: true })'],
+  ['optionFromOptional', 'Effect.catchNoSuchElement'],
+  ['makeSemaphore', 'Semaphore.make'],
+  ['unsafeMakeSemaphore', 'Semaphore.makeUnsafe'],
+  ['makeLatch', 'Latch.make'],
+  ['unsafeMakeLatch', 'Latch.makeUnsafe'],
+  ['dieMessage', 'Effect.die(new Error(message))'],
   ['async', 'Effect.callback'],
   ['asyncEffect', 'Effect.callback'],
   ['either', 'Effect.result'],
   ['zipRight', 'Effect.andThen'],
-  ['zipLeft', 'Effect.zip + Effect.map'],
+  ['zipLeft', 'Effect.tap'],
   ['fork', 'Effect.forkChild'],
   ['forkDaemon', 'Effect.forkDetach'],
-  ['forkAll', 'removed'],
-  ['forkWithErrorHandler', 'removed'],
+  ['forkAll', 'Effect.forEach + Effect.forkChild'],
+  ['forkWithErrorHandler', 'Effect.forkChild + Fiber.await'],
 ]);
 
 const LAYER_REPLACEMENTS = new Map<string, string>([
@@ -31,9 +39,35 @@ const LAYER_REPLACEMENTS = new Map<string, string>([
   ['scopedContext', 'Layer.effectContext'],
   ['catchAll', 'Layer.catch'],
   ['catchAllCause', 'Layer.catchCause'],
+  ['tapErrorCause', 'Layer.tapCause'],
 ]);
 
-const STREAM_REPLACEMENTS = new Map<string, string>([['async', 'Stream.callback']]);
+/** From the Effect `migration/v3-to-v4.md` reference. Each v4 name exists in `effect@4.0.0-rc.115`. */
+const STREAM_REPLACEMENTS = new Map<string, string>([
+  ['async', 'Stream.callback'],
+  ['asyncEffect', 'Stream.callback'],
+  ['asyncPush', 'Stream.callback'],
+  ['asyncScoped', 'Stream.callback'],
+  ['repeatEffect', 'Stream.fromEffectRepeat'],
+  ['repeatEffectWithSchedule', 'Stream.fromEffectSchedule'],
+  ['repeatEffectChunk', 'Stream.fromIterableEffectRepeat'],
+  ['fromChunk', 'Stream.fromArray'],
+  ['fromChunks', 'Stream.fromArrays'],
+  ['mapChunks', 'Stream.mapArray'],
+  ['mapChunksEffect', 'Stream.mapArrayEffect'],
+  ['either', 'Stream.result'],
+  ['flattenChunks', 'Stream.flattenArray'],
+  ['flattenIterables', 'Stream.flattenIterable'],
+  ['mergeEither', 'Stream.mergeResult'],
+  ['zipWithChunks', 'Stream.zipWithArray'],
+  ['bufferChunks', 'Stream.bufferArray'],
+  ['combineChunks', 'Stream.combineArray'],
+  ['catchAll', 'Stream.catch'],
+  ['catchAllCause', 'Stream.catchCause'],
+  ['catchSome', 'Stream.catchFilter'],
+  ['catchSomeCause', 'Stream.catchCauseFilter'],
+  ['tapErrorCause', 'Stream.tapCause'],
+]);
 
 const SCOPE_REPLACEMENTS = new Map<string, string>([['extend', 'Scope.provide']]);
 
@@ -42,6 +76,12 @@ const PREDICATE_REPLACEMENTS = new Map<string, string>([
   ['isNullable', 'Predicate.isNullish'],
   ['isNotNullable', 'Predicate.isNotNullish'],
   ['isReadonlyRecord', 'Predicate.isReadonlyObject'],
+]);
+
+/** v3 Schema names. `Schema.Date` is the v4 schema for `Date` instances. */
+const SCHEMA_REPLACEMENTS = new Map<string, string>([
+  ['DateFromSelf', 'Schema.Date'],
+  ['DateFromNumber', 'Schema.DateFromMillis'],
 ]);
 
 export const noV3EffectApisName = bnRuleName('no-v3-apis');
@@ -70,6 +110,11 @@ function v3ApiOf(
       return { api: `Scope.${name}`, replacement };
     }
   }
+  for (const [name, replacement] of SCHEMA_REPLACEMENTS) {
+    if (isModuleMember(node, bindings, 'schema', name)) {
+      return { api: `Schema.${name}`, replacement };
+    }
+  }
   for (const [name, replacement] of PREDICATE_REPLACEMENTS) {
     if (isModuleMember(node, bindings, 'predicate', name)) {
       return { api: `Predicate.${name}`, replacement };
@@ -87,14 +132,14 @@ export const noV3EffectApis: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow Effect v3 combinators that were renamed or removed in Effect v4',
+      description:
+        'Disallow Effect v3 combinators and Schema names that were renamed or removed in Effect v4',
     },
     messages: {
       renamed: agentDiagnostic({
-        problem:
-          '`{{api}}` is an Effect v3 API. The v4 replacement is `{{replacement}}` (`removed` means the API is gone).',
+        problem: '`{{api}}` is an Effect v3 API. The v4 replacement is `{{replacement}}`.',
         why: 'v3 names do not exist or mean something else on Effect v4 (`effect@rc`). Mixing them breaks types and runtime.',
-        fix: 'Replace `{{api}}` with `{{replacement}}`. If replacement is `removed` / `removed (typed defects only)`, delete the call and use typed `Effect.fail` / `catch` / `forkChild` as documented in bellona Effect rules.',
+        fix: 'Replace `{{api}}` with `{{replacement}}`. For `catchSome*`, turn the `Option` handler into a `Filter`, or use `catchIf` / `catchCauseIf` for a boolean check. Check each call site: some v4 names take new options. `Schema.Date` accepts `Date` instances. For ISO strings, use `Schema.DateFromString`.',
         avoid: 'Do not keep the v3 name behind a local alias. Do not disable the rule.',
       }),
     },

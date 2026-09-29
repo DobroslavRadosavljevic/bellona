@@ -18,6 +18,22 @@ runEffectRule(requireEffectFnNameName, {
       ),
     },
     { ...ts, code: withEffect('Effect.fnUntraced(function*() { return 1 })') },
+    {
+      ...ts,
+      code: withEffect(
+        'const make = (tool: string) => Effect.fn(`Tools.${tool}`)(function*() { return tool })',
+      ),
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'const bind = (tool: string) => ({ reserve: Effect.fn(`FileToolSteps.${tool}.reserve`)(function*() { return tool }) })',
+      ),
+    },
+    {
+      ...ts,
+      code: withEffect('const loadUser = Effect.fn(`loadUser`)(function*() { return 1 })'),
+    },
     { ...ts, code: NO_EFFECT },
     {
       ...ts,
@@ -37,6 +53,34 @@ runEffectRule(requireEffectFnNameName, {
     }),
   ],
   invalid: [
+    {
+      ...ts,
+      code: withEffect(
+        'const make = (tool: string) => Effect.fn(`${tool}`)(function*() { return tool })',
+      ),
+      errors: [error('dynamic')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'const make = (tool: string) => Effect.fn(`tool-${tool}`)(function*() { return tool })',
+      ),
+      errors: [error('dynamic')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'const id = "1";\nconst loadUser = Effect.fn(`Users.${id}`)(function*() { return 1 })',
+      ),
+      errors: [error('dynamic')],
+    },
+    {
+      ...ts,
+      code: withEffect(
+        'const make = (name: string) => Effect.fn(name)(function*() { return name })',
+      ),
+      errors: [error('missing')],
+    },
     {
       ...ts,
       code: withEffect('const loadUser = Effect.fn(function*() { return 1 })'),

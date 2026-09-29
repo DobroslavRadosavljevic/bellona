@@ -12,6 +12,34 @@ const requireStatusOnly = [{ requireAllRoutes: false }];
 runElysiaRule(requireResponseSchemaName, {
   valid: [
     {
+      name: 'redirect with a response that has no redirect key',
+      ...ts,
+      code: `${elysiaImport}app.get('/go', ({ redirect }) => redirect('https://x'), { response: { 200: t.String() } })`,
+    },
+    {
+      name: 'narrowed: redirect with a response that has no redirect key',
+      ...ts,
+      options: [...requireStatusOnly],
+      code: `${elysiaImport}app.get('/go', () => redirect('/x'), { response: { 401: t.Any() } })`,
+    },
+    {
+      name: 'chained guard without callback supplies response',
+      ...ts,
+      code: `${elysiaImport}new Elysia().guard({ response: t.String() }).get('/', () => 'ok')`,
+    },
+    {
+      name: 'deep member .status() is not Elysia status()',
+      ...ts,
+      options: [...requireStatusOnly],
+      code: `${elysiaImport}app.get('/', ({ upstream }) => upstream.res.status(502))`,
+    },
+    {
+      name: 'deep member .redirect() is not Elysia redirect()',
+      ...ts,
+      options: [...requireStatusOnly],
+      code: `${elysiaImport}app.get('/', ({ store }) => store.router.redirect('/x'))`,
+    },
+    {
       ...ts,
       code: `${elysiaImport}app.get('/', () => 'ok', { response: t.String() })`,
     },
@@ -38,7 +66,7 @@ runElysiaRule(requireResponseSchemaName, {
       ...ts,
       code: `${elysiaImport}app.get('/', () => status(200, 'ok'), { ...shared })`,
     },
-    // Redirect with redirect status key
+    // Redirect with a response schema
     {
       ...ts,
       code: `${elysiaImport}app.get('/go', ({ redirect }) => redirect('https://example.com'), { response: { 302: t.Any() } })`,
@@ -93,6 +121,12 @@ runElysiaRule(requireResponseSchemaName, {
     },
   ],
   invalid: [
+    {
+      name: 'guard after the route does not supply response',
+      ...ts,
+      code: `${elysiaImport}new Elysia().get('/', () => 'ok').guard({ response: t.String() })`,
+      errors: [error('missingResponse')],
+    },
     // Default requireAllRoutes: every route needs response
     {
       ...ts,
@@ -120,12 +154,6 @@ runElysiaRule(requireResponseSchemaName, {
       code: `${elysiaImport}app.get('/go', ({ redirect }) => redirect('https://example.com'))`,
       errors: [error('missingResponse')],
     },
-    // Redirect with response but no redirect status key
-    {
-      ...ts,
-      code: `${elysiaImport}app.get('/go', ({ redirect }) => redirect('https://x'), { response: { 200: t.String() } })`,
-      errors: [error('missingRedirectStatus')],
-    },
     // requireAllRoutes: false: status() still checked
     {
       ...ts,
@@ -139,12 +167,6 @@ runElysiaRule(requireResponseSchemaName, {
       options: [...requireStatusOnly],
       code: `${elysiaImport}app.get('/go', () => redirect('/x'))`,
       errors: [error('missingResponse')],
-    },
-    {
-      ...ts,
-      options: [...requireStatusOnly],
-      code: `${elysiaImport}app.get('/go', () => redirect('/x'), { response: { 401: t.Any() } })`,
-      errors: [error('missingRedirectStatus')],
     },
     {
       ...ts,

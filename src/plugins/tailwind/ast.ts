@@ -117,3 +117,15 @@ export function bindingName(id: ESTree.Node): string | undefined {
   }
   return undefined;
 }
+
+/** True when a function (named or anonymous) encloses the node. */
+export function isInsideFunction(node: ESTree.Node): boolean {
+  let current: ESTree.Node | undefined = node.parent ?? undefined;
+  while (current !== undefined) {
+    if (isFunctionLike(current)) {
+      return true;
+    }
+    current = current.parent ?? undefined;
+  }
+  return false;
+}

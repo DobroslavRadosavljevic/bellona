@@ -26,12 +26,117 @@ runEffectRule(noV3EffectApisName, {
     { ...ts, code: withEffect('Predicate.isObject(x)') },
     { ...ts, code: withEffect('Predicate.isObjectKeyword(x)') },
     { ...ts, code: withEffect('Predicate.isNullish(x)') },
+    { ...ts, code: withEffect('Schema.DateFromString') },
+    { ...ts, code: withEffect('Schema.DateFromMillis') },
+    { ...ts, code: withEffect('Schema.DateTimeUtcFromString') },
+    { ...ts, code: withEffect('Schema.Date') },
+    { ...ts, code: withEffect('Schema.Struct({ createdAt: Schema.Date })') },
+    { ...ts, code: `import { Date } from 'effect/Schema';\nexport const CreatedAt = Date` },
+    { ...ts, code: withEffect('Effect.tapCause(Effect.void, () => Effect.void)') },
+    { ...ts, code: withEffect('Effect.ignore(Effect.void, { log: true })') },
+    { ...ts, code: withEffect('Layer.tapCause(layer, () => Effect.void)') },
+    { ...ts, code: withEffect('Stream.fromEffectRepeat(Effect.succeed(1))') },
+    { ...ts, code: withEffect('Stream.catch(stream, () => Stream.empty)') },
     validWith(withEffect('Effect.catchAll((e) => e)'), {
       filename: 'src/app.ts',
       options: [{ allow: ['app.ts'] }],
     }),
   ],
   invalid: [
+    {
+      ...ts,
+      code: withEffect('Schema.DateFromSelf'),
+      errors: [renamed('Schema.DateFromSelf', 'Schema.Date')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.DateFromNumber'),
+      errors: [renamed('Schema.DateFromNumber', 'Schema.DateFromMillis')],
+    },
+    {
+      ...ts,
+      code: `import { DateFromSelf } from 'effect/Schema';\nexport const CreatedAt = DateFromSelf`,
+      errors: [renamed('Schema.DateFromSelf', 'Schema.Date')],
+    },
+    {
+      ...ts,
+      code: `import { Schema as S } from 'effect';\nS.DateFromNumber`,
+      errors: [renamed('Schema.DateFromNumber', 'Schema.DateFromMillis')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema["DateFromSelf"]'),
+      errors: [renamed('Schema.DateFromSelf', 'Schema.Date')],
+    },
+    {
+      ...ts,
+      code: withEffect('Schema.Struct({ at: Schema.DateFromSelf, ms: Schema.DateFromNumber })'),
+      errors: [
+        renamed('Schema.DateFromSelf', 'Schema.Date'),
+        renamed('Schema.DateFromNumber', 'Schema.DateFromMillis'),
+      ],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.dieMessage("x")'),
+      errors: [renamed('Effect.dieMessage', 'Effect.die(new Error(message))')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.unsafeMakeSemaphore(1)'),
+      errors: [renamed('Effect.unsafeMakeSemaphore', 'Semaphore.makeUnsafe')],
+    },
+
+    {
+      ...ts,
+      code: withEffect('Effect.tapErrorCause(Effect.void, () => Effect.void)'),
+      errors: [renamed('Effect.tapErrorCause', 'Effect.tapCause')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.ignoreLogged(Effect.void)'),
+      errors: [renamed('Effect.ignoreLogged', 'Effect.ignore({ log: true })')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.optionFromOptional(Effect.void)'),
+      errors: [renamed('Effect.optionFromOptional', 'Effect.catchNoSuchElement')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.makeSemaphore(1)'),
+      errors: [renamed('Effect.makeSemaphore', 'Semaphore.make')],
+    },
+    {
+      ...ts,
+      code: withEffect('Effect.makeLatch()'),
+      errors: [renamed('Effect.makeLatch', 'Latch.make')],
+    },
+    {
+      ...ts,
+      code: withEffect('Layer.tapErrorCause(layer, () => Effect.void)'),
+      errors: [renamed('Layer.tapErrorCause', 'Layer.tapCause')],
+    },
+    {
+      ...ts,
+      code: withEffect('Stream.repeatEffect(Effect.succeed(1))'),
+      errors: [renamed('Stream.repeatEffect', 'Stream.fromEffectRepeat')],
+    },
+    {
+      ...ts,
+      code: withEffect('Stream.catchAll(stream, () => Stream.empty)'),
+      errors: [renamed('Stream.catchAll', 'Stream.catch')],
+    },
+    {
+      ...ts,
+      code: withEffect('Stream.fromChunk(chunk)'),
+      errors: [renamed('Stream.fromChunk', 'Stream.fromArray')],
+    },
+    {
+      ...ts,
+      code: withEffect('Stream.asyncScoped((emit) => Effect.void)'),
+      errors: [renamed('Stream.asyncScoped', 'Stream.callback')],
+    },
     {
       ...ts,
       code: withEffect('Effect.catchAll((e) => Effect.succeed(e))'),
@@ -50,17 +155,22 @@ runEffectRule(noV3EffectApisName, {
     {
       ...ts,
       code: withEffect('Effect.catchSome((e) => e)'),
-      errors: [error('renamed')],
+      errors: [renamed('Effect.catchSome', 'Effect.catchFilter')],
     },
     {
       ...ts,
       code: withEffect('Effect.catchSomeCause((c) => c)'),
-      errors: [error('renamed')],
+      errors: [renamed('Effect.catchSomeCause', 'Effect.catchCauseFilter')],
     },
     {
       ...ts,
       code: withEffect('Effect.catchSomeDefect((d) => d)'),
-      errors: [error('renamed')],
+      errors: [
+        renamed(
+          'Effect.catchSomeDefect',
+          'Effect.catchDefect (die again for defects you do not handle)',
+        ),
+      ],
     },
     {
       ...ts,
@@ -95,12 +205,12 @@ runEffectRule(noV3EffectApisName, {
     {
       ...ts,
       code: withEffect('Effect.forkAll([Effect.void])'),
-      errors: [error('renamed')],
+      errors: [renamed('Effect.forkAll', 'Effect.forEach + Effect.forkChild')],
     },
     {
       ...ts,
       code: withEffect('Effect.forkWithErrorHandler(Effect.void, () => {})'),
-      errors: [error('renamed')],
+      errors: [renamed('Effect.forkWithErrorHandler', 'Effect.forkChild + Fiber.await')],
     },
     {
       ...ts,

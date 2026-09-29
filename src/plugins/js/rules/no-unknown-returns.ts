@@ -4,6 +4,7 @@ import type { ESTree } from '@oxlint/plugins';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts';
+import { isOverloadImplementation } from '../shared/overloads.ts';
 
 type FunctionWithReturnType =
   | ESTree.ArrowFunctionExpression
@@ -84,7 +85,7 @@ export const noUnknownReturns: CreateOnceRule = defineBellonaRule({
 
     const checkReturnType = (node: FunctionWithReturnType) => {
       const annotation = node.returnType;
-      if (annotation === null || annotation === undefined) return;
+      if (annotation === null || annotation === undefined || isOverloadImplementation(node)) return;
       if (
         !resolvesToUnknown(
           annotation.typeAnnotation,

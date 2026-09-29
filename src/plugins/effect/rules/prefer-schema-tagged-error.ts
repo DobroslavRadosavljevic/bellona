@@ -47,21 +47,21 @@ export const preferSchemaTaggedError: CreateOnceRule = defineBellonaRule({
       errorClass: agentDiagnostic({
         problem:
           'This domain error is a plain `class X extends Error` (or similar) instead of `Schema.TaggedError`.',
-        why: 'Effect v4 typed errors need a `_tag` and a schema. A raw `Error` subclass is not channel `E`.',
+        why: 'A plain `Error` subclass has no `_tag`, so `Effect.catchTag` cannot match it. It is not yieldable, so `return yield* new X()` does not work.',
         fix: 'Define `export class Boom extends Schema.TaggedError<Boom>()("Boom", { message: Schema.String }) {}` and `yield*` / `Effect.fail` that class.',
         avoid: 'Do not keep `extends Error` and add a `_tag` by hand. Do not disable the rule.',
       }),
       dataTagged: agentDiagnostic({
         problem:
           'This uses `Data.TaggedError`. Effect v4 domain errors should be `Schema.TaggedError`.',
-        why: '`Data.TaggedError` is the older data-class style. Schema-tagged errors decode and type as Schema.',
+        why: 'Effect v4 docs define errors with `Schema.TaggedError`. It has a schema, so the error can be encoded, decoded, and sent over RPC or HTTP. `Data.TaggedError` has no schema.',
         fix: 'Replace with `class Boom extends Schema.TaggedError<Boom>()("Boom", { … }) {}`.',
         avoid:
           'Do not mix `Data.TaggedError` and `Schema.TaggedError` for the same error. Do not disable the rule.',
       }),
       failError: agentDiagnostic({
         problem: 'This fails with `new Error(...)` instead of a `Schema.TaggedError`.',
-        why: '`Error` is a defect-shaped value, not a typed `E` in the Effect channel.',
+        why: '`new Error` has no `_tag`. The error type is only `Error`, so callers cannot tell failures apart or use `Effect.catchTag`.',
         fix: 'Construct your `Schema.TaggedError` and `return yield* new Boom({ message })` or `Effect.fail(new Boom({ … }))`.',
         avoid: 'Do not `Effect.die` to hide it. Do not disable the rule.',
       }),

@@ -7,9 +7,9 @@ describe('tanstack-router plugin', () => {
     expect(Object.keys(tanstackRouter.rules)).toEqual([
       'create-route-property-order',
       'no-control-flow-outside-edge',
+      'no-deprecated-apis',
       'no-dynamic-to',
       'no-get-route-api',
-      'no-hooks-in-route-lifecycle',
       'no-imperative-location-navigation',
       'no-loader-data-in-not-found',
       'no-not-found-in-component',
@@ -18,12 +18,11 @@ describe('tanstack-router plugin', () => {
       'no-href',
       'no-type-assertion',
       'no-search-in-loader',
-      'require-params-with-path-tokens',
+      'no-whole-search-loader-deps',
       'require-hook-from',
       'require-inline-route-options',
       'require-throw-not-found',
       'require-throw-redirect',
-      'require-validate-search-when-used',
     ]);
   });
 });

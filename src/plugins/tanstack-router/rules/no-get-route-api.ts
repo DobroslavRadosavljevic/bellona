@@ -49,15 +49,15 @@ export const noGetRouteApi: CreateOnceRule = defineBellonaRule({
     messages: {
       getRouteApi: agentDiagnostic({
         problem:
-          'This code calls `getRouteApi`. That helper binds hooks to a route behind a runtime id.',
-        why: 'Bound APIs hide the `from` literal. Shared components then lose typed `params` / loader data, or they couple to one route.',
+          'This code calls `getRouteApi`. This codebase uses one pattern for route hooks: the exported hook with a literal `from`.',
+        why: '`getRouteApi("/posts")` is typed, but it adds a second way to read route data. The hook call no longer shows its route, and a moved component keeps a stale route id in a separate binding.',
         fix: 'Call the hook with a route id: `useLoaderData({ from: "/posts/$postId" })` (same for `useParams` / `useSearch` / `useRouteContext`). For shared UI, pass `{ strict: false }` or pass data as props.',
         avoid:
           'Do not wrap `getRouteApi` in a local helper. Do not switch to `Route.useLoaderData()` (also banned). Do not disable the rule.',
       }),
       boundHook: agentDiagnostic({
         problem: 'This code uses a bound route hook (`Route.useX()` or `routeApi.useX()`).',
-        why: 'Bound hooks skip an explicit `from` literal, so inference and reuse suffer the same way as `getRouteApi`.',
+        why: '`Route.useX()` is typed, but it adds a second way to read route data. A component that imports `Route` from its route file can also make a circular import.',
         fix: 'Call the exported hook with `from`: `useLoaderData({ from: "/posts/$postId" })`. For shared components use `{ strict: false }` or props.',
         avoid: 'Do not assign `const useData = Route.useLoaderData`. Do not disable the rule.',
       }),

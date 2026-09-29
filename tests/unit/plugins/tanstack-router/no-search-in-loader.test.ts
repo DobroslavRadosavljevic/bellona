@@ -38,6 +38,40 @@ runTanstackRouterRule(noSearchInLoaderName, {
       options: [{ allow: ['posts.tsx'] }],
     }),
     validWith('const search = 1; loader({ search })', { filename: APP_FILENAME }),
+    // A `search` field that comes through `loaderDeps` is the documented input.
+    validWith(
+      fileRouteCode(`
+        validateSearch: (input) => ({ search: String(input.search ?? '') }),
+        loaderDeps: ({ search }) => ({ search: search.search }),
+        loader: ({ deps }) => fetchPosts(deps.search),
+      `),
+      { filename: APP_FILENAME },
+    ),
+    validWith(
+      fileRouteCode(`
+        validateSearch: (input) => ({ search: String(input.search ?? '') }),
+        loaderDeps: ({ search: { search } }) => ({ search }),
+        loader: ({ deps: { search } }) => fetchPosts(search),
+      `),
+      { filename: APP_FILENAME },
+    ),
+    // Loader data can have its own `search` field.
+    validWith(
+      fileRouteCode(`loader: async () => (await fetchSaved()).map((item) => item.search)`),
+      {
+        filename: APP_FILENAME,
+      },
+    ),
+    validWith(
+      fileRouteCode(`loader: async () => (await fetchSaved()).map(({ search }) => search)`),
+      { filename: APP_FILENAME },
+    ),
+    validWith(
+      fileRouteCode(`loader: () => { const read = ({ search }) => search; return read({}) }`),
+      {
+        filename: APP_FILENAME,
+      },
+    ),
   ],
   invalid: [
     invalidWith({
@@ -82,7 +116,22 @@ runTanstackRouterRule(noSearchInLoaderName, {
     }),
     invalidWith({
       filename: APP_FILENAME,
-      code: fileRouteCode(`loader: () => { const read = ({ search }) => search; return read({}) }`),
+      code: fileRouteCode(`loader: ({ location }) => fetchPosts(location.search.offset)`),
+      errors: [searchInLoader],
+    }),
+    invalidWith({
+      filename: APP_FILENAME,
+      code: fileRouteCode(`loader: (opts) => fetchPosts(opts.location.search)`),
+      errors: [searchInLoader],
+    }),
+    invalidWith({
+      filename: APP_FILENAME,
+      code: fileRouteCode(`loader: ({ location: { search } }) => fetchPosts(search)`),
+      errors: [searchInLoader],
+    }),
+    invalidWith({
+      filename: APP_FILENAME,
+      code: fileRouteCode(`loader: () => fetchPosts(window.location.search)`),
       errors: [searchInLoader],
     }),
     invalidWith({

@@ -1,16 +1,13 @@
 import type { ESTree } from '@oxlint/plugins';
 
-import { isAstNode } from '../../lib/ast-node.ts';
-import { isJsString } from '../../lib/js-kind.ts';
 import {
-  getCallName,
   getStaticPropertyName,
   isFunctionLike,
   isReturnArgument,
   isThrowArgument,
   unwrapExpression,
 } from './ast.ts';
-import { getObjectPropValue, getStaticRoutePathValue, objectHasOwnProperty } from './router.ts';
+import { getObjectPropValue, getStaticRoutePathValue } from './router.ts';
 
 export const CREATE_ROUTE_DIRECT = new Set(['createRootRoute', 'createRoute']);
 
@@ -18,7 +15,6 @@ export const CREATE_ROUTE_INDIRECT = new Set(['createFileRoute', 'createRootRout
 
 const LOADER_PROP = 'loader';
 const HANDLER_PROP = 'handler';
-const BEFORE_LOAD_PROP = 'beforeLoad';
 
 export const ROUTE_PROPERTY_SORT_RULES: ReadonlyArray<
   readonly [readonly string[], readonly string[]]
@@ -30,31 +26,6 @@ export const ROUTE_PROPERTY_SORT_RULES: ReadonlyArray<
   [['beforeLoad'], ['loader']],
   [['loader'], ['onEnter', 'onStay', 'onLeave', 'head', 'scripts', 'headers', 'remountDeps']],
 ];
-
-export function callLeafName(node: ESTree.CallExpression): string | undefined {
-  const name = getCallName(node);
-  return name?.split('.').at(-1);
-}
-
-export function isNamedCall(node: ESTree.CallExpression, name: string): boolean {
-  return callLeafName(node) === name;
-}
-
-export function isHookCall(node: ESTree.CallExpression): boolean {
-  const leaf = callLeafName(node);
-  if (leaf === 'use') {
-    const callee = unwrapExpression(node.callee);
-    if (callee?.type === 'Identifier') {
-      return callee.name === 'use';
-    }
-    if (callee?.type === 'MemberExpression') {
-      const object = unwrapExpression(callee.object);
-      return object?.type === 'Identifier' && object.name === 'React';
-    }
-    return false;
-  }
-  return leaf !== undefined && /^use[A-Z]/u.test(leaf);
-}
 
 const REDIRECT_OBJECTS = new Set(['Route', 'route']);
 
@@ -92,8 +63,13 @@ export function isRedirectHandled(node: ESTree.CallExpression): boolean {
   return isThrowArgument(node) || isReturnArgument(node) || callHasThrowTrue(node);
 }
 
+/**
+ * The router handles a thrown or returned `notFound()` from `loader`, `beforeLoad`, and
+ * server functions (`router-core` `load-client.js` `normalize`, `start-server-core`
+ * `server-functions-handler.js`).
+ */
 export function isNotFoundHandled(node: ESTree.CallExpression): boolean {
-  return isThrowArgument(node) || callHasThrowTrue(node);
+  return isThrowArgument(node) || isReturnArgument(node) || callHasThrowTrue(node);
 }
 
 export type CreatedRoute = {
@@ -139,31 +115,8 @@ function optionsFromArgs(
   return { functionName, options, routePath: factoryPath ?? optionPath };
 }
 
-export function getCallFromPath(node: ESTree.CallExpression): string | undefined {
-  const first = node.arguments[0];
-  if (first === undefined || first.type === 'SpreadElement') {
-    return undefined;
-  }
-  return getStaticRoutePathValue(getObjectPropValue(first, 'from'));
-}
-
-export function routeHasValidateSearch(options: ESTree.ObjectExpression): boolean {
-  return objectHasOwnProperty(options, 'validateSearch');
-}
-
 function parentOf(node: ESTree.Node): ESTree.Node | undefined {
   return node.parent ?? undefined;
-}
-
-function enclosingFunction(node: ESTree.Node): ESTree.Node | undefined {
-  let current = parentOf(node);
-  while (current !== undefined) {
-    if (isFunctionLike(current)) {
-      return current;
-    }
-    current = parentOf(current);
-  }
-  return undefined;
 }
 
 function propertyNameOfFunction(fn: ESTree.Node): string | undefined {
@@ -196,6 +149,14 @@ function functionIsLoaderOrHandler(fn: ESTree.Node): boolean {
   );
 }
 
+/** A `beforeLoad`, `loader`, or `loader.handler` function: it gets the route context object. */
+export function isRouteLifecycleFunction(fn: ESTree.Node): boolean {
+  return (
+    isFunctionLike(fn) &&
+    (functionIsLoaderOrHandler(fn) || propertyNameOfFunction(fn) === 'beforeLoad')
+  );
+}
+
 export function isInsideLoaderFunction(node: ESTree.Node): boolean {
   let current = parentOf(node);
   while (current !== undefined) {
@@ -207,126 +168,94 @@ export function isInsideLoaderFunction(node: ESTree.Node): boolean {
   return false;
 }
 
-export function isInsideRouteLifecycle(node: ESTree.Node): boolean {
-  if (isInsideLoaderFunction(node)) {
-    return true;
+function enclosingLoaderFunction(node: ESTree.Node): ESTree.Node | undefined {
+  let current = parentOf(node);
+  while (current !== undefined) {
+    if (isFunctionLike(current) && functionIsLoaderOrHandler(current)) {
+      return current;
+    }
+    current = parentOf(current);
   }
-  const fn = enclosingFunction(node);
-  if (fn === undefined) {
-    return false;
-  }
-  return propertyNameOfFunction(fn) === BEFORE_LOAD_PROP;
+  return undefined;
 }
 
-function isSearchRead(node: ESTree.Node): boolean {
-  if (node.type !== 'Identifier' || !('name' in node) || node.name !== 'search') {
-    return false;
-  }
-  const parent = parentOf(node);
-  if (parent === undefined) {
-    return false;
-  }
-  if (parent.type === 'MemberExpression' && parent.property === node && !parent.computed) {
-    return true;
-  }
-  if (parent.type === 'MemberExpression' && parent.computed && parent.property === node) {
-    return false;
-  }
-  if (parent.type === 'MemberExpression' && parent.object === node) {
-    return false;
-  }
-  if (
-    parent.type === 'Property' &&
-    parent.key === node &&
-    parent.parent?.type === 'ObjectPattern'
-  ) {
-    return true;
-  }
-  return false;
+function isSearchKey(node: ESTree.Node): boolean {
+  return getStaticPropertyName(node) === 'search';
 }
 
-function isComputedSearchMember(node: ESTree.Node): boolean {
-  if (node.type !== 'MemberExpression' || !node.computed) {
+/** `location`, `window.location`, or `ctx.location`: a parsed location with raw `search`. */
+function isLocationObject(node: ESTree.Expression): boolean {
+  const object = unwrapExpression(node);
+  if (object?.type === 'Identifier') {
+    return object.name === 'location';
+  }
+  return (
+    object?.type === 'MemberExpression' && getStaticPropertyName(object.property) === 'location'
+  );
+}
+
+/** `{ search }` or `{ location: { search } }` on the loader's own context parameter. */
+function isLoaderContextSearchKey(node: ESTree.Node, loader: ESTree.Node): boolean {
+  if (!isFunctionLike(loader)) {
     return false;
   }
-  const property = unwrapExpression(node.property);
-  return property?.type === 'Literal' && isJsString(property.value) && property.value === 'search';
+  const property = parentOf(node);
+  if (property?.type !== 'Property' || property.key !== node || property.computed) {
+    return false;
+  }
+  const pattern = parentOf(property);
+  if (pattern?.type !== 'ObjectPattern') {
+    return false;
+  }
+  const holder = parentOf(pattern);
+  if (holder === loader) {
+    return loader.params[0] === pattern;
+  }
+  if (holder?.type === 'AssignmentPattern' && parentOf(holder) === loader) {
+    return loader.params[0] === holder;
+  }
+  return (
+    holder?.type === 'Property' &&
+    holder.value === pattern &&
+    getStaticPropertyName(holder.key) === 'location' &&
+    parentOf(holder)?.type === 'ObjectPattern'
+  );
 }
 
-export function isSearchAccess(node: ESTree.Node): boolean {
-  return isSearchRead(node) || isComputedSearchMember(node);
+/** `ctx.search` where `ctx` is the loader's first parameter. */
+function isLoaderContextParam(node: ESTree.Expression, loader: ESTree.Node): boolean {
+  if (!isFunctionLike(loader)) {
+    return false;
+  }
+  const object = unwrapExpression(node);
+  const param = loader.params[0];
+  return (
+    object?.type === 'Identifier' && param?.type === 'Identifier' && param.name === object.name
+  );
 }
 
+/**
+ * Raw search read inside `loader`: the context's `search`, or `search` on a location.
+ * A `search` field on `deps` or on loaded data is not raw search input.
+ */
 export function isSearchAccessInLoader(node: ESTree.Node): boolean {
-  return isSearchAccess(node) && isInsideLoaderFunction(node);
-}
-
-function subtreeReadsSearch(node: ESTree.Node): boolean {
-  if (isSearchAccess(node)) {
-    return true;
+  if (node.type === 'Identifier') {
+    const loader = isSearchKey(node) ? enclosingLoaderFunction(node) : undefined;
+    return loader !== undefined && isLoaderContextSearchKey(node, loader);
   }
-  for (const [key, value] of Object.entries(node)) {
-    if (key === 'parent') {
-      continue;
-    }
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (isAstNode(item) && subtreeReadsSearch(item)) {
-          return true;
-        }
-      }
-      continue;
-    }
-    if (isAstNode(value) && subtreeReadsSearch(value)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function routeOptionFunctionReadsSearch(options: ESTree.ObjectExpression, name: string): boolean {
-  const value = getObjectPropValue(options, name);
-  if (value === undefined) {
+  if (node.type !== 'MemberExpression') {
     return false;
   }
-  const fn = unwrapExpression(value);
-  if (fn === undefined || !isFunctionLike(fn)) {
+  const property = node.computed ? unwrapExpression(node.property) : node.property;
+  const readsSearch =
+    property !== undefined &&
+    isSearchKey(property) &&
+    (!node.computed || property.type === 'Literal');
+  const loader = readsSearch ? enclosingLoaderFunction(node) : undefined;
+  if (loader === undefined) {
     return false;
   }
-  return subtreeReadsSearch(fn);
-}
-
-export function loaderDepsReadsSearch(options: ESTree.ObjectExpression): boolean {
-  return routeOptionFunctionReadsSearch(options, 'loaderDeps');
-}
-
-export function beforeLoadReadsSearch(options: ESTree.ObjectExpression): boolean {
-  return routeOptionFunctionReadsSearch(options, 'beforeLoad');
-}
-
-export function pathHasParamToken(value: string): boolean {
-  return /\$/u.test(value);
-}
-
-/** Required `$postId` / splat `$`. Optional `{ -$locale }` / `prefix{-$name}` do not count. */
-export function pathHasRequiredParamToken(value: string): boolean {
-  let braceDepth = 0;
-  for (const char of value) {
-    if (char === '{') {
-      braceDepth += 1;
-      continue;
-    }
-    if (char === '}') {
-      if (braceDepth > 0) {
-        braceDepth -= 1;
-      }
-      continue;
-    }
-    if (char === '$' && braceDepth === 0) {
-      return true;
-    }
-  }
-  return false;
+  return isLocationObject(node.object) || isLoaderContextParam(node.object, loader);
 }
 
 export function sortRoutePropertiesByOrder<T extends { name: string }>(

@@ -39,8 +39,8 @@ export const BENCH_USAGE = `Usage: bun run bench [--plugin <id>] [--rule <id>] [
 
 Times every Bellona rule on one mixed corpus. Default: all plugins, scale 8, one run each.
 
-  --plugin js          Repeat to limit plugins (js, react, effect, elysia, tanstack-router, zod, tailwind, base-ui)
-  --rule bl-js/max-classes   Repeat to limit rules (full id, slug, or plugin/slug)
+  --plugin js          Repeat to limit plugins (js, react, effect, elysia, tanstack-query, tanstack-router, zod, tailwind, base-ui)
+  --rule bl-js/no-inline-import-type   Repeat to limit rules (full id, slug, or plugin/slug)
   --scale 8            Files per domain in the corpus
   --repeat 1           Runs per rule; report the median
   --keep               Keep .temp/bench after the run

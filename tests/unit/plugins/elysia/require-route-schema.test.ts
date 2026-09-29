@@ -10,6 +10,26 @@ const elysiaImport = `import { Elysia, t } from 'elysia'\n`;
 
 runElysiaRule(requireRouteSchemaName, {
   valid: [
+    {
+      name: 'chained guard without callback covers later routes (params)',
+      ...ts,
+      code: `${elysiaImport}new Elysia().guard({ params: t.Object({ id: t.String() }) }).get('/:id', ({ params }) => params)`,
+    },
+    {
+      name: 'chained guard without callback covers later routes (body)',
+      ...ts,
+      code: `${elysiaImport}new Elysia().guard({ body: t.Object({}) }).get('/', () => 'ok').post('/', ({ body }) => body)`,
+    },
+    {
+      name: 'chained guard through a same-file binding',
+      ...ts,
+      code: `${elysiaImport}const base = new Elysia().guard({ body: t.Object({}) })\nbase.post('/', ({ body }) => body)`,
+    },
+    {
+      name: 'key-value store put() is not a route',
+      ...ts,
+      code: `${elysiaImport}kv.put('session', token)`,
+    },
     { ...ts, code: `${elysiaImport}app.get('/', () => 'ok')` },
     {
       ...ts,
@@ -121,6 +141,24 @@ runElysiaRule(requireRouteSchemaName, {
     },
   ],
   invalid: [
+    {
+      name: 'connect() is an Elysia route method',
+      ...ts,
+      code: `${elysiaImport}new Elysia().connect('/:id', () => 'ok')`,
+      errors: [error('missingParams')],
+    },
+    {
+      name: 'guard after the route does not cover it',
+      ...ts,
+      code: `${elysiaImport}new Elysia().post('/', ({ body }) => body).guard({ body: t.Object({}) })`,
+      errors: [error('missingSchema')],
+    },
+    {
+      name: 'guard with callback does not cover routes chained after it',
+      ...ts,
+      code: `${elysiaImport}new Elysia().guard({ body: t.Object({}) }, (app) => app).post('/', () => 'ok')`,
+      errors: [error('missingSchema')],
+    },
     {
       ...ts,
       code: `${elysiaImport}app.post('/', ({ body }) => body)`,

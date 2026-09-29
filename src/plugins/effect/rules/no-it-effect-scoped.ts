@@ -72,7 +72,7 @@ export const noItEffectScoped: CreateOnceRule = defineBellonaRule({
       scoped: agentDiagnostic({
         problem:
           'This `it.effect` / `it.live` test wraps the body in `Effect.scoped`. Those runners already provide a `Scope`.',
-        why: 'A second `Effect.scoped` is redundant and can close resources at the wrong time.',
+        why: '`it.effect` and `it.live` already run the test in `Effect.scoped`, so a second scope adds nothing. Remove it to keep one owner for test resources.',
         fix: 'Remove `Effect.scoped`. Keep `it.effect("name", () => Effect.gen(function* () { … }))`.',
         avoid: 'Do not switch to `it.scopedLive` (removed). Do not disable the rule.',
       }),

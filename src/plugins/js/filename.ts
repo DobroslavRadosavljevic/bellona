@@ -23,3 +23,18 @@ export function matchesAllow(filename: string, allow: readonly string[]): boolea
     return false;
   });
 }
+
+/** The linted path with `/` separators, relative to the lint working directory. */
+export function relativePath(filename: string, cwd: string): string {
+  const path = slash(filename);
+  const base = slash(cwd).replace(/\/+$/u, '');
+  return base !== '' && path.startsWith(`${base}/`) ? path.slice(base.length + 1) : path;
+}
+
+const skippedFilePattern =
+  /(?:\.(?:test|spec|stories)\.|\.stories-|\.gen\.|\.d\.[cm]?ts$|\/__tests__\/|\/generated\/)/u;
+
+/** Tests, stories, generated files, and declaration files follow their own layout. */
+export function isSkippedLayoutFile(path: string): boolean {
+  return skippedFilePattern.test(path);
+}

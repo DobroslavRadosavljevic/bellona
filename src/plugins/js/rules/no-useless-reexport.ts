@@ -45,6 +45,31 @@ function isDirective(statement: ESTree.Directive | ESTree.Statement): boolean {
   );
 }
 
+const boundaryDirectives: ReadonlySet<string> = new Set(['use client', 'use server']);
+
+/**
+ * `"use client"` or `"use server"` makes the file a bundler boundary. A file
+ * that only re-exports a third-party component under `"use client"` is how
+ * React Server Components use a client component that lacks the directive.
+ * @see https://nextjs.org/docs/app/getting-started/server-and-client-components#third-party-components
+ */
+function hasBoundaryDirective(program: ESTree.Program): boolean {
+  return program.body.some(
+    (statement) =>
+      isDirective(statement) &&
+      'directive' in statement &&
+      isJsString(statement.directive) &&
+      boundaryDirectives.has(statement.directive),
+  );
+}
+
+/**
+ * Tools load `vite.config.ts`, `oxlint.config.ts`, and similar files by path.
+ * No code imports them, so a config that only re-exports a shared config has
+ * no use site to move the import to.
+ */
+const toolConfigFilePattern = /\.config\.[cm]?[jt]sx?$/u;
+
 function isNeutralStatement(statement: ESTree.Directive | ESTree.Statement): boolean {
   return statement.type === 'EmptyStatement' || isDirective(statement);
 }
@@ -362,7 +387,7 @@ export const noUselessReexport: CreateOnceRule = defineBellonaRule({
         problem:
           'This file only re-exports other modules (`export … from`, `export *`, or import-then-export with no local use). A rename-only file still counts.',
         why: 'A re-export file (barrel) hides the real module. Callers import a pass-through path, and the public surface is not listed in one owner file.',
-        fix: 'Delete this file. Import the source module at each use site (`import { User } from "./user"`). If this path is a published package entry that must stay stable, add it to `{ allow: ["that-file.ts"] }` on `bl-js/no-useless-reexport`.',
+        fix: 'Delete this file. Import the source module at each use site (`import { User } from "./user"`). If this path is a published package entry that must stay stable, add it to `{ allow: ["that-file.ts"] }` on `bl-js/no-useless-reexport`. Tool config files (`*.config.ts`) and files with `"use client"` or `"use server"` are not checked.',
         avoid:
           'Do not add a dummy function to “make it mixed”. Do not keep `export *`. Do not disable the rule on a new barrel.',
       }),
@@ -411,11 +436,15 @@ export const noUselessReexport: CreateOnceRule = defineBellonaRule({
     return {
       before() {
         const options = readNoUselessReexportOptions(context);
-        if (matchesAllow(context.filename, options.allow)) {
+        if (
+          matchesAllow(context.filename, options.allow) ||
+          toolConfigFilePattern.test(context.filename)
+        ) {
           return false;
         }
       },
       Program(node) {
+        if (hasBoundaryDirective(node)) return;
         const { allowRenames } = readNoUselessReexportOptions(context);
         const findings: Finding[] = [];
         const imported: ImportedName[] = [];

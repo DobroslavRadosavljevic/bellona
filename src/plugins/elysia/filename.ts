@@ -40,10 +40,6 @@ export function isUnderRoutesDir(filename: string): boolean {
   return slash(filename).includes('/routes/');
 }
 
-export function isUnderModulesDir(filename: string): boolean {
-  return slash(filename).includes('/modules/');
-}
-
 export function isRoutesIndexFile(filename: string): boolean {
   return isUnderRoutesDir(filename) && isIndexBasename(filename);
 }
@@ -54,4 +50,9 @@ export function isRoutesLeafFile(filename: string): boolean {
 
 export function isUnderPluginsDir(filename: string): boolean {
   return slash(filename).includes('/plugins/');
+}
+
+/** `*.test.*` / `*.spec.*` file (not fixtures or stories). */
+export function isTestOrSpecFile(filename: string): boolean {
+  return /\.(?:test|spec)\.[cm]?[jt]sx?$/u.test(slash(filename));
 }

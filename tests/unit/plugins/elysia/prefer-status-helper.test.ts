@@ -8,6 +8,16 @@ const elysiaImport = `import { Elysia, status } from 'elysia'\n`;
 runElysiaRule(preferStatusHelperName, {
   valid: [
     {
+      name: 'logger .error() on a member chain is not the old context error()',
+      ...ts,
+      code: `${elysiaImport}app.get('/', ({ store }) => { store.logger.error('x'); return 'ok' })`,
+    },
+    {
+      name: 'imported error() helper is not the old context error()',
+      ...ts,
+      code: `${elysiaImport}import { error } from './log'\napp.get('/', () => { error('x'); return 'ok' })`,
+    },
+    {
       ...ts,
       code: `${elysiaImport}app.get('/', () => status(418, 'teapot'))`,
     },
@@ -30,6 +40,12 @@ runElysiaRule(preferStatusHelperName, {
     },
   ],
   invalid: [
+    {
+      name: 'function-form context error()',
+      ...ts,
+      code: `${elysiaImport}app.get('/', function ({ error }) { return error(404) })`,
+      errors: [error('preferStatusOverError')],
+    },
     {
       ...ts,
       code: `${elysiaImport}app.get('/', ({ set }) => { set.status = 418; return 'x' })`,

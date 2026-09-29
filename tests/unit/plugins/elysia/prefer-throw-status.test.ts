@@ -11,6 +11,16 @@ const elysiaImport = `import { Elysia, t, status } from 'elysia'\n`;
 runElysiaRule(preferThrowStatusName, {
   valid: [
     {
+      name: 'Elysia built-in error class sets its own status',
+      ...ts,
+      code: `import { Elysia, NotFoundError } from 'elysia'\napp.get('/', () => { throw new NotFoundError() })`,
+    },
+    {
+      name: 'custom error class with status (documented Elysia pattern)',
+      ...ts,
+      code: `${elysiaImport}class TeapotError extends Error { status = 418 }\napp.get('/', () => { throw new TeapotError('x') })`,
+    },
+    {
       ...ts,
       code: `${elysiaImport}app.get('/', () => { throw status(400, 'bad') })`,
     },
@@ -50,6 +60,24 @@ runElysiaRule(preferThrowStatusName, {
     },
   ],
   invalid: [
+    {
+      name: 'Error() called without new',
+      ...ts,
+      code: `${elysiaImport}app.get('/', () => { throw Error('x') })`,
+      errors: [error('throwError')],
+    },
+    {
+      name: 'macro resolve',
+      ...ts,
+      code: `${elysiaImport}new Elysia().macro({ auth: { resolve() { throw new Error('x') } } })`,
+      errors: [error('throwError')],
+    },
+    {
+      name: 'mapResolve lifecycle',
+      ...ts,
+      code: `${elysiaImport}new Elysia().mapResolve(() => { throw new Error('x') })`,
+      errors: [error('throwError')],
+    },
     {
       ...ts,
       code: `${elysiaImport}app.get('/', () => { throw new Error('x') })`,

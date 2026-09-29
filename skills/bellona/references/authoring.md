@@ -22,7 +22,7 @@ Ask before: new runtime dependencies, new plugin subpaths, oxlint major bumps, p
 
 ## New rule (copy this path)
 
-1. Copy `src/plugins/js/rules/max-classes.ts`.
+1. Copy `src/plugins/js/rules/no-inline-import-type.ts`.
 2. Export `bnRuleName('your-slug')` as `yourRuleName`. Register the plugin with `defineBellonaPlugin('bl-<id>', …)`.
 3. Use `defineBellonaRule` + `createOnce`. Type with `defineBellonaRule`; do not annotate as `Rule` (widens).
 4. Write `meta.messages` with `agentDiagnostic` from `src/lib/lint-message.ts` (Problem / Why / Fix / Avoid). Keep `{{placeholders}}` that `context.report` fills. Do not put JSX `params={{ x }}` in the text — Oxlint treats that as a placeholder.
@@ -30,13 +30,13 @@ Ask before: new runtime dependencies, new plugin subpaths, oxlint major bumps, p
 6. Register in `src/plugins/<id>/index.ts`.
 7. Add `tests/unit/plugins/<id>/<rule>.test.ts` with `valid` / `invalid` `RuleTester` cases:
    - default behavior
-   - option variants (`allow`, `max`, …)
+   - option variants (`allow`, …)
    - no-import skip (domain plugins)
    - test-file skip when the production rule skips tests
 8. Run focused Vitest, then `bun run check`.
 
 ```sh
-bunx vitest run tests/unit/plugins/js/max-classes.test.ts
+bunx vitest run tests/unit/plugins/js/no-inline-import-type.test.ts
 bunx vitest run tests/unit/plugins/effect/prefer-effect-fn.test.ts -t "pipe"
 bun run check
 ```

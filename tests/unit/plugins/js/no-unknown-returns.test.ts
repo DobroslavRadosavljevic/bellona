@@ -16,8 +16,14 @@ runJsRule(noUnknownReturnsName, {
     'function cause(): { cause: unknown } { return { cause: input }; }',
     'type Result = { value: unknown }; function load(): Result { return result; }',
     'function load(): Promise<User> { return promise; }',
+    "function read(key: 'id'): string;\nfunction read(key: 'age'): number;\nfunction read(key: string): unknown { return key; }",
+    "class Store { read(key: 'id'): string; read(key: string): unknown { return key; } }",
   ],
   invalid: [
+    {
+      code: "function read(key: 'id'): unknown;\nfunction read(key: string): unknown { return key; }",
+      errors: [error],
+    },
     { code: 'function load(): unknown { return input; }', errors: [error] },
     { code: 'const load = (): unknown => input;', errors: [error] },
     { code: 'type Loader = () => unknown;', errors: [error] },

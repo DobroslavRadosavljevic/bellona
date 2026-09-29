@@ -2,26 +2,17 @@ import type { CreateOnceRule } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
-import { collectEffectBindings, isModuleCall, type EffectBindings } from '../bindings.ts';
+import {
+  collectEffectBindings,
+  EFFECT_RUNNERS,
+  isModuleCall,
+  type EffectBindings,
+} from '../bindings.ts';
 import {
   DEFAULT_ENTRY_OPTIONS,
   ENTRY_OPTION_SCHEMA,
   shouldSkipRunPromiseFile,
 } from '../options.ts';
-
-const RUNNERS = [
-  'runPromise',
-  'runPromiseExit',
-  'runPromiseWith',
-  'runPromiseExitWith',
-  'runSync',
-  'runSyncExit',
-  'runSyncWith',
-  'runFork',
-  'runForkWith',
-  'runCallback',
-  'runCallbackWith',
-] as const;
 
 export const noRunPromiseInModulesName = bnRuleName('no-run-promise-in-modules');
 
@@ -56,7 +47,7 @@ export const noRunPromiseInModules: CreateOnceRule = defineBellonaRule({
         bindings = collectEffectBindings(context.sourceCode.ast);
       },
       CallExpression(node) {
-        for (const name of RUNNERS) {
+        for (const name of EFFECT_RUNNERS) {
           if (isModuleCall(node, bindings, 'effect', name)) {
             context.report({ messageId: 'run', node });
             return;

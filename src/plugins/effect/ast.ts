@@ -128,13 +128,28 @@ export function isArrayExpressionArgument(node: ESTree.CallExpression, index: nu
 }
 
 /** True when `fn` is a direct argument of `call`. */
-export function callHasFunctionArgument(call: ESTree.CallExpression, fn: ESTree.Node): boolean {
+export function callHasFunctionArgument(
+  call: ESTree.CallExpression | ESTree.NewExpression,
+  fn: ESTree.Node,
+): boolean {
   return call.arguments.some((argument) => {
     if (argument.type === 'SpreadElement') {
       return false;
     }
     return unwrapExpression(argument) === fn;
   });
+}
+
+/** The first parent that is not parentheses or a TypeScript `as` / `!` / `satisfies` wrapper. */
+export function outerParent(node: ESTree.Node): ESTree.Node | undefined {
+  let parent = parentOf(node);
+  while (
+    parent !== undefined &&
+    (parent.type === 'ParenthesizedExpression' || isTsExpressionWrapper(parent))
+  ) {
+    parent = parentOf(parent);
+  }
+  return parent;
 }
 
 export function isReturnedNode(node: ESTree.Node): boolean {
@@ -259,22 +274,6 @@ export function hasStaticClassMember(node: ESTree.Class, name: string): boolean 
       continue;
     }
     if (getStaticPropertyName(element.key) === name) {
-      return true;
-    }
-  }
-  return false;
-}
-
-export function objectHasMakeOption(node: ESTree.Node | undefined): boolean {
-  const expression = unwrapExpression(node);
-  if (expression?.type !== 'ObjectExpression') {
-    return false;
-  }
-  for (const property of expression.properties) {
-    if (property.type === 'SpreadElement') {
-      return true;
-    }
-    if (getStaticPropertyName(property.key) === 'make') {
       return true;
     }
   }

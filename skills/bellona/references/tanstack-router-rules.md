@@ -12,9 +12,11 @@ Reports use four lines: **Problem**, **Why**, **Fix**, **Avoid**. Apply **Fix**.
 
 `notFound()` and `redirect()` belong in a route module (`createFileRoute` / `createRoute` / `createRootRoute*`) or a `createServerFn` handler. Do not throw them from `lib/` helpers.
 
+A file that calls `createMiddleware` (TanStack Start) can also throw `redirect()`, for example an auth gate in `.server()`. `notFound()` stays out of middleware files.
+
 ## `bl-tanstack-router/no-not-found-in-component`
 
-Do not call `notFound()` inside `component`, `pendingComponent`, `errorComponent`, or `notFoundComponent`. Throw it in `loader` or `beforeLoad`.
+Do not call `notFound()` inside `component`, `pendingComponent`, `errorComponent`, or `notFoundComponent`. Throw it in `loader` or `beforeLoad`. The router supports a throw in render, but a loader throw stops the match before render and sets the SSR status to 404.
 
 ## `bl-tanstack-router/no-loader-data-in-not-found`
 
@@ -30,6 +32,25 @@ Do not use deprecated `NotFoundRoute` or `createRouter({ notFoundRoute })`. Use 
 
 `params` / `validateSearch` → `search` → `loaderDeps` / `ssr` → `context` → `beforeLoad` → `loader` → lifecycle (`onEnter`, `onStay`, `onLeave`, `head`, `scripts`, `headers`, `remountDeps`).
 
+## `bl-tanstack-router/no-deprecated-apis`
+
+Disallow APIs that are marked `@deprecated` in `@tanstack/react-router` 1.170 and TanStack Start:
+
+| Deprecated | Use |
+| --- | --- |
+| `redirect({ code })` | `redirect({ statusCode })` |
+| `notFound({ global: true })` | `notFound({ routeId: rootRouteId })` |
+| Route option `parseParams` / `stringifyParams` | `params: { parse, stringify }` |
+| Route option `preSearchFilters` / `postSearchFilters` | `search: { middlewares }` |
+| `navigate` from the `beforeLoad` / `loader` context | `throw redirect({ to })` |
+| `startTransition` on `Link` / `Navigate` / navigate options | Nothing. Every navigation uses a transition. |
+| `new RouteApi()`, `new Route()`, `new RootRoute()`, `new FileRoute()` | `getRouteApi`, `createRoute`, `createRootRoute`, `createFileRoute` |
+| `rootRouteWithContext`, `FileRouteLoader`, `ScrollRestoration`, type `ErrorRouteProps` | `createRootRouteWithContext`, a `loader` in the route file, router option `scrollRestoration`, type `ErrorComponentProps` |
+| `useBlocker(fn, condition)`, `useBlocker({ blockerFn })`, `<Block blockerFn>` | `useBlocker({ shouldBlockFn })` |
+| Start `.inputValidator()` on `createServerFn` / `createMiddleware` | `.validator()` |
+
+`new Router()` is not reported. The React `Router` constructor has no `@deprecated` tag. Use `createRouter` anyway.
+
 ## `bl-tanstack-router/no-dynamic-to`
 
 `to` on `Link` / `Navigate` / `navigate` / `redirect` / `linkOptions` / `buildLocation` / `preloadRoute` must be a string literal (or a static template with no expressions). No interpolation, concat, or variables.
@@ -44,12 +65,6 @@ navigate({ to: '/posts/$postId', params: { postId } })
 Disallow `getRouteApi` and bound hooks `Route.useLoaderData()` / `routeApi.useX()`.
 
 Prefer: `useLoaderData({ from: '/posts/$postId' })` (and the other hooks with `from`).
-
-## `bl-tanstack-router/no-hooks-in-route-lifecycle`
-
-Disallow React hooks inside `beforeLoad` or `loader`.
-
-Prefer: put values on router `context`, or call non-hook APIs (`queryClient.ensureQueryData`).
 
 ## `bl-tanstack-router/no-imperative-location-navigation`
 
@@ -75,11 +90,23 @@ Prefer: string-literal paths or `linkOptions(...)`; let inference flow.
 
 ## `bl-tanstack-router/no-search-in-loader`
 
-Do not read `search` inside `loader`. Declare `validateSearch`, map fields in `loaderDeps`, read `deps` in the loader.
+Do not read raw search inside `loader`: the loader context `search`, or `location.search` (also `ctx.location.search` and `window.location.search`). Declare `validateSearch`, map fields in `loaderDeps`, read `deps` in the loader.
+
+A `search` field on `deps` (`deps.search`, `{ deps: { search } }`) or on loaded data is valid.
+
+## `bl-tanstack-router/no-whole-search-loader-deps`
+
+`loaderDeps` must not return the whole `search` object: `({ search }) => search`, `({ search }) => ({ ...search })`, `({ search }) => ({ search })`, or `(ctx) => ctx.search`. Any search change then runs the loader again.
+
+```tsx
+loaderDeps: ({ search: { page, q } }) => ({ page, q }),
+```
 
 ## `bl-tanstack-router/require-inline-route-options`
 
 `createFileRoute` / `createRoute` / `createRootRoute` / `createLazyFileRoute` / `createLazyRoute` must take an inline options object. Do not pass a helper (`legalRoute("…")`), a shared variable, or `{ ...helper() }`.
+
+The router plugin code-splits route keys only from an inline object literal.
 
 ```tsx
 export const Route = createFileRoute('/{-$locale}/accessibility/')({
@@ -87,20 +114,11 @@ export const Route = createFileRoute('/{-$locale}/accessibility/')({
 })
 ```
 
-## `bl-tanstack-router/require-params-with-path-tokens`
-
-If `to` contains a **required** `$` token (`$postId`, splat `$`), pass a `params` object.
-
-Optional tokens (`{-$locale}`, `/posts/{-$category}`, `prefix{-$name}.txt`) do not need `params`.
-
-```ts
-navigate({ to: '/posts/$postId', params: { postId: id } })
-<Link to="/{-$locale}/blog/authors" />
-```
-
 ## `bl-tanstack-router/require-hook-from`
 
-Bare `useNavigate` / `useParams` / `useSearch` / `useLoaderData` / `useRouteContext` need `{ from }` or `{ strict: false }` (shared components).
+Bare `useNavigate` needs `{ from }`. It has no `strict` option, so `{ strict: false }` does not count. A shared component that uses only absolute `to` paths can pass `from: "/"`.
+
+The rule does not check `useParams` / `useSearch` / `useLoaderData` / `useRouteContext`. Their TypeScript options already require `from` or `strict: false`.
 
 ## `bl-tanstack-router/require-throw-not-found`
 
@@ -109,7 +127,3 @@ Bare `useNavigate` / `useParams` / `useSearch` / `useLoaderData` / `useRouteCont
 ## `bl-tanstack-router/require-throw-redirect`
 
 `redirect({ to })` must be thrown, returned, or `{ throw: true }`. A bare call does not navigate.
-
-## `bl-tanstack-router/require-validate-search-when-used`
-
-If the route reads search params, it must declare `validateSearch`. Search is raw URL text until parsed.

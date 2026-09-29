@@ -29,6 +29,19 @@ const EXACT_REPLACEMENTS = new Map<string, string>([
   ['@effect/platform/HttpApi', 'effect/unstable/httpapi'],
   ['@effect/platform/HttpApiBuilder', 'effect/unstable/httpapi'],
   ['@effect/platform/KeyValueStore', 'effect/unstable/persistence'],
+  ['@effect/platform/Command', 'effect/unstable/process'],
+  ['@effect/platform/CommandExecutor', 'effect/unstable/process'],
+  ['@effect/platform/Socket', 'effect/unstable/socket'],
+  ['@effect/platform/SocketServer', 'effect/unstable/socket'],
+  ['@effect/platform/Worker', 'effect/unstable/workers'],
+  ['@effect/platform/WorkerError', 'effect/unstable/workers'],
+  ['@effect/platform/WorkerRunner', 'effect/unstable/workers'],
+  ['@effect/platform/Transferable', 'effect/unstable/workers'],
+  ['@effect/platform/Ndjson', 'effect/unstable/encoding'],
+  ['@effect/platform/MsgPack', 'effect/unstable/encoding/SchemaBinary'],
+  ['@effect/platform/OpenApi', 'effect/unstable/httpapi'],
+  ['@effect/typeclass/Semigroup', 'effect/Combiner'],
+  ['@effect/typeclass/Monoid', 'effect/Reducer'],
   ['@effect/sql/SqlClient', 'effect/unstable/sql'],
   ['@effect/sql/SqlError', 'effect/unstable/sql'],
   ['@effect/sql/Migrator', 'effect/unstable/sql'],
@@ -57,6 +70,7 @@ const EXACT_REPLACEMENTS = new Map<string, string>([
 ]);
 
 const PREFIX_REPLACEMENTS: readonly { prefix: string; replacement: string }[] = [
+  { prefix: '@effect/platform/HttpApi', replacement: 'effect/unstable/httpapi' },
   { prefix: '@effect/platform/', replacement: 'effect or effect/unstable/http' },
   { prefix: '@effect/sql/', replacement: 'effect/unstable/sql' },
   { prefix: '@effect/cli/', replacement: 'effect/unstable/cli' },

@@ -1,12 +1,12 @@
 import type { CreateOnceRule } from '@oxlint/plugins';
 import type { ESTree } from '@oxlint/plugins';
 
-import { isJsNumber } from '../../../lib/js-kind.ts';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { unwrapExpression } from '../ast.ts';
 import {
   getObjectPropertyValue,
+  getStaticStatusCode,
   isElysiaStatusCall,
   isInsideElysiaHandlerContext,
   isStringLiteralOrConstString,
@@ -29,8 +29,9 @@ const shouldCheckErrorBody = (
   if (!code) {
     return false;
   }
-  if (code.type === 'Literal' && isJsNumber(code.value)) {
-    return code.value >= 400;
+  const status = getStaticStatusCode(code);
+  if (status !== undefined) {
+    return status >= 400;
   }
   if (code.type === 'Identifier') {
     return hasCodeKey;

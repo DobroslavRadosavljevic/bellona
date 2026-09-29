@@ -13,9 +13,9 @@ import {
 } from '../../../../src/plugins/effect/v3-imports.ts';
 
 describe('effect plugin', () => {
-  it('registers 28 rules under meta.name bl-effect', () => {
+  it('registers 54 rules under meta.name bl-effect', () => {
     expect(effect.meta.name).toBe('bl-effect');
-    expect(Object.keys(effect.rules)).toHaveLength(28);
+    expect(Object.keys(effect.rules)).toHaveLength(54);
   });
 });
 

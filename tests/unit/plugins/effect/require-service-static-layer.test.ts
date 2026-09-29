@@ -14,7 +14,7 @@ runEffectRule(requireServiceStaticLayerName, {
     {
       ...ts,
       code: withEffect(
-        'class Db extends Context.Service<Db, { q(): string }>()("myapp/db/Db", { make: Effect.succeed({ q: () => "1" }) }) {}',
+        'class Db extends Context.Service<Db, { q(): string }>()("myapp/db/Db", { make: Effect.succeed({ q: () => "1" }) }) { static readonly layer = Layer.effect(this, this.make) }',
       ),
     },
     { ...ts, code: withEffect('const Db = Context.Service<{ q(): string }>("myapp/db/Db")') },
@@ -53,7 +53,15 @@ runEffectRule(requireServiceStaticLayerName, {
       code: withEffect(
         'class Db extends Context.Service<Db, { q(): string }>()("myapp/db/Db", { make: Effect.succeed({ q: () => "1" }) }) { static Default = Layer.empty }',
       ),
-      errors: [error('defaultMember')],
+      errors: [error('defaultMember'), error('layer')],
+    },
+    {
+      // `options.make` stores the constructor on the class. It does not make a layer.
+      ...ts,
+      code: withEffect(
+        'class Db extends Context.Service<Db, { q(): string }>()("myapp/db/Db", { make: Effect.succeed({ q: () => "1" }) }) {}',
+      ),
+      errors: [error('layer')],
     },
   ],
 });

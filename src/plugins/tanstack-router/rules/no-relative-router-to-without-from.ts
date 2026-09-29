@@ -39,7 +39,7 @@ export const noRelativeRouterToWithoutFrom: CreateOnceRule = defineBellonaRule({
       missingFrom: agentDiagnostic({
         problem:
           '`to` is relative (`./`, `../`, or empty) and there is no `from`. Relative targets need an origin route.',
-        why: 'Without `from`, the router cannot resolve the path or infer types for relative navigation.',
+        why: 'Without `from`, TypeScript cannot check a relative `to`, its `params`, or its `search`. At runtime the path resolves from the current match, so the target changes when the component renders under another route.',
         fix: 'Add `from={Route.fullPath}` on the `Link` / options, or `useNavigate({ from: "/posts" })` / `navigate({ from, to: "./edit" })`. Prefer a full literal `to: "/posts/$postId"` when you can.',
         avoid:
           'Do not convert the relative path to a guessed absolute string. Do not disable the rule.',

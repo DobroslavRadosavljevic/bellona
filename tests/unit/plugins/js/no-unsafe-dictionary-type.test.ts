@@ -1,4 +1,6 @@
+import js from '../../../../src/plugins/js/index.ts';
 import { noUnsafeDictionaryTypeName } from '../../../../src/plugins/js/rules/no-unsafe-dictionary-type.ts';
+import { runRule } from '../../lib/rule-tester.ts';
 import { runJsRule } from './harness.ts';
 
 const error = { messageId: 'unsafeDictionary' };
@@ -28,8 +30,38 @@ runJsRule(noUnsafeDictionaryTypeName, {
     'interface Escape { readonly id: string } interface Escape {} type A = Record<string, Escape>;',
     'interface Owner { readonly id: string } type A = Record<string, object & Owner>;',
     'type Wrap<T> = { readonly wrapped: T }; type Inner<T, U> = { readonly value: T } & Wrap<U>; type Outer<T, U> = Record<string, Inner<T, U>>; declare function f<T, U>(): Outer<T, U>;',
+    // A constraint or a conditional test only limits a type argument. Reads use the argument type.
+    'function pick<T extends Record<string, unknown>>(value: T): T { return value; }',
+    'type Stringify<Env extends { [key: string]: unknown }> = { [K in keyof Env]: string };',
+    'type IsDictionary<T> = T extends Record<string, unknown> ? true : false;',
+    // The callee type already gives this parameter type. Removing the annotation keeps the same type.
+    'const route = createRoute({ validateSearch: (search: Record<string, unknown>) => parse(search) });',
+    'router.use((input: Record<string, unknown>) => parse(input));',
+    'const handlers = { on: (input: Record<string, unknown>) => parse(input) } satisfies Handlers;',
+    'const handler: Handler = (input: Record<string, unknown>) => parse(input);',
   ],
   invalid: [
+    {
+      code: 'export function Mention(props: Record<string, unknown>) { return props; }',
+      errors: [error],
+    },
+    {
+      code: 'const handlers = { on: (input: Record<string, unknown>) => parse(input) };',
+      errors: [error],
+    },
+    {
+      code: 'const route = createRoute({ validateSearch: (search: Search): Record<string, unknown> => search });',
+      errors: [error],
+    },
+    { code: 'function pick<T = Record<string, unknown>>(value: T) {}', errors: [error] },
+    {
+      code: 'function pick<T extends Record<string, unknown>>(value: T, extra: Record<string, unknown>) {}',
+      errors: [error],
+    },
+    {
+      code: 'type Read<T> = T extends Record<string, unknown> ? Record<string, unknown> : never;',
+      errors: [error],
+    },
     { code: 'type A = Record<string, unknown>;', errors: [error] },
     { code: 'type A = { [key: string]: any };', errors: [error] },
     { code: 'type A = { [index: number]: Command; [key: string]: unknown | Command };', errors: 1 },
@@ -98,3 +130,20 @@ runJsRule(noUnsafeDictionaryTypeName, {
     },
   ],
 });
+
+runRule(
+  js,
+  noUnsafeDictionaryTypeName,
+  {
+    valid: [
+      'const element = <Markdown components={{ mention: (props: Record<string, unknown>) => render(props) }} />;',
+    ],
+    invalid: [
+      {
+        code: 'export function Mention(props: Record<string, unknown>) { return <span>{String(props.id)}</span>; }',
+        errors: [error],
+      },
+    ],
+  },
+  'tsx',
+);

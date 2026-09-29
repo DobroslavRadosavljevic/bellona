@@ -4,6 +4,10 @@ import { runReactRule } from './harness.ts';
 
 runReactRule(componentFileNameMatchName, {
   valid: [
+    validWith(
+      'export function DataGridRows() { return null; }\nexport const DataGridRowsMemo = memo(DataGridRows, (previous, next) => previous === next);',
+      { filename: 'data-grid-rows.tsx' },
+    ),
     validWith('export function UserCard() { return null; }', { filename: 'user-card.tsx' }),
     validWith('export const UserCard = () => null;', { filename: 'user-card.tsx' }),
     validWith('export const UserCard = memo(() => null);', { filename: 'user-card.tsx' }),

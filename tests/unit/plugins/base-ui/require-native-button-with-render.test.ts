@@ -12,6 +12,10 @@ function requireTrue(component: string) {
   return { messageId: 'requireTrue' as const, data: { component } };
 }
 
+function requireDynamic(component: string) {
+  return { messageId: 'requireDynamic' as const, data: { component } };
+}
+
 function requireExplicit(component: string) {
   return { messageId: 'requireExplicit' as const, data: { component } };
 }
@@ -120,6 +124,13 @@ runBaseUiRule(requireNativeButtonWithRenderName, {
       'const A = () => <Button render={(props) => <button type="button" {...props} />}>Save</Button>',
       { filename: tsx },
     ),
+    validWith('const A = () => <Menu.Item render={show && <Link to="/" />}>Go</Menu.Item>', {
+      filename: tsx,
+    }),
+    validWith(
+      'const A = () => <Button nativeButton={!isLink} render={isLink ? <a href="/" /> : <button type="button" />}>Go</Button>',
+      { filename: tsx },
+    ),
     validWith(
       'const A = () => <Button nativeButton={isLink ? false : true} render={<Link to="/" />}>Go</Button>',
       { filename: tsx },
@@ -130,10 +141,6 @@ runBaseUiRule(requireNativeButtonWithRenderName, {
     ),
     validWith(
       'const A = () => <Button nativeButton={false} render={(<Link to="/" />) as const}>Go</Button>',
-      { filename: tsx },
-    ),
-    validWith(
-      'const A = () => <Button nativeButton={false} render={show && <Link to="/" />}>Go</Button>',
       { filename: tsx },
     ),
     validWith(
@@ -210,10 +217,6 @@ runBaseUiRule(requireNativeButtonWithRenderName, {
       filename: tsx,
       options: [{ requireExplicitWhenUnknown: true }],
     }),
-    validWith(
-      'const A = () => <Button nativeButton={false} render={() => { if (ok) return <Link to="/" />; return <button type="button" /> }}>Go</Button>',
-      { filename: tsx },
-    ),
     validWith(
       'const A = () => <DropdownMenuTrigger render={<Button />}>Open</DropdownMenuTrigger>',
       {
@@ -334,10 +337,28 @@ runBaseUiRule(requireNativeButtonWithRenderName, {
       errors: [requireFalse('Button')],
     }),
     invalidWith({
-      name: 'logical render with Link',
+      name: 'logical render with Link falls back to the default button',
       filename: tsx,
       code: 'const A = () => <Button render={show && <Link to="/" />}>Go</Button>',
-      errors: [requireFalse('Button')],
+      errors: [requireDynamic('Button')],
+    }),
+    invalidWith({
+      name: 'logical render with Link and a fixed false',
+      filename: tsx,
+      code: 'const A = () => <Button nativeButton={false} render={show && <Link to="/" />}>Go</Button>',
+      errors: [requireDynamic('Button')],
+    }),
+    invalidWith({
+      name: 'conditional render with undefined falls back to the default button',
+      filename: tsx,
+      code: 'const A = () => <Button nativeButton={false} render={isLink ? <a href="/" /> : undefined}>Go</Button>',
+      errors: [requireDynamic('Button')],
+    }),
+    invalidWith({
+      name: 'conditional render with a button and an anchor',
+      filename: tsx,
+      code: 'const A = () => <Button render={isLink ? <a href="/" /> : <button type="button" />}>Go</Button>',
+      errors: [requireDynamic('Button')],
     }),
     invalidWith({
       name: 'conditional render with two non-button hosts',
@@ -520,10 +541,16 @@ runBaseUiRule(requireNativeButtonWithRenderName, {
       errors: [requireTrue('Button')],
     }),
     invalidWith({
-      name: 'mixed function returns treat a Link branch as non-button',
+      name: 'mixed function returns need a dynamic nativeButton',
       filename: tsx,
       code: 'const A = () => <Button render={() => { if (ok) return <Link to="/" />; return <button type="button" /> }}>Go</Button>',
-      errors: [requireFalse('Button')],
+      errors: [requireDynamic('Button')],
+    }),
+    invalidWith({
+      name: 'mixed function returns with a fixed false',
+      filename: tsx,
+      code: 'const A = () => <Button nativeButton={false} render={() => { if (ok) return <Link to="/" />; return <button type="button" /> }}>Go</Button>',
+      errors: [requireDynamic('Button')],
     }),
   ],
 });

@@ -11,7 +11,7 @@ export const requireThrowNotFound: CreateOnceRule = defineBellonaRule({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Require `throw notFound(...)` or `notFound({ throw: true })`',
+      description: 'Require `notFound(...)` to be thrown, returned, or called with `throw: true`',
     },
     messages: {
       throwNotFound: agentDiagnostic({

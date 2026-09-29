@@ -6,6 +6,7 @@ import {
   collectRouterEdgeBindings,
   isControlFlowNotFoundCall,
   isControlFlowRedirectCall,
+  programDefinesMiddleware,
   programDefinesRouterEdge,
   type RouterEdgeBindings,
 } from '../edge.ts';
@@ -18,7 +19,7 @@ export const noControlFlowOutsideEdge: CreateOnceRule = defineBellonaRule({
     type: 'problem',
     docs: {
       description:
-        'Keep `notFound()` and `redirect()` in route modules or `createServerFn` handlers',
+        'Keep `notFound()` and `redirect()` in route modules, `createServerFn` handlers, or (`redirect()` only) `createMiddleware` files',
     },
     messages: {
       notFound: agentDiagnostic({
@@ -30,9 +31,9 @@ export const noControlFlowOutsideEdge: CreateOnceRule = defineBellonaRule({
       }),
       redirect: agentDiagnostic({
         problem:
-          '`redirect()` is called in a module that does not define a route or a `createServerFn`.',
+          '`redirect()` is called in a module that does not define a route, a `createServerFn`, or a `createMiddleware`.',
         why: '`redirect()` is route control flow. A helper then ties every caller to the router.',
-        fix: 'Return a result from this helper. Call `throw redirect({ to })` in the route `beforeLoad` or `loader`, or in a `createServerFn` handler.',
+        fix: 'Return a result from this helper. Call `throw redirect({ to })` in the route `beforeLoad` or `loader`, in a `createServerFn` handler, or in a `createMiddleware().server()` callback.',
         avoid: 'Do not wrap `redirect` in `requireAuth`. Do not disable the rule.',
       }),
     },
@@ -42,6 +43,7 @@ export const noControlFlowOutsideEdge: CreateOnceRule = defineBellonaRule({
   createOnce(context) {
     let bindings: RouterEdgeBindings;
     let hasEdge: boolean;
+    let hasMiddleware: boolean;
 
     return {
       before() {
@@ -51,6 +53,7 @@ export const noControlFlowOutsideEdge: CreateOnceRule = defineBellonaRule({
         const program = context.sourceCode.ast;
         bindings = collectRouterEdgeBindings(program);
         hasEdge = programDefinesRouterEdge(program);
+        hasMiddleware = programDefinesMiddleware(program);
       },
       CallExpression(node) {
         if (hasEdge) {
@@ -60,7 +63,7 @@ export const noControlFlowOutsideEdge: CreateOnceRule = defineBellonaRule({
           context.report({ messageId: 'notFound', node });
           return;
         }
-        if (isControlFlowRedirectCall(node, bindings)) {
+        if (!hasMiddleware && isControlFlowRedirectCall(node, bindings)) {
           context.report({ messageId: 'redirect', node });
         }
       },

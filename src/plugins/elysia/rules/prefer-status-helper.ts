@@ -1,10 +1,59 @@
-import type { CreateOnceRule } from '@oxlint/plugins';
+import type { CreateOnceRule, ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
-import { getCallName, getStaticPropertyName, unwrapExpression } from '../ast.ts';
+import { getStaticPropertyName, isFunctionLike, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
+
+/** True when a function's first parameter destructures `{ error }` (the old Elysia context helper). */
+const firstParamDestructuresError = (
+  fn: ESTree.Function | ESTree.ArrowFunctionExpression,
+): boolean => {
+  let [pattern] = fn.params;
+  if (pattern?.type === 'AssignmentPattern') {
+    pattern = pattern.left;
+  }
+  if (pattern?.type !== 'ObjectPattern') {
+    return false;
+  }
+  return pattern.properties.some((property) => {
+    if (property.type !== 'Property' || property.computed) {
+      return false;
+    }
+    if (getStaticPropertyName(property.key) !== 'error') {
+      return false;
+    }
+    const value =
+      property.value.type === 'AssignmentPattern' ? property.value.left : property.value;
+    return value.type === 'Identifier' && value.name === 'error';
+  });
+};
+
+/**
+ * True for a bare `error(…)` call whose `error` comes from a destructured
+ * handler context (`({ error }) => error(404)`). Imported `error` helpers and
+ * `logger.error(…)` do not match.
+ */
+const isContextErrorCall = (node: ESTree.CallExpression): boolean => {
+  const callee = unwrapExpression(node.callee);
+  if (callee?.type !== 'Identifier' || callee.name !== 'error') {
+    return false;
+  }
+  let current: ESTree.Node | undefined = node.parent ?? undefined;
+  while (current) {
+    if (isFunctionLike(current)) {
+      if (firstParamDestructuresError(current)) {
+        return true;
+      }
+      if (current.params.some((param) => param.type === 'Identifier' && param.name === 'error')) {
+        return false;
+      }
+    }
+    current = current.parent ?? undefined;
+  }
+  return false;
+};
 
 /**
  * Prefer `status(code, value)` over `set.status = code` in Elysia handlers /
@@ -44,7 +93,7 @@ export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
         context.report({ messageId: 'preferStatus', node });
       },
       CallExpression(node) {
-        if (getCallName(node) !== 'error') {
+        if (!isContextErrorCall(node)) {
           return;
         }
         if (!isInsideElysiaHandlerContext(node)) {
@@ -57,7 +106,7 @@ export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
   meta: {
     docs: {
       description:
-        'Prefer status(code, value) over set.status or deprecated error() in Elysia handlers',
+        'Prefer status(code, value) over set.status or the removed context error() in Elysia handlers',
     },
     messages: {
       preferStatus: agentDiagnostic({
@@ -68,8 +117,8 @@ export const preferStatusHelper: CreateOnceRule = defineBellonaRule({
       }),
       preferStatusOverError: agentDiagnostic({
         problem:
-          'This handler uses deprecated context `error()`. Elysia 1.3+ renamed it to `status`.',
-        why: '`error()` is the old name. Typed responses and Eden expect `status(code, value)`.',
+          'This handler calls `error()` from the handler context. Elysia 1.3 renamed it to `status`, and the Elysia 1.4 context has no `error`.',
+        why: '`error()` is the old name. On Elysia 1.4 the destructured `error` does not exist, so the call fails. `status(code, value)` is the current API and gives typed responses.',
         fix: 'Replace `error(code, body)` with `return status(code, body)`.',
         avoid: 'Do not keep `error()` under an alias. Do not disable the rule.',
       }),

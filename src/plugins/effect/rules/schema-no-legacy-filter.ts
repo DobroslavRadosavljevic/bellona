@@ -7,6 +7,7 @@ import {
   collectEffectBindings,
   isModuleCall,
   isModuleMember,
+  isSchemaValue,
   type EffectBindings,
 } from '../bindings.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipEffectFile } from '../options.ts';
@@ -24,7 +25,7 @@ const LEGACY_METHODS = new Set([
 ]);
 
 const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
-  ['filter', 'Schema.check / Schema.refine'],
+  ['filter', 'Schema.check(Schema.makeFilter(predicate)) / Schema.refine(refinement)'],
   [
     'filterEffect',
     'Schema.decode({ decode: SchemaGetter.checkEffect(...), encode: SchemaGetter.passthrough() })',
@@ -34,45 +35,29 @@ const LEGACY_SCHEMA_EXPORTS = new Map<string, string>([
   ['negative', 'Schema.check(Schema.isLessThan(0))'],
   ['nonNegative', 'Schema.check(Schema.isGreaterThanOrEqualTo(0))'],
   ['nonPositive', 'Schema.check(Schema.isLessThanOrEqualTo(0))'],
-  ['nonEmptyString', 'Schema.String.check(Schema.isNonEmpty())'],
+  ['nonEmptyString', 'Schema.check(Schema.isNonEmpty()) / Schema.NonEmptyString'],
   ['pattern', 'Schema.check(Schema.isPattern(regex))'],
   ['rename', 'Schema.encodeKeys'],
   ['encodedSchema', 'Schema.toEncoded'],
   ['typeSchema', 'Schema.toType'],
   ['encodedBoundSchema', 'Schema.toEncoded'],
   ['toArbitrary', 'Arbitrary.schema (effect/unstable/arbitrary)'],
+  // v3 filter names. v4 names start with `is` and go in `Schema.check(...)`.
+  ['int', 'Schema.check(Schema.isInt())'],
+  ['finite', 'Schema.check(Schema.isFinite())'],
+  ['greaterThan', 'Schema.check(Schema.isGreaterThan(n))'],
+  ['greaterThanOrEqualTo', 'Schema.check(Schema.isGreaterThanOrEqualTo(n))'],
+  ['lessThan', 'Schema.check(Schema.isLessThan(n))'],
+  ['lessThanOrEqualTo', 'Schema.check(Schema.isLessThanOrEqualTo(n))'],
+  ['between', 'Schema.check(Schema.isBetween({ minimum, maximum }))'],
+  ['multipleOf', 'Schema.check(Schema.isMultipleOf(n))'],
+  ['minLength', 'Schema.check(Schema.isMinLength(n))'],
+  ['maxLength', 'Schema.check(Schema.isMaxLength(n))'],
+  ['UUID', 'Schema.String.check(Schema.isUUID())'],
+  ['ULID', 'Schema.String.check(Schema.isULID())'],
 ]);
 
 export const schemaNoLegacyFilterName = bnRuleName('schema-no-legacy-filter');
-
-function isSchemaReceiver(
-  node: ReturnType<typeof unwrapExpression>,
-  bindings: EffectBindings,
-): boolean {
-  let current = node;
-  while (current !== undefined) {
-    if (current.type === 'Identifier' && bindings.namespaces.schema.has(current.name)) {
-      return true;
-    }
-    if (current.type === 'MemberExpression') {
-      current = unwrapExpression(current.object);
-      continue;
-    }
-    if (current.type === 'CallExpression') {
-      const callee = unwrapExpression(current.callee);
-      if (callee?.type === 'MemberExpression') {
-        current = unwrapExpression(callee.object);
-        continue;
-      }
-      if (callee?.type === 'Identifier' && bindings.namespaces.schema.has(callee.name)) {
-        return true;
-      }
-      return false;
-    }
-    return false;
-  }
-  return false;
-}
 
 export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
   meta: {
@@ -84,8 +69,8 @@ export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
       legacy: agentDiagnostic({
         problem:
           'This uses v3 Schema API `Schema.{{name}}`. The v4 replacement is `{{replacement}}`.',
-        why: '`filter` / `filterEffect` / `optionalWith` / `positive` / `pattern` / `rename` / `encodedSchema` and friends were replaced by `Schema.check` / `Schema.refine` / `Schema.encodeKeys` / `Schema.toEncoded`.',
-        fix: 'Replace `Schema.{{name}}` with `{{replacement}}` (example: `Schema.String.check(Schema.isNonEmpty())` instead of `nonEmptyString`).',
+        why: '`filter` / `filterEffect` / `optionalWith` / `positive` / `int` / `minLength` / `pattern` / `rename` / `encodedSchema` and friends are gone in v4. Filters are `Schema.is*` values that you pass to `Schema.check`.',
+        fix: 'Replace `Schema.{{name}}` with `{{replacement}}` (example: `Schema.String.check(Schema.isNonEmpty())` instead of `Schema.String.pipe(Schema.nonEmptyString())`).',
         avoid: 'Do not keep the v3 method on a renamed import. Do not disable the rule.',
       }),
     },
@@ -121,7 +106,7 @@ export const schemaNoLegacyFilter: CreateOnceRule = defineBellonaRule({
         if (method === undefined || !LEGACY_METHODS.has(method)) {
           return;
         }
-        if (!isSchemaReceiver(unwrapExpression(callee.object), bindings)) {
+        if (!isSchemaValue(unwrapExpression(callee.object), bindings)) {
           return;
         }
         const replacement = LEGACY_SCHEMA_EXPORTS.get(method) ?? 'Schema.check';

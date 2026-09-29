@@ -3,13 +3,11 @@ import type { ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
-import { isFunctionLike, pipeRoot, unwrapExpression } from '../ast.ts';
+import { isFunctionLike, unwrapExpression } from '../ast.ts';
 import {
   collectEffectBindings,
   isBareVitestItCall,
-  isEffectFnAppliedCall,
-  isEffectFnFactoryCall,
-  isEffectNamespaceCall,
+  isEffectExpression,
   type EffectBindings,
 } from '../bindings.ts';
 import {
@@ -25,7 +23,7 @@ function callbackReturnsEffect(fn: ESTree.Node, bindings: EffectBindings): boole
     return false;
   }
   if (fn.type === 'ArrowFunctionExpression' && fn.expression === true) {
-    return isEffectful(fn.body, bindings);
+    return isEffectExpression(fn.body, bindings);
   }
   const body = fn.body;
   if (body === null || body === undefined || body.type !== 'BlockStatement') {
@@ -34,23 +32,12 @@ function callbackReturnsEffect(fn: ESTree.Node, bindings: EffectBindings): boole
   for (const statement of body.body) {
     if (statement.type === 'ReturnStatement') {
       const argument = statement.argument ?? undefined;
-      if (argument !== undefined && isEffectful(argument, bindings)) {
+      if (argument !== undefined && isEffectExpression(argument, bindings)) {
         return true;
       }
     }
   }
   return false;
-}
-
-function isEffectful(node: ESTree.Node | undefined, bindings: EffectBindings): boolean {
-  const root = pipeRoot(node);
-  if (root?.type !== 'CallExpression') {
-    return false;
-  }
-  if (isEffectFnAppliedCall(root, bindings) || isEffectFnFactoryCall(root, bindings)) {
-    return false;
-  }
-  return isEffectNamespaceCall(root, bindings);
 }
 
 export const preferEffectVitest: CreateOnceRule = defineBellonaRule({

@@ -38,7 +38,7 @@ export const noDynamicRouterTo: CreateOnceRule = defineBellonaRule({
       dynamicTo: agentDiagnostic({
         problem:
           '`to` is not a string-literal route path (interpolation, concatenation, or a variable). This applies to `Link` / `Navigate` / `navigate` / `redirect` / `linkOptions` / `buildLocation` / `preloadRoute`.',
-        why: 'The router infers `params` and `search` from a literal path such as `"/posts/$postId"`. A dynamic string is just `string`, so types and mismatches disappear.',
+        why: 'The router infers `params` and `search` from a literal path such as `"/posts/$postId"`. Interpolation and concatenation give type `string`. A variable hides the path from readers and from the other path rules.',
         fix: 'Write `to: "/posts/$postId"` (or `to="/posts/$postId"`) and pass values in `params` / `search`. Or pass a typed `linkOptions({ to: "/…", params })` object. Do not interpolate ids into `to`.',
         avoid:
           'Do not assert `to as "/posts/$postId"`. Do not use `href` instead. Do not disable the rule.',

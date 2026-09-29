@@ -36,7 +36,7 @@ Do the **Fix**. Do not add `oxlint-disable`, a dummy local use, or a second bann
 
 | You wrote | Actual |
 | --- | --- |
-| `js/bn-max-classes` | `bl-js/max-classes` |
+| `js/bn-no-inline-import-type` | `bl-js/no-inline-import-type` |
 | `baseui/bn-…` | `bl-base-ui/…` |
 | `tanstack/bn-…` | `bl-tanstack-router/…` |
 | `effect/prefer-effect-fn` | `bl-effect/prefer-fn` |

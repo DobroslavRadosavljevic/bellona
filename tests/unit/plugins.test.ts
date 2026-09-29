@@ -21,12 +21,13 @@ describe('plugins', () => {
     expect(effect.meta.name).toBe('bl-effect');
     expect(tailwind.meta.name).toBe('bl-tailwind');
     expect(Object.keys(js.rules).every((name) => !name.includes('/'))).toBe(true);
-    expect(Object.keys(effect.rules)).toHaveLength(28);
+    expect(Object.keys(effect.rules)).toHaveLength(54);
     expect(plugins).toEqual({
       js: 'bellona/js',
       react: 'bellona/react',
       baseUi: 'bellona/base-ui',
       zod: 'bellona/zod',
+      tanstackQuery: 'bellona/tanstack-query',
       tanstackRouter: 'bellona/tanstack-router',
       elysia: 'bellona/elysia',
       effect: 'bellona/effect',

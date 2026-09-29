@@ -213,26 +213,9 @@ export function isRouterNavCall(node: ESTree.CallExpression): boolean {
   return leaf !== undefined && ROUTER_NAV_CALL_METHODS.has(leaf);
 }
 
-export function isBareRouterHookCall(node: ESTree.CallExpression): boolean {
-  const callee = unwrapExpression(node.callee);
-  return callee?.type === 'Identifier' && ROUTER_HOOK_NAMES.has(callee.name);
-}
-
 export function isRouterHookCall(node: ESTree.CallExpression): boolean {
   const leaf = callLeafName(node);
   return leaf !== undefined && ROUTER_HOOK_NAMES.has(leaf);
-}
-
-export function hasFromOrStrictFalse(optionsObject: ESTree.Node | undefined): boolean {
-  if (objectHasOwnProperty(optionsObject, 'from')) {
-    return true;
-  }
-  const strictValue = getObjectPropValue(optionsObject, 'strict');
-  if (strictValue === undefined) {
-    return false;
-  }
-  const unwrapped = unwrapExpression(strictValue);
-  return unwrapped?.type === 'Literal' && unwrapped.value === false;
 }
 
 export function resolveIdentifierInit(

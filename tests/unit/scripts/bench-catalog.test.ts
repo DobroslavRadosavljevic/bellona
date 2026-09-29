@@ -15,6 +15,7 @@ describe('bench catalog', () => {
       'js',
       'react',
       'tailwind',
+      'tanstack-query',
       'tanstack-router',
       'zod',
     ]);
@@ -32,7 +33,7 @@ describe('bench catalog', () => {
   it('filters by plugin id and rule slug', () => {
     const jsRules = listBenchRules(['js']);
     expect(jsRules.every((rule) => rule.pluginId === 'js')).toBe(true);
-    const only = filterBenchRules(jsRules, ['max-classes']);
-    expect(only.map((rule) => rule.ruleId)).toEqual(['bl-js/max-classes']);
+    const only = filterBenchRules(jsRules, ['no-inline-import-type']);
+    expect(only.map((rule) => rule.ruleId)).toEqual(['bl-js/no-inline-import-type']);
   });
 });

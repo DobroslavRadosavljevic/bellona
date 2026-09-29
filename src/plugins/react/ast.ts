@@ -139,8 +139,9 @@ export function isComponentWrapperCall(node: ESTree.CallExpression): boolean {
   return isComponentWrapperName(getCallName(node));
 }
 
+/** True when `node` is the component argument (the first one) of `memo` / `forwardRef`. */
 function isWrapperCallArgument(call: ESTree.CallExpression, node: ESTree.Node): boolean {
-  return call.arguments.some((argument) => argument === node);
+  return call.arguments[0] === node;
 }
 
 export function unwrapComponentInit(
@@ -153,16 +154,15 @@ export function unwrapComponentInit(
   if (isFunctionLike(expression)) {
     return expression;
   }
+  // Only the first argument is the component. `memo(Rows, (a, b) => …)` has a
+  // comparator as the second argument, and `memo(Rows)` wraps a component that is
+  // declared elsewhere, so neither defines a new component here.
   if (expression.type === 'CallExpression' && isComponentWrapperCall(expression)) {
-    for (const argument of expression.arguments) {
-      if (argument.type === 'SpreadElement') {
-        continue;
-      }
-      const inner = unwrapComponentInit(argument);
-      if (inner !== undefined) {
-        return inner;
-      }
+    const [first] = expression.arguments;
+    if (first === undefined || first.type === 'SpreadElement') {
+      return undefined;
     }
+    return unwrapComponentInit(first);
   }
   return undefined;
 }
@@ -288,6 +288,11 @@ export function isAtModuleScope(node: ESTree.Node): boolean {
   return true;
 }
 
+/**
+ * True when no function (named or anonymous) encloses the node. A declaration
+ * inside an anonymous callback (`items.map(() => { function Row() {} })`) is
+ * local, not a module-level declaration.
+ */
 export function isModuleLevelDeclaration(node: ESTree.Node): boolean {
-  return getEnclosingFunctionName(node) === undefined;
+  return isAtModuleScope(node);
 }

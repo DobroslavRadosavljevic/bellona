@@ -1,4 +1,4 @@
-import type { CreateOnceRule } from '@oxlint/plugins';
+import type { CreateOnceRule, ESTree } from '@oxlint/plugins';
 
 import { isJsString } from '../../../lib/js-kind.ts';
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
@@ -6,6 +6,33 @@ import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
 import { getCallName, unwrapExpression } from '../ast.ts';
 import { isInsideElysiaHandlerContext } from '../elysia.ts';
 import { ALLOW_OPTION_SCHEMA, DEFAULT_ALLOW_OPTIONS, shouldSkipElysiaFile } from '../options.ts';
+
+/**
+ * Built-in JavaScript error constructors. They carry no HTTP status, so Elysia
+ * answers with 500. Custom classes (Elysia `NotFoundError`, or a class with
+ * `status` / `toResponse()`) are a documented Elysia pattern and are not reported.
+ *
+ * @see https://elysiajs.com/patterns/error-handling.html#custom-error
+ */
+const BUILT_IN_ERROR_CONSTRUCTORS = new Set([
+  'Error',
+  'TypeError',
+  'RangeError',
+  'SyntaxError',
+  'ReferenceError',
+  'EvalError',
+  'URIError',
+  'AggregateError',
+]);
+
+/** `new Error(…)` or `Error(…)` for a built-in error constructor. */
+const isBuiltInErrorConstruction = (node: ESTree.Node): boolean => {
+  if (node.type !== 'NewExpression' && node.type !== 'CallExpression') {
+    return false;
+  }
+  const callee = unwrapExpression(node.callee);
+  return callee?.type === 'Identifier' && BUILT_IN_ERROR_CONSTRUCTORS.has(callee.name);
+};
 
 /**
  * Prefer `return status(...)` over `throw new Error(...)` or string throws
@@ -35,11 +62,7 @@ export const preferThrowStatus: CreateOnceRule = defineBellonaRule({
           return;
         }
 
-        if (
-          argument.type === 'NewExpression' &&
-          argument.callee.type === 'Identifier' &&
-          argument.callee.name.endsWith('Error')
-        ) {
+        if (isBuiltInErrorConstruction(argument)) {
           context.report({ messageId: 'throwError', node });
           return;
         }
@@ -57,9 +80,9 @@ export const preferThrowStatus: CreateOnceRule = defineBellonaRule({
     messages: {
       throwError: agentDiagnostic({
         problem:
-          'This handler throws `new Error(...)` instead of returning `status(code, value)`. `throw status(...)` is allowed for onError-style paths.',
-        why: 'Thrown `Error` is untyped HTTP. Eden and `response` schemas cannot see the status or body.',
-        fix: 'Return `status(code, { code: "…", message: "…" })` with a literal error `code`. Use `throw status(...)` only when you must enter `onError`.',
+          'This handler throws a built-in `Error` (`Error`, `TypeError`, …) instead of returning `status(code, value)`. `throw status(...)` is allowed for onError-style paths.',
+        why: 'A built-in `Error` has no HTTP status, so Elysia answers 500. Eden and `response` schemas cannot see the status or body.',
+        fix: 'Return `status(code, { code: "…", message: "…" })` with a literal error `code`. Use `throw status(...)` only when you must enter `onError`. A custom error class with `status` and `toResponse()` is also valid.',
         avoid: 'Do not throw a string. Do not disable the rule.',
       }),
       throwLiteral: agentDiagnostic({

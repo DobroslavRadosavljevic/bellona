@@ -5,7 +5,11 @@ import { isJsBoolean } from '../../lib/js-kind.ts';
 import { asExpression, isFunctionLike, unwrapExpression } from './ast.ts';
 import { buildRenderHostCatalog, nameSetHas, type RenderHostCatalog } from './options.ts';
 
-export type RenderHostKind = 'button' | 'non-button' | 'unknown';
+/**
+ * `mixed`: one branch mounts a `<button>` and another branch does not. No fixed
+ * `nativeButton` value is right for both branches.
+ */
+export type RenderHostKind = 'button' | 'non-button' | 'mixed' | 'unknown';
 
 export type NativeButtonLiteral = boolean | undefined | 'dynamic';
 
@@ -151,6 +155,7 @@ function classifyFunctionRender(
 
   let sawButton = false;
   let sawNonButton = false;
+  let sawMixed = false;
   let sawUnknown = false;
 
   const visit = (current: ESTree.Node): void => {
@@ -160,6 +165,8 @@ function classifyFunctionRender(
         sawButton = true;
       } else if (kind === 'non-button') {
         sawNonButton = true;
+      } else if (kind === 'mixed') {
+        sawMixed = true;
       } else {
         sawUnknown = true;
       }
@@ -188,32 +195,62 @@ function classifyFunctionRender(
 
   visit(body);
 
+  if (sawMixed || (sawButton && sawNonButton)) {
+    return 'mixed';
+  }
+  if (sawUnknown) {
+    return 'unknown';
+  }
+  if (sawButton) {
+    return 'button';
+  }
   if (sawNonButton) {
     return 'non-button';
   }
-  if (sawButton && !sawUnknown) {
-    return 'button';
-  }
   return 'unknown';
+}
+
+/** `null` or `false` (and `undefined`, checked by the caller): Base UI renders the default element. */
+function isEmptyRenderValue(expression: ESTree.Expression): boolean {
+  return expression.type === 'Literal' && (expression.value === null || expression.value === false);
 }
 
 function combineHostKinds(left: RenderHostKind, right: RenderHostKind): RenderHostKind {
-  if (left === 'non-button' || right === 'non-button') {
-    return 'non-button';
+  if (left === right) {
+    return left;
   }
-  if (left === 'button' && right === 'button') {
-    return 'button';
+  if (left === 'mixed' || right === 'mixed') {
+    return 'mixed';
   }
-  return 'unknown';
+  if (left === 'unknown' || right === 'unknown') {
+    return 'unknown';
+  }
+  return 'mixed';
 }
 
+/**
+ * Classify the DOM node that a `render` value mounts.
+ *
+ * `fallback` is the kind of the part's own default element. Base UI renders that
+ * element when `render` is falsy, so `render={show && <Link />}` is `<Link>` or
+ * the default element.
+ * @see https://base-ui.com/react/handbook/composition
+ */
 export function classifyRenderHost(
   node: ESTree.Node | null | undefined,
   catalog: RenderHostCatalog = DEFAULT_RENDER_HOST_CATALOG,
+  fallback: RenderHostKind = 'unknown',
 ): RenderHostKind {
+  if (node?.type === 'Identifier' && node.name === 'undefined') {
+    return fallback;
+  }
   const expression = unwrapExpression(asExpression(node));
   if (expression === undefined) {
     return 'unknown';
+  }
+
+  if (isEmptyRenderValue(expression)) {
+    return fallback;
   }
 
   if (expression.type === 'JSXElement') {
@@ -230,16 +267,15 @@ export function classifyRenderHost(
 
   if (expression.type === 'ConditionalExpression') {
     return combineHostKinds(
-      classifyRenderHost(expression.consequent, catalog),
-      classifyRenderHost(expression.alternate, catalog),
+      classifyRenderHost(expression.consequent, catalog, fallback),
+      classifyRenderHost(expression.alternate, catalog, fallback),
     );
   }
 
   if (expression.type === 'LogicalExpression') {
-    return combineHostKinds(
-      classifyRenderHost(expression.left, catalog),
-      classifyRenderHost(expression.right, catalog),
-    );
+    const left =
+      expression.operator === '&&' ? fallback : classifyRenderHost(expression.left, catalog);
+    return combineHostKinds(left, classifyRenderHost(expression.right, catalog, fallback));
   }
 
   return 'unknown';

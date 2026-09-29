@@ -330,15 +330,6 @@ export function classifyUnsafeDictionary(
   return null;
 }
 
-function resolvesToDictionary(
-  type: ESTree.TSType,
-  environment: TypeEnvironment,
-  substitutions: TypeAliasEnvironment,
-  resolvingAliases: ReadonlySet<string>,
-): boolean {
-  return dictionaryValueTypes(type, environment, substitutions, resolvingAliases).length > 0;
-}
-
 export function classifyWideningTarget(
   type: ESTree.TSType,
   environment: TypeEnvironment,
@@ -353,7 +344,11 @@ export function classifyWideningTarget(
         ? { kind: 'anonymous object' }
         : null;
   }
-  if (unwrapped.type === 'TSMappedType') return { kind: 'open dictionary' };
+  if (unwrapped.type === 'TSMappedType') {
+    return isBroadMappedKey(unwrapped.constraint, environment, new Map())
+      ? { kind: 'open dictionary' }
+      : null;
+  }
   if (unwrapped.type !== 'TSTypeReference') return null;
   const name = typeReferenceName(unwrapped);
   if (name === null) return null;
@@ -361,13 +356,16 @@ export function classifyWideningTarget(
     const wrapped = unwrapped.typeArguments?.params[0];
     return wrapped === undefined ? null : classifyWideningTarget(wrapped, environment);
   }
-  if (name === 'Record' && isBuiltIn(name, environment)) return { kind: 'open dictionary' };
+  if (name === 'Record' && isBuiltIn(name, environment)) {
+    return isOpenRecord(unwrapped, environment, new Map()) ? { kind: 'open dictionary' } : null;
+  }
   const alias = environment.aliases.get(name);
   if (alias === undefined) return null;
   if ((alias.typeParameters?.params.length ?? 0) > 0) {
     const substitutions = aliasSubstitution(alias, unwrapped, new Map());
     return substitutions !== null &&
-      resolvesToDictionary(alias.typeAnnotation, environment, substitutions, new Set([name]))
+      classifyAliasBroadTarget(alias.typeAnnotation, environment, substitutions, new Set([name]))
+        ?.kind === 'open dictionary'
       ? { kind: 'generic container' }
       : null;
   }
@@ -382,10 +380,17 @@ export function classifyWideningTarget(
   return resolved;
 }
 
+/**
+ * A key type is broad when it admits keys that no object literal can list:
+ * `string`, `number`, `symbol`, `PropertyKey`, or a template type such as
+ * `` `model-${string}` ``. A closed union (`'info' | 'warn'`) or an imported
+ * key type is not broad. There, `Record<Key, V>` makes the map exhaustive.
+ */
 function isBroadMappedKey(
   type: ESTree.TSType,
   environment: TypeEnvironment,
   substitutions: TypeAliasEnvironment,
+  resolvingAliases: ReadonlySet<string> = new Set(),
 ): boolean {
   const unwrapped = unwrapTransparentType(type);
   if (
@@ -395,17 +400,44 @@ function isBroadMappedKey(
   ) {
     return true;
   }
+  if (unwrapped.type === 'TSTemplateLiteralType') {
+    return unwrapped.types.some((member) =>
+      isBroadMappedKey(member, environment, substitutions, resolvingAliases),
+    );
+  }
   if (unwrapped.type === 'TSUnionType') {
-    return unwrapped.types.every((member) => isBroadMappedKey(member, environment, substitutions));
+    return unwrapped.types.every((member) =>
+      isBroadMappedKey(member, environment, substitutions, resolvingAliases),
+    );
   }
   if (unwrapped.type !== 'TSTypeReference') return false;
   const name = typeReferenceName(unwrapped);
   if (name === null) return false;
   const substitution = substitutions.get(name);
   if (substitution !== undefined && !isUnappliedReferenceTo(substitution, name)) {
-    return isBroadMappedKey(substitution, environment, substitutions);
+    return isBroadMappedKey(substitution, environment, substitutions, resolvingAliases);
   }
-  return name === 'PropertyKey' && isBuiltIn(name, environment);
+  if (name === 'PropertyKey' && isBuiltIn(name, environment)) return true;
+  const alias = environment.aliases.get(name);
+  if (
+    alias === undefined ||
+    resolvingAliases.has(name) ||
+    (alias.typeParameters?.params.length ?? 0) > 0
+  ) {
+    return false;
+  }
+  const nextResolving = new Set(resolvingAliases);
+  nextResolving.add(name);
+  return isBroadMappedKey(alias.typeAnnotation, environment, substitutions, nextResolving);
+}
+
+function isOpenRecord(
+  type: ESTree.TSTypeReference,
+  environment: TypeEnvironment,
+  substitutions: TypeAliasEnvironment,
+): boolean {
+  const key = type.typeArguments?.params[0];
+  return key !== undefined && isBroadMappedKey(key, environment, substitutions);
 }
 
 function classifyAliasBroadTarget(
@@ -443,7 +475,7 @@ function classifyAliasBroadTarget(
       : classifyAliasBroadTarget(wrapped, environment, substitutions, resolvingAliases);
   }
   if (name === 'Record' && isBuiltIn(name, environment)) {
-    return { kind: 'open dictionary' };
+    return isOpenRecord(unwrapped, environment, substitutions) ? { kind: 'open dictionary' } : null;
   }
   const alias = environment.aliases.get(name);
   if (alias === undefined || resolvingAliases.has(name)) return null;

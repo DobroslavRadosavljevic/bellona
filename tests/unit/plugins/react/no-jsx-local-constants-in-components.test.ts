@@ -6,6 +6,10 @@ runReactRule(noJsxLocalConstantsInComponentsName, {
   valid: [
     validWith('function Card() { return flag ? <A /> : <B />; }', { filename: 'card.tsx' }),
     validWith('function helper() { const x = <span />; return x; }', { filename: 'card.tsx' }),
+    validWith(
+      'const RowsMemo = memo(Rows, (a, b) => { const probe = <span />; return a === b; });',
+      { filename: 'rows.tsx' },
+    ),
     validWith('function Card() { let node = <span />; return node; }', { filename: 'card.tsx' }),
     validWith('function Card() { const label = "hi"; return <span>{label}</span>; }', {
       filename: 'card.tsx',

@@ -7,6 +7,7 @@ export default defineConfig({
     react: './src/plugins/react/index.ts',
     'base-ui': './src/plugins/base-ui/index.ts',
     zod: './src/plugins/zod/index.ts',
+    'tanstack-query': './src/plugins/tanstack-query/index.ts',
     'tanstack-router': './src/plugins/tanstack-router/index.ts',
     elysia: './src/plugins/elysia/index.ts',
     effect: './src/plugins/effect/index.ts',

@@ -7,6 +7,7 @@ export const plugins = {
   react: 'bellona/react',
   baseUi: 'bellona/base-ui',
   zod: 'bellona/zod',
+  tanstackQuery: 'bellona/tanstack-query',
   tanstackRouter: 'bellona/tanstack-router',
   elysia: 'bellona/elysia',
   effect: 'bellona/effect',

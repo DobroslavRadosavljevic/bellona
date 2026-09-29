@@ -1,7 +1,7 @@
 import type { ESTree } from '@oxlint/plugins';
 
 import { isAstNode } from '../../lib/ast-node.ts';
-import { isJsString } from '../../lib/js-kind.ts';
+import { isJsNumber, isJsString, type RuntimeScalar } from '../../lib/js-kind.ts';
 import { getCallName, getStaticPropertyName, isFunctionLike, unwrapExpression } from './ast.ts';
 
 function visitAstChildren(node: ESTree.Node, visit: (child: ESTree.Node) => void): void {
@@ -33,6 +33,7 @@ export const ELYSIA_ROUTE_METHODS = new Set([
   'options',
   'head',
   'all',
+  'connect',
   'route',
 ]);
 
@@ -52,6 +53,7 @@ export const ROUTE_LIFECYCLE_HOOK_KEYS = new Set([
   'transform',
   'mapResponse',
   'afterResponse',
+  'resolve',
 ]);
 
 /** Instance lifecycle registration methods. */
@@ -65,6 +67,8 @@ export const ELYSIA_LIFECYCLE_METHODS = new Set([
   'onAfterResponse',
   'derive',
   'resolve',
+  'mapDerive',
+  'mapResolve',
   'mapResponse',
 ]);
 
@@ -409,10 +413,13 @@ export const routeHookHasSchema = (hook: ESTree.ObjectExpression | undefined): b
 export const getEnclosingElysiaGuardHook = (
   node: ESTree.Node,
 ): ESTree.ObjectExpression | undefined => {
+  let child: ESTree.Node = node;
   let current: ESTree.Node | undefined = node.parent ?? undefined;
 
   while (current) {
-    if (current.type === 'CallExpression') {
+    // `.post(…).guard({…})`: the route is in the guard callee chain, not in its
+    // callback, so the guard does not apply to it.
+    if (current.type === 'CallExpression' && current.callee !== child) {
       const leaf = callLeafName(current);
       if (leaf === 'guard') {
         const [first] = current.arguments;
@@ -433,10 +440,61 @@ export const getEnclosingElysiaGuardHook = (
         }
       }
     }
+    child = current;
     current = current.parent ?? undefined;
   }
 
   return undefined;
+};
+
+/**
+ * Hook objects of `.guard({…})` calls (no callback) earlier in the receiver
+ * chain of a route call. Elysia applies such a guard to every route that is
+ * registered after it on the same instance.
+ *
+ * @see https://elysiajs.com/essential/plugin.html#guard
+ */
+export const getChainedElysiaGuardHooks = (
+  node: ESTree.CallExpression,
+): ESTree.ObjectExpression[] => {
+  const hooks: ESTree.ObjectExpression[] = [];
+  const seen = new Set<ESTree.Node>();
+  let current = unwrapExpression(node.callee);
+
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    if (current.type === 'MemberExpression') {
+      current = unwrapExpression(current.object);
+      continue;
+    }
+    if (current.type === 'Identifier') {
+      const init = resolveIdentifierInit(current);
+      current = init === current ? undefined : init;
+      continue;
+    }
+    if (current.type !== 'CallExpression') {
+      break;
+    }
+    if (callLeafName(current) === 'guard' && current.arguments.length === 1) {
+      const hook = getElysiaGuardHookObject(current);
+      if (hook) {
+        hooks.push(hook);
+      }
+    }
+    current = unwrapExpression(current.callee);
+  }
+
+  return hooks;
+};
+
+/** Guard / group hooks that apply to a route call (enclosing callback or chained guard). */
+export const getApplicableGuardHooks = (node: ESTree.CallExpression): ESTree.ObjectExpression[] => {
+  const hooks = getChainedElysiaGuardHooks(node);
+  const enclosing = getEnclosingElysiaGuardHook(node);
+  if (enclosing) {
+    hooks.push(enclosing);
+  }
+  return hooks;
 };
 
 /** `new Elysia(...)` call. */
@@ -603,11 +661,32 @@ export const isElysiaStyleRouteCall = (node: ESTree.CallExpression): boolean => 
   if (isElysiaInstanceExpression(callee.object)) {
     return true;
   }
+  // Unknown receiver: require a `/path` string so `kv.put('key', value)` and
+  // `searchParams.delete('a', 'b')` do not count as routes.
+  if (!routePathArgumentStartsWithSlash(node)) {
+    return false;
+  }
   const handler = getElysiaRouteHandler(node);
   if (!handler) {
     return false;
   }
   return handler.type !== 'ObjectExpression';
+};
+
+/** True when the path argument is a string or template literal that starts with `/`. */
+const routePathArgumentStartsWithSlash = (node: ESTree.CallExpression): boolean => {
+  const argument = node.arguments[callLeafName(node) === 'route' ? 1 : 0];
+  if (!argument || argument.type === 'SpreadElement') {
+    return false;
+  }
+  const expression = resolveIdentifierInit(argument) ?? unwrapExpression(argument);
+  if (expression?.type === 'Literal' && isJsString(expression.value)) {
+    return expression.value.startsWith('/');
+  }
+  if (expression?.type === 'TemplateLiteral') {
+    return expression.quasis[0]?.value.raw.startsWith('/') ?? false;
+  }
+  return false;
 };
 
 /** Leaf method name of an Elysia instance member call, if any. */
@@ -712,27 +791,6 @@ export const chainIncludesListen = (node: ESTree.Node): boolean => {
   return false;
 };
 
-/** Extract a type reference name from a TS annotation node. */
-const typeReferenceName = (annotation: ESTree.Node): string | undefined => {
-  if (annotation.type === 'TSTypeReference') {
-    const { typeName } = annotation;
-    if (typeName?.type === 'Identifier') {
-      return typeName.name;
-    }
-    if (typeName?.type === 'TSQualifiedName') {
-      const { right } = typeName;
-      return right?.name ?? undefined;
-    }
-  }
-  if (annotation.type === 'TSImportType') {
-    const { qualifier } = annotation;
-    if (qualifier?.type === 'Identifier') {
-      return qualifier.name;
-    }
-  }
-  return undefined;
-};
-
 /** Type name from a parameter's TS type annotation (`Context`, unions, etc.). */
 function parameterTypeAnnotation(param: ESTree.Node): ESTree.Node | undefined {
   if (
@@ -749,36 +807,117 @@ function parameterTypeAnnotation(param: ESTree.Node): ESTree.Node | undefined {
   return undefined;
 }
 
-export const getParamTypeName = (param: ESTree.Node): string | undefined => {
-  const annotation = parameterTypeAnnotation(param);
-  if (annotation === undefined) {
-    return undefined;
-  }
+/** Local names that refer to Elysia's `Context` type in one file. */
+export interface ElysiaContextBindings {
+  /** Local names of `Context` imported from `elysia` (`Context`, `Ctx` for `Context as Ctx`). */
+  readonly names: ReadonlySet<string>;
+  /** Local names of `import * as E from 'elysia'`. */
+  readonly namespaces: ReadonlySet<string>;
+  /** True when `Context` is bound to something that is not Elysia (Effect, Hono, a local type). */
+  readonly foreignContext: boolean;
+}
 
-  /** Recursively search unions/intersections for a type reference name. */
-  const search = (node: ESTree.Node): string | undefined => {
-    const direct = typeReferenceName(node);
-    if (direct) {
-      return direct;
+const isElysiaModuleSource = (source: RuntimeScalar): boolean =>
+  isJsString(source) && (source === 'elysia' || source.startsWith('elysia/'));
+
+const declaresLocalContext = (statement: ESTree.Node | null | undefined): boolean =>
+  (statement?.type === 'TSTypeAliasDeclaration' ||
+    statement?.type === 'TSInterfaceDeclaration' ||
+    statement?.type === 'ClassDeclaration') &&
+  statement.id?.name === 'Context';
+
+/**
+ * Find which names mean Elysia `Context` in this file. An unimported `Context`
+ * counts as Elysia (the file imports `elysia`), unless another import or a
+ * local declaration binds `Context`.
+ */
+export const collectElysiaContextBindings = (program: ESTree.Program): ElysiaContextBindings => {
+  const names = new Set<string>();
+  const namespaces = new Set<string>();
+  let foreignContext = false;
+
+  for (const statement of program.body) {
+    if (declaresLocalContext(statement)) {
+      foreignContext = true;
     }
-    if (node.type === 'TSUnionType' || node.type === 'TSIntersectionType') {
-      for (const part of node.types) {
-        const found = search(part);
-        if (found !== undefined) {
-          return found;
+    if (
+      statement.type === 'ExportNamedDeclaration' &&
+      declaresLocalContext(statement.declaration)
+    ) {
+      foreignContext = true;
+    }
+    if (statement.type !== 'ImportDeclaration') {
+      continue;
+    }
+    const fromElysia = isElysiaModuleSource(statement.source.value);
+    for (const specifier of statement.specifiers) {
+      const local = specifier.local.name;
+      if (specifier.type === 'ImportNamespaceSpecifier' && fromElysia) {
+        namespaces.add(local);
+        continue;
+      }
+      if (specifier.type === 'ImportSpecifier' && fromElysia) {
+        const imported = getStaticPropertyName(specifier.imported);
+        if (imported === 'Context') {
+          names.add(local);
         }
+        continue;
+      }
+      if (local === 'Context') {
+        foreignContext = true;
       }
     }
-    if (node.type === 'TSParenthesizedType') {
-      return search(node.typeAnnotation);
-    }
-    return undefined;
-  };
+  }
 
-  return search(annotation);
+  if (!foreignContext) {
+    names.add('Context');
+  }
+  return { names, namespaces, foreignContext };
 };
 
-export const isContextTypeName = (name: string | undefined): boolean => name === 'Context';
+/** True when a TS type node names Elysia `Context` (direct, aliased, namespaced, or `import('elysia')`). */
+const isElysiaContextTypeNode = (
+  annotation: ESTree.Node,
+  bindings: ElysiaContextBindings,
+): boolean => {
+  if (annotation.type === 'TSTypeReference') {
+    const { typeName } = annotation;
+    if (typeName.type === 'Identifier') {
+      return bindings.names.has(typeName.name);
+    }
+    if (typeName.type === 'TSQualifiedName') {
+      return (
+        typeName.right.name === 'Context' &&
+        typeName.left.type === 'Identifier' &&
+        bindings.namespaces.has(typeName.left.name)
+      );
+    }
+    return false;
+  }
+  if (annotation.type === 'TSImportType') {
+    return (
+      isElysiaModuleSource(annotation.source.value) &&
+      annotation.qualifier?.type === 'Identifier' &&
+      annotation.qualifier.name === 'Context'
+    );
+  }
+  if (annotation.type === 'TSUnionType' || annotation.type === 'TSIntersectionType') {
+    return annotation.types.some((part) => isElysiaContextTypeNode(part, bindings));
+  }
+  if (annotation.type === 'TSParenthesizedType') {
+    return isElysiaContextTypeNode(annotation.typeAnnotation, bindings);
+  }
+  return false;
+};
+
+/** True when a parameter is typed as Elysia `Context`. */
+export const isElysiaContextParam = (
+  param: ESTree.Node,
+  bindings: ElysiaContextBindings,
+): boolean => {
+  const annotation = parameterTypeAnnotation(param);
+  return annotation !== undefined && isElysiaContextTypeNode(annotation, bindings);
+};
 
 /** Route handler expression (usually 2nd arg, or 3rd for `.route`). */
 export const getElysiaRouteHandler = (node: ESTree.CallExpression): ESTree.Node | undefined => {
@@ -889,23 +1028,110 @@ export const isCookieJarMember = (node: ESTree.Node | undefined): boolean => {
   return object?.type === 'Identifier' && object.name === 'cookie';
 };
 
-/** HTTP redirect status codes commonly declared on Elysia `response` schemas. */
-export const REDIRECT_STATUS_KEYS = new Set(['301', '302', '303', '307', '308']);
+/**
+ * Elysia `StatusMap` (elysia 1.4.30 `dist/utils.mjs`). `status('Not Found')` is
+ * the same as `status(404)`.
+ */
+export const ELYSIA_STATUS_CODES: ReadonlyMap<string, number> = new Map([
+  ['Continue', 100],
+  ['Switching Protocols', 101],
+  ['Processing', 102],
+  ['Early Hints', 103],
+  ['OK', 200],
+  ['Created', 201],
+  ['Accepted', 202],
+  ['Non-Authoritative Information', 203],
+  ['No Content', 204],
+  ['Reset Content', 205],
+  ['Partial Content', 206],
+  ['Multi-Status', 207],
+  ['Already Reported', 208],
+  ['Multiple Choices', 300],
+  ['Moved Permanently', 301],
+  ['Found', 302],
+  ['See Other', 303],
+  ['Not Modified', 304],
+  ['Temporary Redirect', 307],
+  ['Permanent Redirect', 308],
+  ['Bad Request', 400],
+  ['Unauthorized', 401],
+  ['Payment Required', 402],
+  ['Forbidden', 403],
+  ['Not Found', 404],
+  ['Method Not Allowed', 405],
+  ['Not Acceptable', 406],
+  ['Proxy Authentication Required', 407],
+  ['Request Timeout', 408],
+  ['Conflict', 409],
+  ['Gone', 410],
+  ['Length Required', 411],
+  ['Precondition Failed', 412],
+  ['Payload Too Large', 413],
+  ['URI Too Long', 414],
+  ['Unsupported Media Type', 415],
+  ['Range Not Satisfiable', 416],
+  ['Expectation Failed', 417],
+  ["I'm a teapot", 418],
+  ['Enhance Your Calm', 420],
+  ['Misdirected Request', 421],
+  ['Unprocessable Content', 422],
+  ['Locked', 423],
+  ['Failed Dependency', 424],
+  ['Too Early', 425],
+  ['Upgrade Required', 426],
+  ['Precondition Required', 428],
+  ['Too Many Requests', 429],
+  ['Request Header Fields Too Large', 431],
+  ['Unavailable For Legal Reasons', 451],
+  ['Internal Server Error', 500],
+  ['Not Implemented', 501],
+  ['Bad Gateway', 502],
+  ['Service Unavailable', 503],
+  ['Gateway Timeout', 504],
+  ['HTTP Version Not Supported', 505],
+  ['Variant Also Negotiates', 506],
+  ['Insufficient Storage', 507],
+  ['Loop Detected', 508],
+  ['Not Extended', 510],
+  ['Network Authentication Required', 511],
+]);
 
-/** True when expression is an Elysia `status(...)` call (not `res.status`). */
-export const isElysiaStatusCall = (node: ESTree.CallExpression): boolean => {
-  const name = getCallName(node);
-  return name === 'status';
+/** Numeric status of a `status(code, …)` argument: a number literal or a `StatusMap` name. */
+export const getStaticStatusCode = (
+  node: ESTree.Node | ESTree.SpreadElement | undefined,
+): number | undefined => {
+  if (!node || node.type === 'SpreadElement') {
+    return undefined;
+  }
+  const code = unwrapExpression(node);
+  if (code?.type !== 'Literal') {
+    return undefined;
+  }
+  if (isJsNumber(code.value)) {
+    return code.value;
+  }
+  if (isJsString(code.value)) {
+    return ELYSIA_STATUS_CODES.get(code.value);
+  }
+  return undefined;
 };
 
-/** True when expression is an Elysia `redirect(...)` call (identifier or member-free). */
-export const isElysiaRedirectCall = (node: ESTree.CallExpression): boolean => {
-  const name = getCallName(node);
-  return name === 'redirect';
+/** True when the callee is the bare identifier `name` (not `a.b.name`). */
+const isBareIdentifierCall = (node: ESTree.CallExpression, name: string): boolean => {
+  const callee = unwrapExpression(node.callee);
+  return callee?.type === 'Identifier' && callee.name === name;
 };
+
+/** True when expression is an Elysia `status(...)` call (not `res.status` / `a.b.status`). */
+export const isElysiaStatusCall = (node: ESTree.CallExpression): boolean =>
+  isBareIdentifierCall(node, 'status');
+
+/** True when expression is an Elysia `redirect(...)` call (not `a.b.redirect`). */
+export const isElysiaRedirectCall = (node: ESTree.CallExpression): boolean =>
+  isBareIdentifierCall(node, 'redirect');
 
 /** Depth-first walk; stops when `predicate` returns true. */
-const subtreeMatches = (
+export const subtreeMatches = (
   node: ESTree.Node | undefined,
   predicate: (current: ESTree.Node) => boolean,
 ): boolean => {
@@ -930,6 +1156,10 @@ const subtreeMatches = (
   visit(node);
   return found;
 };
+
+/** Walk a subtree for `new Elysia(...)`. */
+export const subtreeCreatesElysia = (node: ESTree.Node | undefined): boolean =>
+  subtreeMatches(node, (current) => isNewElysiaExpression(current));
 
 /** Walk a subtree for Elysia `status(...)` calls. */
 export const subtreeUsesElysiaStatus = (node: ESTree.Node | undefined): boolean =>
@@ -1027,17 +1257,12 @@ export const routeHookHasSchemaKey = (
  */
 export const routeOrGuardHasSchemaKey = (node: ESTree.CallExpression, key: string): boolean =>
   routeHookHasSchemaKey(getElysiaRouteHookObject(node), key) ||
-  routeHookHasSchemaKey(getEnclosingElysiaGuardHook(node), key);
+  getApplicableGuardHooks(node).some((hook) => routeHookHasSchemaKey(hook, key));
 
-/** True when the route hook or an enclosing guard/group declares any schema key. */
+/** True when the route hook or an applicable guard/group declares any schema key. */
 export const routeOrGuardHasSchema = (node: ESTree.CallExpression): boolean =>
   routeHookHasSchema(getElysiaRouteHookObject(node)) ||
-  routeHookHasSchema(getEnclosingElysiaGuardHook(node));
-
-/** True when route or enclosing guard `response` includes a redirect status. */
-export const routeOrGuardResponseHasRedirectStatus = (node: ESTree.CallExpression): boolean =>
-  routeHookResponseHasRedirectStatus(getElysiaRouteHookObject(node)) ||
-  routeHookResponseHasRedirectStatus(getEnclosingElysiaGuardHook(node));
+  getApplicableGuardHooks(node).some((hook) => routeHookHasSchema(hook));
 
 /** Same-object property node, if it is a static key. */
 export const getObjectProperty = (
@@ -1065,47 +1290,6 @@ export const getObjectPropertyValue = (
     return undefined;
   }
   return unwrapExpression(property.value);
-};
-
-/**
- * Whether a route hook's `response` schema includes a redirect status key
- * (`301`/`302`/`303`/`307`/`308`). Spreads / non-object responses → unknown
- * (treated as satisfied).
- */
-export const routeHookResponseHasRedirectStatus = (
-  hook: ESTree.ObjectExpression | undefined,
-): boolean => {
-  if (!hook) {
-    return false;
-  }
-  if (objectHasSpread(hook)) {
-    return true;
-  }
-  if (!objectHasOwnProperty(hook, 'response')) {
-    return false;
-  }
-
-  const response = getObjectPropertyValue(hook, 'response');
-  if (!response) {
-    return true;
-  }
-  if (response.type !== 'ObjectExpression') {
-    // Identifier / call / schema ref: cannot inspect keys.
-    return true;
-  }
-  if (objectHasSpread(response)) {
-    return true;
-  }
-  for (const property of response.properties) {
-    if (property.type === 'SpreadElement') {
-      continue;
-    }
-    const key = getStaticPropertyName(property.key);
-    if (key && REDIRECT_STATUS_KEYS.has(key)) {
-      return true;
-    }
-  }
-  return false;
 };
 
 /** Auth-ish keys returned from derive/resolve callbacks. */

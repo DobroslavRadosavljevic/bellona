@@ -14,6 +14,22 @@ runEffectRule(preferEffectVitestName, {
       ...testTs,
       code: withVitestPlain('it("ok", () => Effect.fn("load")(function*() { return 1 }))'),
     },
+    { ...testTs, code: withVitestPlain('it("ok", () => Effect.runPromise(Effect.succeed(1)))') },
+    {
+      ...testTs,
+      code: withVitestPlain('test("ok", () => { return Effect.runPromiseExit(Effect.fail("x")) })'),
+    },
+    { ...testTs, code: withVitestPlain('it("ok", () => Effect.runSync(Effect.succeed(1)))') },
+    {
+      ...testTs,
+      code: withVitestPlain(
+        'it("ok", () => Effect.succeed(1).pipe(Effect.map((n) => n), Effect.runPromise))',
+      ),
+    },
+    {
+      ...testTs,
+      code: withVitestPlain('it("ok", () => Effect.fnUntracedEager(function*() { return 1 }))'),
+    },
     { ...testTs, code: NO_EFFECT },
     {
       filename: 'src/app.ts',

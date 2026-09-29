@@ -45,11 +45,19 @@ export const requireNativeButtonWithRender: CreateOnceRule = defineBellonaRule({
       }),
       requireTrue: agentDiagnostic({
         problem:
-          '`<{{component}}>` uses `render` to mount a real `<button>` host, but `nativeButton={false}` is set.',
-        why: 'A button host must use the native button semantics (`nativeButton` omitted or true). False lies about the DOM node.',
-        fix: 'Remove `nativeButton={false}`, or set `nativeButton={true}` / `nativeButton`. Keep the `<button>` host in `render`.',
+          '`<{{component}}>` uses `render` to mount a real `<button>` host, but `nativeButton` is false (`nativeButton={false}`, or omitted on a part whose default is false, such as `Menu.Item`).',
+        why: 'Base UI warns when `nativeButton` is false and the DOM node is a `<button>`. It adds non-native attributes such as `role` and `aria-disabled` that a real button does not need.',
+        fix: 'Set `nativeButton` (or `nativeButton={true}`) on `<{{component}}>`. Keep the `<button>` host in `render`.',
         avoid:
           'Do not change the host to a `div` to match `nativeButton={false}` unless that is the real design. Do not disable the rule.',
+      }),
+      requireDynamic: agentDiagnostic({
+        problem:
+          '`<{{component}}>` uses a `render` value that mounts a `<button>` in one branch and a non-button in another branch. A fixed `nativeButton` is wrong for one branch.',
+        why: 'Base UI checks `nativeButton` against the mounted DOM node and warns when they disagree. A falsy `render` (`show && <Link />`) mounts the default element of the part.',
+        fix: 'Set `nativeButton` from the same condition as `render` (for example `nativeButton={!isLink}`), or render two elements, one per branch.',
+        avoid:
+          'Do not pick `nativeButton={false}` or `true` for both branches. Do not disable the rule.',
       }),
       requireExplicit: agentDiagnostic({
         problem:
@@ -118,7 +126,20 @@ export const requireNativeButtonWithRender: CreateOnceRule = defineBellonaRule({
           return;
         }
 
-        const hostKind = classifyRenderHost(getJsxAttrValue(node, 'render'), current.catalog);
+        const hostKind = classifyRenderHost(
+          getJsxAttrValue(node, 'render'),
+          current.catalog,
+          defaultNative ? 'button' : 'non-button',
+        );
+
+        if (hostKind === 'mixed') {
+          context.report({
+            messageId: 'requireDynamic',
+            data: { component: name },
+            node: node.name,
+          });
+          return;
+        }
 
         if (hostKind === 'non-button') {
           if (nativeButton === false || (nativeButton === undefined && defaultNative === false)) {

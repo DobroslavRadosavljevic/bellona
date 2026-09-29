@@ -127,6 +127,39 @@ function isDictionaryAccumulatorTarget(destination: WideningTarget): boolean {
   return destination.kind === 'open dictionary' || destination.kind === 'generic container';
 }
 
+function isStaticKey(key: ESTree.Expression): boolean {
+  return key.type === 'Literal' || (key.type === 'TemplateLiteral' && key.expressions.length === 0);
+}
+
+/**
+ * `const prices: Record<string, Price> = { … }` followed by `prices[id]` needs
+ * the dictionary type: with the inferred closed type, a runtime `string` key
+ * is a compile error (TS7053). Keep the annotation when this file reads or
+ * writes the binding by a runtime key.
+ * @see https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures
+ */
+function isIndexedByRuntimeKey(variable: Variable): boolean {
+  return variable.references.some((reference) => {
+    const { identifier } = reference;
+    const parent = identifier.parent;
+    return (
+      parent?.type === 'MemberExpression' &&
+      parent.object === identifier &&
+      parent.computed &&
+      !isStaticKey(parent.property)
+    );
+  });
+}
+
+function declaredVariable(
+  sourceCode: SourceCode,
+  declarator: ESTree.VariableDeclarator,
+): Variable | null {
+  if (declarator.id.type !== 'Identifier') return null;
+  const name = declarator.id.name;
+  return sourceCode.getDeclaredVariables(declarator).find((entry) => entry.name === name) ?? null;
+}
+
 function hasParentAssertion(node: ESTree.Node): boolean {
   return node.parent?.type === 'TSAsExpression' || node.parent?.type === 'TSTypeAssertion';
 }
@@ -145,10 +178,18 @@ export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
       widening: agentDiagnostic({
         problem:
           'The explicit {{target}} type on {{subject}} widens a value whose type is already known from the expression (literal, constructor, or other evidence in this file).',
-        why: 'A broad or anonymous annotation (`unknown`, `object`, `{}`, open dictionaries, generic containers) throws away that evidence. Later code must guess or assert.',
-        fix: 'Remove the annotation and keep inference, or write `const x = value satisfies NamedType`, or annotate with a named owner type that matches the value. Parse untrusted input at the boundary into that named type.',
+        why: 'A broad annotation (`unknown`, `object`, a dictionary with `string` keys, a generic dictionary alias) throws away that evidence, such as the key names. Later code must guess or assert.',
+        fix: 'Remove the annotation and keep inference, or write `const x = value satisfies NamedType`, or annotate with a named owner type that matches the value. Parse untrusted input at the boundary into that named type. A dictionary type stays allowed when this file reads or writes the binding by a runtime key (`table[key]`); for other modules, export a lookup function from this file.',
         avoid:
           'Do not assert `as NamedType` after widening. Do not replace the annotation with `any`. Do not wrap the value in a redundant cast. Do not disable the rule.',
+      }),
+      anonymousObject: agentDiagnostic({
+        problem:
+          'The inline object type on {{subject}} repeats the type that TypeScript already infers from the value. The type has no owner name.',
+        why: 'An inline object type does not keep more evidence than inference. Other code cannot import it, so each use copies the fields, and the copies can drift apart.',
+        fix: 'Remove the annotation and keep inference, or write `value satisfies NamedType`, or move the fields into a named type and use that name here.',
+        avoid:
+          'Do not replace the annotation with `object`, `unknown`, or `any`. Do not assert `as NamedType`. Do not disable the rule.',
       }),
     },
   },
@@ -159,15 +200,20 @@ export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
       expression: ESTree.Expression,
       destination: WideningTarget | null,
       subject: string,
+      binding: Variable | null = null,
     ) => {
       if (destination === null) return;
-      if (isDictionaryAccumulatorTarget(destination) && isEmptyObjectExpression(expression)) {
+      if (
+        isDictionaryAccumulatorTarget(destination) &&
+        (isEmptyObjectExpression(expression) ||
+          (binding !== null && isIndexedByRuntimeKey(binding)))
+      ) {
         return;
       }
       if (!hasKnownEvidence(context.sourceCode, expression)) return;
       context.report({
         node: expression,
-        messageId: 'widening',
+        messageId: destination.kind === 'anonymous object' ? 'anonymousObject' : 'widening',
         data: { subject, target: destination.kind },
       });
     };
@@ -181,10 +227,13 @@ export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
       },
       VariableDeclarator(node) {
         if (node.init === null || node.id.type !== 'Identifier') return;
+        const destination = targetFromAnnotation(node.id.typeAnnotation);
+        if (destination === null) return;
         reportFlow(
           node.init,
-          targetFromAnnotation(node.id.typeAnnotation),
+          destination,
           `binding \`${node.id.name}\``,
+          declaredVariable(context.sourceCode, node),
         );
       },
       PropertyDefinition(node) {
@@ -213,6 +262,7 @@ export const noKnownValueWidening: CreateOnceRule = defineBellonaRule({
           node.right,
           targetFromAnnotation(declarator.id.typeAnnotation),
           `binding \`${declarator.id.name}\``,
+          variable,
         );
       },
       ReturnStatement(node) {

@@ -60,6 +60,11 @@ runEffectRule(noRunPromiseInModulesName, {
   invalid: [
     {
       ...moduleTs,
+      code: withEffect('Effect.runSyncExitWith(context)(Effect.succeed(1))'),
+      errors: [error('run')],
+    },
+    {
+      ...moduleTs,
       code: withEffect('Effect.runPromise(Effect.succeed(1))'),
       errors: [error('run')],
     },
