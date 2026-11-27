@@ -4,6 +4,7 @@ import {
   noChainedTypeAssertionsName,
 } from './rules/no-chained-type-assertions.ts';
 import { noGenericModuleNames, noGenericModuleNamesName } from './rules/no-generic-module-names.ts';
+import { noIifeName, noIife } from './rules/no-iife.ts';
 import { noInlineImportType, noInlineImportTypeName } from './rules/no-inline-import-type.ts';
 import { noKnownValueWidening, noKnownValueWideningName } from './rules/no-known-value-widening.ts';
 import { noModuleMocking, noModuleMockingName } from './rules/no-module-mocking.ts';
@@ -34,6 +35,7 @@ import {
 const js = defineBellonaPlugin('bl-js', {
   [noChainedTypeAssertionsName]: noChainedTypeAssertions,
   [noGenericModuleNamesName]: noGenericModuleNames,
+  [noIifeName]: noIife,
   [noInlineImportTypeName]: noInlineImportType,
   [noKnownValueWideningName]: noKnownValueWidening,
   [noModuleMockingName]: noModuleMocking,
@@ -59,6 +61,8 @@ export {
   noChainedTypeAssertionsName,
   noGenericModuleNames,
   noGenericModuleNamesName,
+  noIife,
+  noIifeName,
   noInlineImportType,
   noInlineImportTypeName,
   noKnownValueWidening,

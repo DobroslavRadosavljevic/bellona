@@ -34,6 +34,26 @@ good: src/pricing/price-rules.ts, src/charts/motion-easing.ts, src/routes/posts/
 
 Prefer: name the module after the concept it owns (`pricing/`, `person-name.ts`).
 
+## `bl-js/no-iife`
+
+Disallow immediately invoked function expressions (IIFEs): a call whose callee is an arrow function or a function expression, also `async` ones. Parentheses around the callee do not change the result. No options.
+
+Not reported: named calls (`run()`), `fn.call()` / `fn.apply()`, callbacks that are passed but not called (`useMemo(() => …, [])`), and `new (class {})()`.
+
+Prefer: derive the value plainly, move a reusable step to a named module function, or put stateful behavior in a hook or a state owner. Use top-level `await` instead of an async IIFE in modules and scripts.
+
+```ts
+// bad
+const label = (() => (cents > 0 ? format(cents) : 'Free'))()
+;(async () => {
+  await main()
+})()
+
+// good
+const label = cents > 0 ? format(cents) : 'Free'
+await main()
+```
+
 ## `bl-js/no-inline-import-type`
 
 Disallow TypeScript `import("…")` types, including `import("./mod").Name` and `typeof import("./mod")`.

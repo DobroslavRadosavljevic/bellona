@@ -3,19 +3,12 @@ import type { ESTree } from '@oxlint/plugins';
 
 import { agentDiagnostic } from '../../../lib/lint-message.ts';
 import { defineBellonaRule, bnRuleName } from '../../../lib/rule.ts';
+import { unwrapParentheses } from '../shared/scope.ts';
 
 type TypeAssertionExpression = ESTree.TSAsExpression | ESTree.TSTypeAssertion;
 
 function isTypeAssertionExpression(node: ESTree.Node): node is TypeAssertionExpression {
   return node.type === 'TSAsExpression' || node.type === 'TSTypeAssertion';
-}
-
-function unwrapParenthesizedExpression(expression: ESTree.Expression): ESTree.Expression {
-  let current = expression;
-  while (current.type === 'ParenthesizedExpression') {
-    current = current.expression;
-  }
-  return current;
 }
 
 function isConstAssertion(node: TypeAssertionExpression): boolean {
@@ -47,7 +40,7 @@ function isForbiddenAssertionChain(node: TypeAssertionExpression): boolean {
   while (isTypeAssertionExpression(current)) {
     assertionCount += 1;
     hasNonConstAssertion ||= !isConstAssertion(current);
-    current = unwrapParenthesizedExpression(current.expression);
+    current = unwrapParentheses(current.expression);
   }
 
   return assertionCount > 1 && hasNonConstAssertion;

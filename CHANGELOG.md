@@ -9,6 +9,10 @@ Oxlint JS plugins are alpha (outside Oxlint semver). A bellona minor may need a 
 
 ## [Unreleased]
 
+### Added
+
+- `bl-js/no-iife`: report an immediately invoked function expression, such as `(() => x)()`, `(function () {})()`, or `(async () => {})()`. Named calls, `fn.call()`, passed callbacks, and `new (class {})()` are not reported. The rule ships off, like every bellona rule.
+
 ## [0.5.0] - 2026-09-30
 
 ### Upgrade notes
