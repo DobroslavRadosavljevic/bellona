@@ -190,6 +190,7 @@ rules: {
   // js
   'bl-js/no-chained-type-assertions': 'error',
   'bl-js/no-generic-module-names': 'error',
+  'bl-js/no-iife': 'error',
   'bl-js/no-inline-import-type': 'error',
   'bl-js/no-known-value-widening': 'error',
   'bl-js/no-module-mocking': 'error',

@@ -87,6 +87,7 @@ Many domain rules skip test and spec files. Most of them also skip files that ne
 
 - `bl-js/no-chained-type-assertions`
 - `bl-js/no-generic-module-names`
+- `bl-js/no-iife`
 - `bl-js/no-inline-import-type`
 - `bl-js/no-known-value-widening`
 - `bl-js/no-module-mocking`

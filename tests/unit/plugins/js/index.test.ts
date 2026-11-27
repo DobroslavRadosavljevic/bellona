@@ -7,6 +7,7 @@ describe('js plugin', () => {
     expect(Object.keys(js.rules)).toEqual([
       'no-chained-type-assertions',
       'no-generic-module-names',
+      'no-iife',
       'no-inline-import-type',
       'no-known-value-widening',
       'no-module-mocking',
